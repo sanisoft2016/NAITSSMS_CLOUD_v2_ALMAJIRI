@@ -1,0 +1,106 @@
+<section class="broadsheet-page">
+  @if (isLoading()) {
+    <div class="ajax-loader" aria-live="polite" aria-busy="true">
+      <div class="ajax-loader__spinner"></div>
+    </div>
+  }
+
+  <p class="page-lead">Broad Sheet Report</p>
+
+  <div class="filter-panel">
+    <div class="filter-row filter-row--top">
+      <div class="print-col" [class.no-display]="!showPrintButton()">
+        <button type="button" class="btn btn-primary" (click)="printReport()">Print</button>
+      </div>
+
+      <div class="inline-field inline-field--collection-type">
+        <label class="control-label" for="ResultCollectionType">Result Collection Type:</label>
+        <select
+          id="ResultCollectionType"
+          class="form-control"
+          name="ResultCollectionType"
+          [(ngModel)]="collectionType"
+          (ngModelChange)="onCollectionTypeChange()">
+          <option value="2">Per Arm Result</option>
+          <option value="1">Per Class Result</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-row filter-row--filters">
+      <div class="inline-field">
+        <label class="control-label" for="Session">Session</label>
+        <select
+          id="Session"
+          class="form-control session-select"
+          name="Session"
+          [(ngModel)]="sessionId"
+          [compareWith]="compareOptionValues"
+          (ngModelChange)="onSessionChange()">
+          @for (option of sessions(); track option.value) {
+            <option [ngValue]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div id="termDiv" class="inline-field">
+        <label class="control-label" for="Term">Term</label>
+        <select
+          id="Term"
+          class="form-control"
+          name="Term"
+          [(ngModel)]="termStatus"
+          [compareWith]="compareOptionValues"
+          (ngModelChange)="onTermChange()">
+          @for (option of terms(); track option.value) {
+            <option [ngValue]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div id="ClassContainer" class="inline-field">
+        <label class="control-label" for="ClassName">Class</label>
+        <select
+          id="ClassName"
+          class="form-control"
+          name="ClassName"
+          [(ngModel)]="classValue"
+          (ngModelChange)="onClassChange()">
+          <option value="">Select</option>
+          @for (option of classOptions(); track option.value) {
+            <option [value]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div id="ArmContainer" class="inline-field" [class.no-display]="!showArmField">
+        <label class="control-label" for="ArmName">Arm</label>
+        <select
+          id="ArmName"
+          class="form-control"
+          name="ArmName"
+          [(ngModel)]="armValue"
+          (ngModelChange)="onArmChange()">
+          <option value="">Select</option>
+          @for (option of armOptions(); track option.value) {
+            <option [value]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert-banner alert-banner--error">{{ errorMessage() }}</div>
+  }
+
+  @if (reportMessage() && !hasReport()) {
+    <p class="empty-message">{{ reportMessage() }}</p>
+  }
+
+  <div id="pageContent" class="page-content">
+    @if (hasReport() && report(); as currentReport) {
+      <app-broadsheet-report-sheet [report]="currentReport" [logoUrl]="logoUrl()" />
+    }
+  </div>
+</section>

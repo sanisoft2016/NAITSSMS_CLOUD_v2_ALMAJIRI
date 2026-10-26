@@ -1,0 +1,167 @@
+<section class="acct-opt-items">
+  <header class="acct-opt-items__header">
+    <h1 class="acct-opt-items__title">Optional Fees Index</h1>
+  </header>
+
+  @if (flashSuccess()) {
+    <div class="acct-opt-items__alert acct-opt-items__alert--success" role="status">
+      {{ flashSuccess() }}
+    </div>
+  }
+  @if (error()) {
+    <div class="acct-opt-items__alert acct-opt-items__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="acct-opt-items__filter">
+    <label class="acct-opt-items__filter-label" for="ItemCategoryId">Category Name</label>
+    <select
+      id="ItemCategoryId"
+      name="ItemCategoryId"
+      class="acct-opt-items__control"
+      [ngModel]="selectedCategoryId()"
+      (ngModelChange)="onCategoryChange($event)"
+      [disabled]="loading() || categories().length === 0"
+    >
+      @if (categories().length === 0) {
+        <option value="-1">No Optional Fee category</option>
+      } @else {
+        @for (cat of categories(); track cat.id) {
+          <option [value]="cat.id">{{ cat.categoryName }}</option>
+        }
+      }
+    </select>
+  </div>
+
+  <div class="acct-opt-items__panel" id="pageContent">
+    @if (loading() || filtering()) {
+      <div class="acct-opt-items__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (items().length === 0) {
+      @if (filteredByCategory()) {
+        <p class="acct-opt-items__empty acct-opt-items__empty--danger">
+          Sorry! No optional fee item under your selected category.
+        </p>
+      } @else {
+        <p class="acct-opt-items__empty">No optional fee items yet.</p>
+      }
+    } @else {
+      <div class="acct-opt-items__table-wrap">
+        <table class="acct-opt-items__table">
+          <thead>
+            <tr>
+              <th>Created Date</th>
+              <th>Category Name</th>
+              <th>Item Name</th>
+              <th>Cost</th>
+              <th class="acct-opt-items__actions-head">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.id) {
+              <tr>
+                <td>{{ formatCreatedDate(item.createdDate) }}</td>
+                <td>{{ item.categoryName }}</td>
+                <td>{{ item.itemName }}</td>
+                <td>{{ item.cost }}</td>
+                <td class="acct-opt-items__actions-cell">
+                  <div class="acct-opt-items__actions">
+                    <button
+                      type="button"
+                      class="acct-opt-items__btn acct-opt-items__btn--edit"
+                      (click)="openEdit(item)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="acct-opt-items__btn acct-opt-items__btn--delete"
+                      (click)="deleteItem(item)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (showEditModal()) {
+    <div class="acct-opt-items__overlay" role="dialog" aria-modal="true" (click)="closeEditModal()">
+      <div class="acct-opt-items__modal" (click)="$event.stopPropagation()">
+        <div class="acct-opt-items__modal-head">
+          <h2 class="acct-opt-items__modal-title">Edit optional fee item</h2>
+          <button type="button" class="acct-opt-items__modal-close" (click)="closeEditModal()" aria-label="Close">
+            ×
+          </button>
+        </div>
+
+        <div class="acct-opt-items__edit-form">
+          <div class="acct-opt-items__edit-group">
+            <label class="acct-opt-items__edit-label" for="ItemCategoryId2nd">Optional Fee category name</label>
+            <select
+              id="ItemCategoryId2nd"
+              name="ItemCategoryId2nd"
+              class="acct-opt-items__control"
+              [ngModel]="editCategoryId()"
+              (ngModelChange)="editCategoryId.set($event)"
+            >
+              @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id">{{ cat.categoryName }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="acct-opt-items__edit-group">
+            <label class="acct-opt-items__edit-label" for="ItemName">Item Name</label>
+            <input
+              id="ItemName"
+              name="ItemName"
+              type="text"
+              class="acct-opt-items__control"
+              maxlength="30"
+              [ngModel]="editItemName()"
+              (ngModelChange)="editItemName.set($event)"
+            />
+          </div>
+
+          <div class="acct-opt-items__edit-group">
+            <label class="acct-opt-items__edit-label" for="Cost">Cost</label>
+            <input
+              id="Cost"
+              name="Cost"
+              type="number"
+              step="any"
+              min="0"
+              class="acct-opt-items__control"
+              [ngModel]="editCost()"
+              (ngModelChange)="editCost.set($event === '' || $event == null ? null : +$event)"
+            />
+          </div>
+
+          <div class="acct-opt-items__edit-actions">
+            <button
+              type="button"
+              class="acct-opt-items__btn acct-opt-items__btn--edit"
+              [disabled]="saving()"
+              (click)="saveChanges()"
+            >
+              Save changes
+            </button>
+            <button
+              type="button"
+              class="acct-opt-items__btn acct-opt-items__btn--delete"
+              (click)="closeEditModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,49 @@
+@import '../public-page/public-page.scss';
+
+$about-body-size: 1.05rem;
+$about-body-leading: 1.65;
+
+.public-page,
+.public-page p,
+.public-page li,
+.public-page span,
+.public-page a,
+.public-page strong {
+  font-family: var(--public-body);
+}
+
+.public-page__main h1,
+.public-page__tagline,
+.public-page__section h2,
+.public-page__section h3,
+.public-page__feature-index,
+.public-page__feature-grid strong,
+.public-page__roles strong,
+.public-page__cta-band h2 {
+  font-family: var(--public-body);
+}
+
+.public-page p:not(.public-page__eyebrow):not(.public-page__section-kicker),
+.public-page__lead,
+.public-page__intro p,
+.public-page__section p,
+.public-page__feature-grid span:not(.public-page__feature-index),
+.public-page__roles span,
+.public-page__checklist li,
+.public-page__benefits li,
+.public-page__column li {
+  font-family: var(--public-body);
+  font-size: $about-body-size;
+  line-height: $about-body-leading;
+}
+
+.public-page__section a {
+  color: var(--public-teal-deep);
+  font-weight: 700;
+  font-size: inherit;
+  text-decoration: none;
+}
+
+.public-page__section a:hover {
+  text-decoration: underline;
+}

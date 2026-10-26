@@ -1,0 +1,110 @@
+<section class="student-subjects-page">
+  <p class="page-lead">
+    Student Subject Selection Management.<br />
+    Please select subject category from the dropdown and then the actual subject.
+  </p>
+
+  @if (loading) {
+    <div class="loader">Loading categories…</div>
+  } @else {
+    <div class="well">
+      <div class="form-row">
+        <div class="field field--search">
+          <label class="control-label" for="parameter">Enter Subject Name:</label>
+          <div class="field-controls">
+            <input
+              id="parameter"
+              class="form-control"
+              name="parameter"
+              type="text"
+              placeholder="Subject name here"
+              [(ngModel)]="searchParameter" />
+            <button type="button" class="btn btn-primary" (click)="searchSubjects()">Search</button>
+          </div>
+        </div>
+
+        <div class="field field--category">
+          <label class="control-label" for="Subjects">Subject Category</label>
+          <select
+            id="Subjects"
+            name="Subjects"
+            class="form-control"
+            [(ngModel)]="selectedCategory"
+            (ngModelChange)="onCategoryChange()">
+            <option value="">Select category</option>
+            @for (option of categories; track option.value) {
+              <option [value]="option.value">{{ option.text || option.value }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div id="pageContent" class="page-content">
+    @if (listLoading) {
+      <div class="loader">Loading subjects…</div>
+    } @else if (message && !(payload?.subjectDtos?.length)) {
+      <p class="empty-message">{{ message }}</p>
+    } @else if (payload) {
+      @if (sortedSubjects.length) {
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>S/No</th>
+              <th>Subject Name</th>
+              <th>Time Status</th>
+              <th>Category</th>
+              @if (!isSearchMode) {
+                <th class="text-center">Selections</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (subject of sortedSubjects; track subject.id; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ subject.subjectName }}</td>
+                <td>{{ timeStatusLabel(subject.timeStatus) }}</td>
+                <td>{{ categoryLabel(subject) }}</td>
+                @if (!isSearchMode) {
+                  <td class="text-center">
+                    @if (selectionMode(subject) === 'compulsory') {
+                      <span class="compulsory">Compulsary</span>
+                    } @else {
+                      <input
+                        type="checkbox"
+                        class="selections"
+                        [checked]="isSelected(subject.id)"
+                        (change)="toggleSelection(subject.id, $any($event.target).checked)" />
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (showUnassign) {
+          <button
+            type="button"
+            class="btn btn-assign"
+            [disabled]="actionBusy"
+            (click)="removeSelections()">
+            Un-assign
+          </button>
+        } @else if (showAssign) {
+          <button
+            type="button"
+            class="btn btn-assign"
+            [disabled]="actionBusy"
+            (click)="submitSelections()">
+            Submit
+          </button>
+        }
+      } @else {
+        <p class="empty-message">{{ payload.emptyMessage || 'No Subject for this class yet.' }}</p>
+      }
+    }
+  </div>
+</section>

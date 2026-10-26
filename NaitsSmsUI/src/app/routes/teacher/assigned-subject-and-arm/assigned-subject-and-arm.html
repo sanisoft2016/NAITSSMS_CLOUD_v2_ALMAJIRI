@@ -1,0 +1,85 @@
+<div class="assigned-subject-page" id="pageContent">
+  @if (isLoading()) {
+    <p class="page-message page-message--center">Loading assigned subjects and classes...</p>
+  } @else if (errorMessage()) {
+    <p class="page-message page-message--center page-message--danger">{{ errorMessage() }}</p>
+  } @else if (assignments().length > 0) {
+    <header class="page-header">
+      <p class="page-title">
+        List of Subjects and Arms that has been assigned to you
+      </p>
+
+      <div class="action-row">
+        <button
+          type="button"
+          class="btn btn-warning btn-xs"
+          [disabled]="isLoading()"
+          (click)="loadAssignments('uncompleted-ca-exams')"
+        >
+          Un-completed CAs and Exams Score Entering
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger btn-xs"
+          [disabled]="isLoading()"
+          (click)="loadAssignments('uncompleted-ca')"
+        >
+          Un-completed Exams Score Entering
+        </button>
+      </div>
+    </header>
+
+    <div class="table-panel">
+      <div class="table-wrap">
+        <table class="table table-bordered table-hover legacy-table">
+          <colgroup>
+            <col class="col-sno" />
+            <col class="col-subject" />
+            <col class="col-class-arm" />
+            <col class="col-menu" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>SNo</th>
+              <th>Subject</th>
+              <th>Class / Arm</th>
+              <th>Menu</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of assignments(); track item.id ?? scoresRowKey(item); let index = $index) {
+              <tr>
+                <td class="cell-sno">{{ index + 1 }}</td>
+                <td>{{ readSubjectName(item) }}</td>
+                <td>{{ readClassArmLabel(item) }}</td>
+                <td class="cell-menu">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-xs load-student-btn"
+                    [disabled]="isScoresLoading(item)"
+                    (click)="openScores(item)">
+                    {{ isScoresLoading(item) ? 'Please Wait ...' : 'CAs and Exams Scores' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else {
+    <p class="page-message page-message--center page-message--danger">
+      No any Teacher / Subject / Class Assignment yet.
+    </p>
+  }
+</div>
+
+@if (scoreModalContext(); as context) {
+  <app-cas-and-exams-score-modal
+    [armId]="context.armId"
+    [subjectId]="context.subjectId"
+    [subjectName]="context.subjectName"
+    [classArm]="context.classArm"
+    (closed)="closeScoreModal()"
+  />
+}

@@ -1,0 +1,52 @@
+<mat-card appearance="outlined">
+  <mat-card-header class="header">
+    <mat-card-title>Class Registration Form</mat-card-title>
+    <span class="spacer"></span>
+    <button mat-stroked-button color="primary" type="button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Go Back
+    </button>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="classForm" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Serial Number (SNo)</mat-label>
+          <input matInput formControlName="sNo" readonly />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Class Name</mat-label>
+          <mat-select formControlName="className" required>
+            @for (opt of classNames; track opt.value) {
+              <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+            }
+          </mat-select>
+          @if (classForm.get('className')?.touched && classForm.get('className')?.hasError('required')) {
+            <mat-error>Class Name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Class Label</mat-label>
+          <input matInput formControlName="classLabel" required />
+          @if (classForm.get('classLabel')?.touched && classForm.get('classLabel')?.hasError('required')) {
+            <mat-error>Class Label is required</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="actions">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="classForm.invalid || isSubmitting()"
+        >
+          Create
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,182 @@
+# =============================================================================
+# Backup monitor – daily check of every database backup on this VPS
+#
+# Emails MAIL_TO when, for any target below:
+#   - no backup file was written in the last 26 hours (the job failed or never ran),
+#   - the newest backup is smaller than the target's minimum size, or
+#   - the newest backup is less than half the size of the previous one
+#     (what an emptied or replaced database looks like).
+# Every Monday it also sends an "all OK" summary, so silence never means the
+# monitor itself has stopped.
+#
+# The SMTP password is read from the existing ASMS API secret
+# (naitsasms-api-secrets / EmailCredentials__Password); no new secret is needed.
+#
+# Apply:     kubectl apply -f k8s/backup-monitor.yaml
+# Test now:  kubectl create job --from=cronjob/backup-monitor backup-monitor-test
+#            kubectl logs job/backup-monitor-test && kubectl delete job backup-monitor-test
+#            (set FORCE_REPORT=true in the ConfigMap to get an email even when all is OK)
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-monitor-config
+  namespace: default
+  labels:
+    app: backup-monitor
+data:
+  SMTP_URL: "smtp://mail.naits.com.ng:8889"
+  MAIL_FROM: "postmaster@naits.com.ng"
+  MAIL_TO: "info@naits.com.ng"
+  MAX_AGE_MINUTES: "1560"
+  FORCE_REPORT: "false"
+  # name|directory inside the pod|file pattern|minimum bytes
+  TARGETS: |
+    Silkcoat|/backups/silkcoat|*.sql.gz|1000000
+    NAITS ASMS|/backups/naitsasms|*.dump|1000000
+    NAITS Hills|/backups/naitssmshills|*.dump|5000000
+    NAITS Ama|/backups/naitssmsama|*.dump|5000000
+  check.sh: |
+    #!/bin/sh
+    set -u
+    PROBLEMS=""
+    SUMMARY=""
+
+    while IFS='|' read -r NAME DIR PATTERN MIN; do
+      [ -z "$NAME" ] && continue
+      # shellcheck disable=SC2086
+      set -- $(ls -1t "$DIR"/$PATTERN 2>/dev/null)
+      if [ $# -eq 0 ]; then
+        PROBLEMS="${PROBLEMS}- ${NAME}: no backup files at all in ${DIR}\n"
+        continue
+      fi
+      NEWEST="$1"
+      PREV="${2:-}"
+      SIZE=$(stat -c %s "$NEWEST")
+      WHEN=$(date -u -d "@$(stat -c %Y "$NEWEST")" '+%Y-%m-%d %H:%M UTC')
+      SUMMARY="${SUMMARY}- ${NAME}: $(basename "$NEWEST"), ${SIZE} bytes, ${WHEN}\n"
+
+      if [ -z "$(find "$NEWEST" -mmin "-${MAX_AGE_MINUTES}")" ]; then
+        PROBLEMS="${PROBLEMS}- ${NAME}: no new backup in the last $((MAX_AGE_MINUTES / 60)) hours (newest is from ${WHEN})\n"
+      fi
+      if [ "$SIZE" -lt "$MIN" ]; then
+        PROBLEMS="${PROBLEMS}- ${NAME}: newest backup is only ${SIZE} bytes (expected at least ${MIN})\n"
+      fi
+      if [ -n "$PREV" ]; then
+        PREV_SIZE=$(stat -c %s "$PREV")
+        if [ $((SIZE * 2)) -lt "$PREV_SIZE" ]; then
+          PROBLEMS="${PROBLEMS}- ${NAME}: newest backup (${SIZE} bytes) is less than half the previous one (${PREV_SIZE} bytes)\n"
+        fi
+      fi
+    done <<EOF
+    $TARGETS
+    EOF
+
+    send_mail() {
+      {
+        printf 'From: NAITS backup monitor <%s>\r\n' "$MAIL_FROM"
+        printf 'To: %s\r\n' "$MAIL_TO"
+        printf 'Subject: %s\r\n' "$1"
+        printf 'Date: %s\r\n' "$(date -R)"
+        printf 'Content-Type: text/plain; charset=utf-8\r\n\r\n'
+        printf '%b\n' "$2"
+      } > /tmp/mail.txt
+      curl -sS --ssl --url "$SMTP_URL" --user "${MAIL_FROM}:${SMTP_PASSWORD}" \
+        --mail-from "$MAIL_FROM" --mail-rcpt "$MAIL_TO" --upload-file /tmp/mail.txt
+    }
+
+    printf 'Latest backups:\n%b' "$SUMMARY"
+    if [ -n "$PROBLEMS" ]; then
+      printf 'PROBLEMS:\n%b' "$PROBLEMS"
+      send_mail "BACKUP PROBLEM on the NAITS/Silkcoat VPS" \
+        "The daily backup check found problems:\n\n${PROBLEMS}\nLatest backups:\n${SUMMARY}\nCheck the backup CronJobs with: kubectl get cronjob; kubectl get jobs"
+      exit 1
+    fi
+    if [ "$(date -u +%u)" = "1" ] || [ "$FORCE_REPORT" = "true" ]; then
+      send_mail "Backups OK on the NAITS/Silkcoat VPS" \
+        "All database backups are current.\n\nLatest backups:\n${SUMMARY}"
+    fi
+    echo "All backups OK."
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-monitor
+  namespace: default
+  labels:
+    app: backup-monitor
+spec:
+  # After the last nightly backup (Ama at 03:00 UTC).
+  schedule: "30 4 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: backup-monitor
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: check
+              image: curlimages/curl:8.10.1
+              command: ["sh", "/scripts/check.sh"]
+              envFrom:
+                - configMapRef:
+                    name: backup-monitor-config
+              env:
+                - name: SMTP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: naitsasms-api-secrets
+                      key: EmailCredentials__Password
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: silkcoat
+                  mountPath: /backups/silkcoat
+                  readOnly: true
+                - name: naitsasms
+                  mountPath: /backups/naitsasms
+                  readOnly: true
+                - name: naitssmshills
+                  mountPath: /backups/naitssmshills
+                  readOnly: true
+                - name: naitssmsama
+                  mountPath: /backups/naitssmsama
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: "10m"
+                  memory: "16Mi"
+                limits:
+                  cpu: "100m"
+                  memory: "64Mi"
+          volumes:
+            - name: scripts
+              configMap:
+                name: backup-monitor-config
+                items:
+                  - key: check.sh
+                    path: check.sh
+            - name: silkcoat
+              hostPath:
+                path: /sani/tmp/database-backups
+                type: Directory
+            - name: naitsasms
+              hostPath:
+                path: /sani/tmp/naittsasms/database-backups
+                type: Directory
+            - name: naitssmshills
+              hostPath:
+                path: /sani/tmp/naitssmshills/database-backups
+                type: Directory
+            - name: naitssmsama
+              hostPath:
+                path: /sani/tmp/naitssmsama/database-backups
+                type: Directory

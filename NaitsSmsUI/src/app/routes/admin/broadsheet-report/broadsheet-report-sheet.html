@@ -1,0 +1,93 @@
+<div class="broadsheet-report">
+  @if (report.schoolInfo) {
+    <table class="table table-borderless broadsheet-report__header">
+      <tr class="broadsheet-report__header-row">
+        <th class="broadsheet-report__spacer"></th>
+        <td class="broadsheet-report__logo-cell">
+          @if (logoUrl) {
+            <img
+              class="broadsheet-report__logo"
+              [src]="logoUrl"
+              alt="School logo"
+              (error)="onLogoError($event)" />
+          }
+        </td>
+        <td class="broadsheet-report__title-cell">
+          <span class="broadsheet-report__school-name">{{ report.schoolInfo.schoolName }}</span><br />
+          <span class="broadsheet-report__motto">CREED: {{ report.schoolInfo.motto }}</span><br />
+          <span><strong>Address: </strong>{{ report.schoolInfo.schoolAddress }}</span><br /><br />
+          <span class="broadsheet-report__report-title">
+            ACADEMIC BROAD SHEET FOR
+            <span class="broadsheet-report__upper">{{ report.classLabel }} {{ report.termLabel }}</span>
+            TERM {{ report.sessionLabel }} ACADEMIC SESSION
+          </span>
+        </td>
+        <th class="broadsheet-report__spacer"></th>
+      </tr>
+    </table>
+  }
+
+  @for (arm of report.arms; track arm.armLabel) {
+    <div class="broadsheet-report__arm">
+      <table class="mytable broadsheet-report__table">
+        <tr class="mytable-head">
+          <th [attr.colspan]="7 + arm.subjects.length" class="broadsheet-report__arm-title">{{ arm.armLabel }}</th>
+        </tr>
+        <tr class="mytable-head">
+          <th class="broadsheet-report__serial-col">S/No</th>
+          <th class="broadsheet-report__admission-col">Admission No.</th>
+          <th class="broadsheet-report__name-col">Full Name</th>
+          @for (subject of arm.subjects; track subject) {
+            <th class="rotate broadsheet-report__subject-col">
+              <div><span>{{ subject }}</span></div>
+            </th>
+          }
+          <th class="rotate broadsheet-report__metric-col">
+            <div><span>No. of Sub</span></div>
+          </th>
+          <th class="rotate broadsheet-report__metric-col">
+            <div><span>Total</span></div>
+          </th>
+          <th class="rotate broadsheet-report__metric-col">
+            <div><span>Ave</span></div>
+          </th>
+          <th class="rotate broadsheet-report__metric-col">
+            <div><span>Position in Class</span></div>
+          </th>
+        </tr>
+
+        @for (student of arm.students; track student.serialNumber + student.admissionNo) {
+          <tr class="mytable-body">
+            <td class="broadsheet-report__serial-cell">{{ student.serialNumber }}</td>
+            <td class="broadsheet-report__admission-cell">{{ student.admissionNo }}</td>
+            <td class="broadsheet-report__name-cell">{{ student.fullName }}</td>
+            @for (score of student.scores; track $index) {
+              <td class="broadsheet-report__score-cell">
+                @if (score.isFail) {
+                  <span class="broadsheet-report__fail">{{ score.displayValue }}</span>
+                } @else {
+                  {{ score.displayValue }}
+                }
+              </td>
+            }
+            <td class="broadsheet-report__score-cell">{{ student.subjectCount }}</td>
+            <td class="broadsheet-report__score-cell">{{ student.total }}</td>
+            <td class="broadsheet-report__score-cell">{{ student.average }}</td>
+            <td class="broadsheet-report__score-cell">{{ student.position }}</td>
+          </tr>
+        }
+
+        <tr class="mytable-body broadsheet-report__summary">
+          <th colspan="6">
+            Number of Students: {{ arm.studentCount }}<br />
+            Highest Average in Class: {{ arm.classHighestAverage }}
+          </th>
+          <th [attr.colspan]="arm.subjects.length">
+            Class Average: {{ arm.subjectAverageScore }}<br />
+            Lowest Average in Class: {{ arm.classLowestAverage }}
+          </th>
+        </tr>
+      </table>
+    </div>
+  }
+</div>

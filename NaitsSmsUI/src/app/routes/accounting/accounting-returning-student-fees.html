@@ -1,0 +1,408 @@
+<section class="acct-fresh">
+  @if (loading()) {
+    <div class="acct-fresh__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <header class="acct-fresh__header">
+      <div>
+        <p class="acct-fresh__eyebrow">Student Fees Management</p>
+        <h1 class="acct-fresh__title">Returning Student Fees</h1>
+        <p class="acct-fresh__subtitle">
+          Record termly school fee payments for returning students with outstanding balances.
+        </p>
+      </div>
+    </header>
+
+    @if (error()) {
+      <div class="acct-fresh__alert acct-fresh__alert--error" role="alert">{{ error() }}</div>
+    }
+    @if (infoMessage()) {
+      <div class="acct-fresh__alert acct-fresh__alert--warn" role="status">{{ infoMessage() }}</div>
+    }
+
+    @if (students().length === 0) {
+      <div class="acct-fresh__empty">
+        <span class="acct-fresh__empty-icon" aria-hidden="true">₦</span>
+        <p class="acct-fresh__empty-title">No returning students pending payment</p>
+        <p class="acct-fresh__empty-text">
+          Either no returning students are registered this term, or all termly fees are already cleared.
+        </p>
+      </div>
+    } @else {
+      <div class="acct-fresh__search card-panel">
+        <label class="acct-fresh__search-label" for="studentSearch">Student Id</label>
+        <div class="acct-fresh__search-row">
+          <input
+            id="studentSearch"
+            class="form-control acct-fresh__search-input"
+            type="text"
+            placeholder="Id No. here — or use Ctrl+F in the table below"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="searchTerm.set($event)"
+          />
+          <button type="button" class="acct-fresh__search-btn" (click)="searchStudentHint()">Search</button>
+        </div>
+      </div>
+
+      <div class="acct-fresh__table-wrap card-panel">
+        <h2 class="acct-fresh__table-title">List of Defaulted Returning Students</h2>
+
+        <div class="acct-fresh__table-scroll">
+          <table class="acct-fresh__table">
+            <thead>
+              <tr>
+                <th>SNo</th>
+                <th>Admission No.</th>
+                <th>Full Name</th>
+                <th>Class Arm</th>
+                <th>Class Category</th>
+                <th>Payment Id / Selection / Button</th>
+                <th>Outstanding</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (student of filteredStudents(); track student.studentLevelPaymentId; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ student.admisionNo }}</td>
+                  <td>{{ student.fullName }}</td>
+                  <td>{{ student.classLabel }} {{ student.armName }}</td>
+                  <td>{{ classCategoryLabel(student.classCategoryStatus) }}</td>
+                  <td class="acct-fresh__pay-cell">
+                    @if (isCurrentCompleted(student)) {
+                      <span class="acct-fresh__status-ok">Completed</span>
+                    } @else if (isPartPayment(student)) {
+                      <button
+                        type="button"
+                        class="acct-fresh__btn acct-fresh__btn--sm"
+                        (click)="openPartPayment(student)"
+                      >
+                        Complete Payment
+                      </button>
+                    } @else {
+                      <div class="acct-fresh__inline-pay">
+                        <input
+                          type="text"
+                          class="acct-fresh__mini-input"
+                          placeholder="Payment Id"
+                          maxlength="8"
+                          [id]="'paymentId-' + student.studentLevelPaymentId"
+                          [ngModel]="rowDraft(student.studentLevelPaymentId).paymentId"
+                          (ngModelChange)="updateRowDraft(student.studentLevelPaymentId, { paymentId: $event })"
+                        />
+                        <input
+                          type="checkbox"
+                          class="acct-fresh__checkbox"
+                          [ngModel]="rowDraft(student.studentLevelPaymentId).selected"
+                          (ngModelChange)="updateRowDraft(student.studentLevelPaymentId, { selected: $event })"
+                        />
+                        <div class="acct-fresh__date-wrap">
+                          <input
+                            type="text"
+                            class="acct-fresh__mini-input acct-fresh__date-input"
+                            placeholder="dd/mm/yyyy"
+                            autocomplete="off"
+                            readonly
+                            [id]="'paymentDate-' + student.studentLevelPaymentId"
+                            [matDatepicker]="rowDatePicker"
+                            [ngModel]="rowDraft(student.studentLevelPaymentId).paymentDate"
+                            (ngModelChange)="updateRowDraft(student.studentLevelPaymentId, { paymentDate: $event })"
+                          />
+                          <mat-datepicker-toggle
+                            class="acct-fresh__date-toggle"
+                            [for]="rowDatePicker"
+                          ></mat-datepicker-toggle>
+                          <mat-datepicker #rowDatePicker [touchUi]="true"></mat-datepicker>
+                        </div>
+                        <button
+                          type="button"
+                          class="acct-fresh__btn acct-fresh__btn--sm acct-fresh__btn--ghost"
+                          (click)="openPartPayment(student)"
+                        >
+                          Part Payment
+                        </button>
+                      </div>
+                    }
+                  </td>
+                  <td class="acct-fresh__outstanding-cell">
+                    @if (otherStatus(student) === 'Completed') {
+                      <span class="acct-fresh__status-ok">None</span>
+                    } @else if (otherStatus(student) === 'None') {
+                      <button
+                        type="button"
+                        class="acct-fresh__btn acct-fresh__btn--sm acct-fresh__btn--danger"
+                        (click)="openPartPayment(student)"
+                      >
+                        Make Payment
+                      </button>
+                    } @else if (otherStatus(student) === 'PartPayment') {
+                      <button
+                        type="button"
+                        class="acct-fresh__btn acct-fresh__btn--sm acct-fresh__btn--warn"
+                        (click)="openPartPayment(student)"
+                      >
+                        Complete Payment
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="acct-fresh__btn acct-fresh__btn--sm"
+                        (click)="openPartPayment(student)"
+                      >
+                        Make Payment
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="acct-fresh__toolbar">
+          <label class="acct-fresh__field-inline">
+            <span>Payment Type</span>
+            <select
+              [ngModel]="paymentType()"
+              (ngModelChange)="onPaymentTypeChange(+$event)"
+            >
+              <option [ngValue]="0">Cash</option>
+              <option [ngValue]="1">Teller</option>
+              <option [ngValue]="2">Transfer</option>
+            </select>
+          </label>
+
+          @if (showReceiptType()) {
+            <label class="acct-fresh__field-inline">
+              <span>Cash Receipt Type</span>
+              <select
+                [ngModel]="receiptType()"
+                (ngModelChange)="onReceiptTypeChange(+$event)"
+              >
+                <option [ngValue]="0">Manual Receipt</option>
+                <option [ngValue]="1">Auto Receipt</option>
+              </select>
+            </label>
+          }
+
+          <button
+            type="button"
+            class="acct-fresh__btn acct-fresh__btn--primary"
+            [disabled]="paying()"
+            (click)="submitSelectionsPreview()"
+          >
+            @if (paying()) {
+              <mat-spinner class="acct-fresh__btn-spin" diameter="16"></mat-spinner>
+              Processing…
+            } @else {
+              Pay
+            }
+          </button>
+        </footer>
+      </div>
+    }
+  }
+
+  @if (showPreviewModal()) {
+    <div class="acct-fresh__overlay" role="dialog" aria-modal="true">
+      <div class="acct-fresh__modal card-panel">
+        <div class="acct-fresh__modal-banner">
+          Please verify before you proceed. The Selected Payment Type is:
+          <strong>{{ previewPaymentTypeLabel() }}</strong>, Amount: Full Payment.
+        </div>
+        <div class="acct-fresh__table-scroll">
+          <table class="acct-fresh__table acct-fresh__table--compact">
+            <thead>
+              <tr>
+                <th>S/No</th>
+                <th>Admission No</th>
+                <th>Full Name</th>
+                <th>Class/Arm</th>
+                <th>Payment Id</th>
+                <th>Payment Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of previewRows(); track row.sNo) {
+                <tr>
+                  <td>{{ row.sNo }}</td>
+                  <td>{{ row.admisnNo }}</td>
+                  <td>{{ row.fullName }}</td>
+                  <td>{{ row.classArm }}</td>
+                  <td>{{ row.paymentId }}</td>
+                  <td>{{ row.paymentDate }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="acct-fresh__modal-actions">
+          <button type="button" class="acct-fresh__btn acct-fresh__btn--danger" (click)="submitSelections()">
+            Continue
+          </button>
+          <button type="button" class="acct-fresh__btn acct-fresh__btn--ghost" (click)="closePreviewModal()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showPartModal()) {
+    <div class="acct-fresh__overlay" role="dialog" aria-modal="true">
+      <div class="acct-fresh__modal acct-fresh__modal--wide card-panel">
+        @if (partStudent(); as student) {
+          <div class="acct-fresh__part-head">
+            <strong>Name:</strong> {{ student.fullName }},
+            <strong>Admsn No:</strong> {{ student.admisionNo }}
+          </div>
+        }
+
+        @if (partLoading()) {
+          <div class="acct-fresh__loading"><mat-spinner diameter="32"></mat-spinner></div>
+        } @else if (partRows().length === 0) {
+          <p class="acct-fresh__empty-text">Sorry! Unknown error occured.</p>
+          <div class="acct-fresh__modal-actions">
+            <button type="button" class="acct-fresh__btn acct-fresh__btn--ghost" (click)="closePartModal()">Close</button>
+          </div>
+        } @else {
+          @for (row of partRows(); track row.studentAcademicLevelId) {
+            @let draft = partDraftOf(row.studentAcademicLevelId);
+            @let rid = row.studentAcademicLevelId;
+            <div class="acct-fresh__table-scroll">
+              <table class="acct-fresh__table acct-fresh__table--compact">
+                <thead>
+                  <tr>
+                    <th>Term / Session</th>
+                    <th>Actual</th>
+                    <th>Paid</th>
+                    <th>Outstanding</th>
+                    <th>Payment</th>
+                    <th>Payment Type</th>
+                    <th>Payment Id</th>
+                    <th>Discount</th>
+                    <th>Date</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ row.termStatus }}, {{ row.session }}</td>
+                    <td>{{ row.actualFees }}</td>
+                    <td>{{ row.amountPaid }}</td>
+                    <td>{{ row.outstanding }}</td>
+                    <td>
+                      <input
+                        [id]="partFieldId(rid, 'amount')"
+                        type="text"
+                        class="acct-fresh__mini-input"
+                        placeholder="Amount"
+                        [ngModel]="draft.paymentAmount"
+                        (ngModelChange)="onPartPaymentAmountChange(rid, $event)"
+                      />
+                    </td>
+                    <td>
+                      <select
+                        [ngModel]="draft.paymentType"
+                        (ngModelChange)="onPartPaymentTypeChange(rid, +$event)"
+                      >
+                        <option [ngValue]="0">Cash</option>
+                        <option [ngValue]="1">Teller</option>
+                        <option [ngValue]="2">Transfer</option>
+                      </select>
+                      @if (draft.paymentType === 0) {
+                        <select
+                          class="acct-fresh__receipt-select"
+                          [ngModel]="draft.receiptType"
+                          (ngModelChange)="onPartReceiptTypeChange(rid, +$event)"
+                        >
+                          <option [ngValue]="0">Manual Receipt</option>
+                          <option [ngValue]="1">Auto Receipt</option>
+                        </select>
+                      }
+                    </td>
+                    <td>
+                      <input
+                        [id]="partFieldId(rid, 'id')"
+                        type="text"
+                        class="acct-fresh__mini-input"
+                        maxlength="8"
+                        [ngModel]="draft.paymentId"
+                        (ngModelChange)="onPartPaymentIdChange(rid, $event)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        [id]="partFieldId(rid, 'discount')"
+                        type="text"
+                        class="acct-fresh__mini-input"
+                        [ngModel]="draft.discount"
+                        (ngModelChange)="onPartDiscountKeyup(rid, $event)"
+                      />
+                      @if (draft.showReason) {
+                        <textarea
+                          [id]="partFieldId(rid, 'reason')"
+                          class="acct-fresh__reason"
+                          rows="3"
+                          placeholder="State reasons"
+                          [ngModel]="draft.reasonForDiscount"
+                          (ngModelChange)="onPartReasonChange(rid, $event)"
+                        ></textarea>
+                      }
+                    </td>
+                    <td>
+                      <div class="acct-fresh__date-wrap">
+                        <input
+                          [id]="partFieldId(rid, 'date')"
+                          type="text"
+                          class="acct-fresh__mini-input acct-fresh__date-input"
+                          placeholder="dd/mm/yyyy"
+                          autocomplete="off"
+                          readonly
+                          [matDatepicker]="partDatePicker"
+                          [ngModel]="draft.paymentDate"
+                          (ngModelChange)="onPartPaymentDateChange(rid, $event)"
+                        />
+                        <mat-datepicker-toggle
+                          class="acct-fresh__date-toggle"
+                          [for]="partDatePicker"
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker #partDatePicker [touchUi]="true"></mat-datepicker>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="acct-fresh__btn acct-fresh__btn--sm"
+                        [disabled]="partSaving()"
+                        (click)="submitPartPayment(row)"
+                      >
+                        Save
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          }
+          <div class="acct-fresh__modal-actions">
+            <button type="button" class="acct-fresh__btn acct-fresh__btn--ghost" (click)="closePartModal()">Close</button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (showReceiptModal()) {
+    <div class="acct-fresh__overlay" role="dialog" aria-modal="true">
+      <div class="acct-fresh__modal acct-fresh__modal--receipt card-panel">
+        <div class="acct-fresh__receipt-body" [innerHTML]="receiptHtml()"></div>
+        <div class="acct-fresh__modal-actions">
+          <button type="button" class="acct-fresh__btn acct-fresh__btn--primary" (click)="printReceipt()">Print</button>
+          <button type="button" class="acct-fresh__btn acct-fresh__btn--ghost" (click)="closeReceiptModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

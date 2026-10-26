@@ -1,0 +1,134 @@
+# Ama SMS instance — proxies API to K3s NodePort 30094
+# (ASMS uses 30092; Hills uses 30093).
+# DNS: ama.ourschoolonline.ng -> 82.29.173.232
+# After this HTTP site is live:
+#   certbot --nginx -d ama.ourschoolonline.ng --non-interactive --agree-tos -m admin@ourschoolonline.ng --redirect
+
+server {
+    server_name ama.ourschoolonline.ng www.ama.ourschoolonline.ng;
+
+    root /var/www/ourschoolonline-ama;
+    index index.html;
+    client_max_body_size 20m;
+
+    location /api/ {
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        add_header Pragma "no-cache" always;
+        expires -1;
+
+        proxy_pass http://127.0.0.1:30094;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+    }
+
+    location /home/ {
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        add_header Pragma "no-cache" always;
+        expires -1;
+
+        proxy_pass http://127.0.0.1:30094;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 300s;
+    }
+
+    location ^~ /Signatures/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+        proxy_pass http://127.0.0.1:30094;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /Passport/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+        proxy_pass http://127.0.0.1:30094;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /profile-avatars/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+        proxy_pass http://127.0.0.1:30094;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /school-logos/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+        proxy_pass http://127.0.0.1:30094;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /Content/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+        proxy_pass http://127.0.0.1:30094;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /uploads/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+        proxy_pass http://127.0.0.1:30094;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~* ^/(?:media|assets|i18n|fonts|images)/.*\.(?:js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|ico|webp)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable" always;
+        try_files $uri =404;
+    }
+    location ~* ^/(?:main|chunk|styles|polyfills|runtime)-[A-Za-z0-9]+\.(?:js|css)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable" always;
+        try_files $uri =404;
+    }
+    location = /favicon.ico {
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800" always;
+        try_files $uri =404;
+    }
+
+    location / {
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        add_header Pragma "no-cache" always;
+        expires -1;
+        try_files $uri $uri/ /index.html;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/ama.ourschoolonline.ng/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/ama.ourschoolonline.ng/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+
+server {
+    if ($host = ama.ourschoolonline.ng) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name ama.ourschoolonline.ng www.ama.ourschoolonline.ng;
+    return 404; # managed by Certbot
+
+
+}

@@ -1,0 +1,320 @@
+<div class="cx">
+  @if (isLoading() && !detail()) {
+    <div class="cx-loading">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>Loading centre record...</span>
+    </div>
+  } @else if (failed()) {
+    <div class="cx-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() || 'This centre could not be loaded.' }}</span>
+      <button mat-stroked-button (click)="back()">Back to overview</button>
+    </div>
+  } @else if (detail(); as c) {
+    <header class="cx-header">
+      <div>
+        <button type="button" class="back-link no-print" (click)="back()">
+          <mat-icon>arrow_back</mat-icon>
+          Programme overview
+        </button>
+        <p class="cx-header__eyebrow">{{ c.zone }} · {{ c.state }} State · {{ c.lga }} LGA</p>
+        <h1>{{ c.centreName }}</h1>
+        <p class="cx-header__sub">
+          {{ c.centreType }} · Head: {{ c.head }}
+          @if (c.yearEstablished) {
+            · Est. {{ c.yearEstablished }}
+          }
+          · {{ c.currentTerm }} {{ c.currentSession }}
+        </p>
+      </div>
+      <div class="cx-header__actions no-print">
+        <button mat-flat-button (click)="print()">
+          <mat-icon>print</mat-icon>
+          Print centre summary
+        </button>
+      </div>
+    </header>
+
+    <section class="cx-kpis">
+      <article class="kpi">
+        <span class="kpi__label">Learners on roll</span>
+        <strong class="kpi__value">{{ c.learners }}</strong>
+        <span class="kpi__foot">{{ c.femaleLearners }} girls · {{ c.learners - c.femaleLearners }} boys</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi__label">Learner attendance</span>
+        <strong class="kpi__value" [class]="rateTone(c.learnerAttendanceRate)">{{ c.learnerAttendanceRate }}%</strong>
+        <span class="kpi__foot">{{ c.fromDate | date: 'dd MMM' }} – {{ c.toDate | date: 'dd MMM yyyy' }}</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi__label">Facilitator attendance</span>
+        <strong class="kpi__value" [class]="rateTone(c.facilitatorAttendanceRate)">{{ c.facilitatorAttendanceRate }}%</strong>
+        <span class="kpi__foot">{{ c.facilitators }} facilitators on the register</span>
+      </article>
+      <article class="kpi" [class.kpi--alert]="c.registerOverdue">
+        <span class="kpi__label">Daily register</span>
+        <strong class="kpi__value">{{ c.daysRegistered }} / {{ c.expectedDays }}</strong>
+        <span class="kpi__foot register-lines">
+          @if (c.classRegisterOverdue) {
+            <span class="flag flag--bad">Class register overdue · last {{ c.lastRegisterDate | date: 'EEE dd MMM' }}</span>
+          } @else {
+            <span>Class register: {{ c.lastRegisterDate | date: 'EEE dd MMM' }}</span>
+          }
+          @if (c.staffRegisterOverdue) {
+            <span class="flag flag--bad">Staff register overdue · last {{ c.lastStaffRegisterDate | date: 'EEE dd MMM' }}</span>
+          } @else {
+            <span>Staff register: {{ c.lastStaffRegisterDate | date: 'EEE dd MMM' }}</span>
+          }
+        </span>
+      </article>
+      @if (c.lastTermOutcome; as outcome) {
+        <article class="kpi">
+          <span class="kpi__label">{{ c.lastTermLabel }}</span>
+          <strong class="kpi__value" [class]="scoreTone(outcome.averageScore)">{{ outcome.averageScore }}%</strong>
+          <span class="kpi__foot">Average score · {{ outcome.passRate }}% of results passed</span>
+        </article>
+      }
+    </section>
+
+    <section class="cx-stack">
+      <article class="panel">
+        <header class="panel__head">
+          <div>
+            <h3>Levels</h3>
+            <p>Current roll by level, with the form master accountable for each register.</p>
+          </div>
+        </header>
+        <div class="table-scroll">
+          <table class="cx-table">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Form master</th>
+                <th class="num">Learners</th>
+                <th class="num">Girls</th>
+                <th class="num">Attendance</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (level of c.levels; track level.classArmId) {
+                <tr>
+                  <td><strong>{{ level.label }}</strong></td>
+                  <td>{{ level.formMaster || 'Not assigned' }}</td>
+                  <td class="num">{{ level.learners }}</td>
+                  <td class="num">{{ level.female }}</td>
+                  <td class="num" [class]="rateTone(level.attendanceRate)">{{ level.attendanceRate }}%</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel">
+        <header class="panel__head">
+          <div>
+            <h3>Facilitators</h3>
+            <p>Lowest attendance first: who is actually in front of the learners.</p>
+          </div>
+        </header>
+        <div class="table-scroll">
+          <table class="cx-table">
+            <thead>
+              <tr>
+                <th>Facilitator</th>
+                <th>Teaches</th>
+                <th class="num">Days absent</th>
+                <th class="num">Attendance</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (f of c.facilitatorsList; track f.employeeId) {
+                <tr>
+                  <td>
+                    <strong>{{ f.fullName }}</strong>
+                    <span class="muted">{{ f.staffNumber }} · {{ f.qualification }}</span>
+                  </td>
+                  <td>{{ f.discipline }}</td>
+                  <td class="num">{{ f.daysAbsent }} of {{ f.daysRegistered }}</td>
+                  <td class="num" [class]="rateTone(f.attendanceRate)">{{ f.attendanceRate }}%</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h3>Daily attendance</h3>
+          <p>Each point is one day's register at this centre.</p>
+        </div>
+        <div class="legend">
+          <span><i class="legend__swatch legend__swatch--learners"></i>Learners</span>
+          <span><i class="legend__swatch legend__swatch--facilitators"></i>Facilitators</span>
+        </div>
+      </header>
+      @if (c.dailyTrend.length > 1) {
+        <svg
+          class="spark"
+          [attr.viewBox]="'0 0 ' + chartWidth + ' ' + chartHeight"
+          preserveAspectRatio="none"
+          role="img"
+          aria-label="Daily learner and facilitator attendance"
+        >
+          <line x1="0" [attr.x2]="chartWidth" [attr.y1]="chartHeight * 0.3" [attr.y2]="chartHeight * 0.3" class="spark__guide" />
+          <line x1="0" [attr.x2]="chartWidth" [attr.y1]="chartHeight * 0.6" [attr.y2]="chartHeight * 0.6" class="spark__guide" />
+          <polyline [attr.points]="facilitatorLine()" class="spark__line spark__line--facilitators" />
+          <polyline [attr.points]="learnerLine()" class="spark__line spark__line--learners" />
+        </svg>
+        <div class="spark__axis">
+          <span>{{ c.dailyTrend[0].date | date: 'dd MMM' }}</span>
+          <span>Scale 50–100% · guides at 85% and 70%</span>
+          <span>{{ c.dailyTrend[c.dailyTrend.length - 1].date | date: 'dd MMM' }}</span>
+        </div>
+      } @else {
+        <p class="panel__empty">Not enough register days in this period to draw a trend.</p>
+      }
+    </section>
+
+    @if (c.atRiskLearners.length) {
+      <section class="panel panel--alert">
+        <header class="panel__head">
+          <div>
+            <h3>Learners at risk ({{ c.atRiskLearners.length }})</h3>
+            <p>Named learners the register has flagged. Select a learner to open the record.</p>
+          </div>
+        </header>
+        <div class="table-scroll">
+          <table class="cx-table">
+            <thead>
+              <tr>
+                <th>Learner</th>
+                <th>Level</th>
+                <th class="num">Attendance</th>
+                <th>Last present</th>
+                <th>Why flagged</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (learner of c.atRiskLearners; track learner.studentId) {
+                <tr class="clickable" (click)="openLearner(learner.studentId)">
+                  <td>
+                    <strong>{{ learner.fullName }}</strong>
+                    <span class="muted">{{ learner.identificationNo }}</span>
+                  </td>
+                  <td>{{ learner.classArmLabel }}</td>
+                  <td class="num" [class]="rateTone(learner.attendanceRate)">{{ learner.attendanceRate }}%</td>
+                  <td>{{ learner.lastPresentDate ? (learner.lastPresentDate | date: 'EEE dd MMM') : '—' }}</td>
+                  <td>
+                    <span class="flag" [class.flag--bad]="learner.currentAbsenceStreak >= 3" [class.flag--warn]="learner.currentAbsenceStreak < 3">
+                      {{ learner.reason }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    <section class="cx-grid-2">
+      <article class="panel">
+        <header class="panel__head">
+          <div>
+            <h3>Results by subject</h3>
+            <p>{{ c.lastTermLabel || 'Last completed term' }} · average score out of 100</p>
+          </div>
+        </header>
+        @if (c.subjectOutcomes.length) {
+          <div class="bars">
+            @for (s of c.subjectOutcomes; track s.key) {
+              <div class="bar-row">
+                <span class="bar-row__label" [title]="s.name">{{ s.name }}</span>
+                <span class="bar-row__track">
+                  <span class="bar-row__fill" [class]="barTone(s.averageScore, 60, 45)" [style.width.%]="s.averageScore"></span>
+                </span>
+                <span class="bar-row__value">{{ s.averageScore }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="panel__empty">No completed term has been recorded yet.</p>
+        }
+      </article>
+
+      <article class="panel">
+        <header class="panel__head">
+          <div>
+            <h3>Where leavers went</h3>
+            <p>Learners who have left this centre and what they moved on to.</p>
+          </div>
+        </header>
+        <dl class="facts">
+          <div><dt>Leavers recorded</dt><dd>{{ c.transitions.leavers }}</dd></div>
+          <div><dt>Into formal school</dt><dd>{{ c.transitions.toFormalSchool }}</dd></div>
+          <div><dt>Into vocational training</dt><dd>{{ c.transitions.toVocational }}</dd></div>
+          <div><dt>Withdrawn</dt><dd>{{ c.transitions.withdrawn }}</dd></div>
+          <div><dt>Transition rate</dt><dd [class]="rateTone(c.transitions.transitionRate)">{{ c.transitions.transitionRate }}%</dd></div>
+          <div><dt>Telephone</dt><dd>{{ c.telephone || '—' }}</dd></div>
+          <div><dt>Address</dt><dd>{{ c.address }}</dd></div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h3>Learners on roll ({{ c.roll.length }})</h3>
+          <p>Select a learner to open the full academic and attendance record.</p>
+        </div>
+        <input
+          class="roll-filter no-print"
+          type="search"
+          placeholder="Filter by name, ID or level"
+          [ngModel]="rollFilter()"
+          (ngModelChange)="rollFilter.set($event)"
+          aria-label="Filter learners"
+        />
+      </header>
+      <div class="table-scroll">
+        <table class="cx-table">
+          <thead>
+            <tr>
+              <th>Learner</th>
+              <th>ID number</th>
+              <th>Level</th>
+              <th>Gender</th>
+              <th>Category</th>
+              <th class="num">Attendance</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (learner of filteredRoll(); track learner.studentId) {
+              <tr class="clickable" (click)="openLearner(learner.studentId)">
+                <td>
+                  <strong>{{ learner.fullName }}</strong>
+                  @if (learner.atRisk) {
+                    <span class="flag flag--bad">At risk</span>
+                  }
+                </td>
+                <td>{{ learner.identificationNo }}</td>
+                <td>{{ learner.level }}</td>
+                <td>{{ learner.gender }}</td>
+                <td>{{ learner.category }}</td>
+                <td class="num" [class]="rateTone(learner.attendanceRate)">{{ learner.attendanceRate }}%</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="muted">No learner matches that filter.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</div>

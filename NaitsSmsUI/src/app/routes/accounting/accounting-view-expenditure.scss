@@ -1,0 +1,435 @@
+/* View Expenditure — legacy ExpenditureCapturingIndex, full-width polished shell. */
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acct-view-exp {
+  --exp-ink: #2a3f54;
+  --exp-muted: #73879c;
+  --exp-line: #d9dee4;
+  --exp-accent: #1a6aa8;
+  --exp-card: #ffffff;
+  --exp-shadow: 0 10px 28px rgb(42 63 84 / 8%);
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1.5rem 1.25rem 2.5rem;
+  color: var(--exp-ink);
+}
+
+.acct-view-exp__filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+  width: 100%;
+  margin-bottom: 1.15rem;
+  padding: 1rem 1.15rem;
+  background: var(--exp-card);
+  border: 1px solid var(--exp-line);
+  border-radius: 12px;
+  box-shadow: var(--exp-shadow);
+  box-sizing: border-box;
+}
+
+.acct-view-exp__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.acct-view-exp__filter--action {
+  justify-content: flex-end;
+}
+
+.acct-view-exp__filter-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.acct-view-exp__select,
+.acct-view-exp__input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.45rem;
+  border: 1px solid #cfd6de;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  background: #fff;
+  color: var(--exp-ink);
+  font-size: 0.95rem;
+}
+
+.acct-view-exp__select:focus,
+.acct-view-exp__input:focus {
+  outline: none;
+  border-color: var(--exp-accent);
+  box-shadow: 0 0 0 3px rgb(26 106 168 / 16%);
+}
+
+.acct-view-exp__alert {
+  margin: 0 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.acct-view-exp__alert--success {
+  color: #3c763d;
+  background: #dff0d8;
+  border: 1px solid #d6e9c6;
+}
+
+.acct-view-exp__alert--warn {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border: 1px solid #faebcc;
+}
+
+.acct-view-exp__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-view-exp__panel {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--exp-card);
+  border: 1px solid var(--exp-line);
+  border-radius: 12px;
+  box-shadow: var(--exp-shadow);
+  overflow: hidden;
+  min-height: 10rem;
+  padding: 1.25rem 1.35rem 1.5rem;
+}
+
+.acct-view-exp__heading {
+  margin: 0 0 1.15rem;
+  text-align: center;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.acct-view-exp__lead {
+  margin: 0 0 1.25rem;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.acct-view-exp__lead--muted {
+  margin-top: 3rem;
+  color: var(--exp-muted);
+}
+
+.acct-view-exp__danger {
+  color: #c9302c;
+  font-weight: 700;
+}
+
+.acct-view-exp__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.acct-view-exp__table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.acct-view-exp__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.acct-view-exp__table th,
+.acct-view-exp__table td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--exp-line);
+  text-align: left;
+}
+
+.acct-view-exp__table thead th {
+  background: #f7f9fc;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--exp-muted);
+}
+
+.acct-view-exp__table tbody tr:hover td {
+  background: #fafcfe;
+}
+
+.acct-view-exp__footer-row td {
+  background: #fafcfe;
+  font-weight: 600;
+}
+
+.acct-view-exp__total-label {
+  text-align: right !important;
+}
+
+.acct-view-exp__actions-head,
+.acct-view-exp__actions-cell {
+  text-align: right;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.acct-view-exp__actions {
+  display: inline-flex;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.acct-view-exp__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.acct-view-exp__btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.acct-view-exp__btn--primary {
+  color: #fff;
+  background: #337ab7;
+  border-color: #2e6da4;
+  min-height: 2.45rem;
+  padding: 0.45rem 1rem;
+}
+
+.acct-view-exp__btn--primary:hover:not(:disabled) {
+  background: #286090;
+}
+
+.acct-view-exp__btn--edit {
+  color: #fff;
+  background: #f0ad4e;
+  border-color: #eea236;
+}
+
+.acct-view-exp__btn--edit:hover:not(:disabled) {
+  background: #ec971f;
+}
+
+.acct-view-exp__btn--delete {
+  color: #fff;
+  background: #d9534f;
+  border-color: #d43f3a;
+}
+
+.acct-view-exp__btn--delete:hover:not(:disabled) {
+  background: #c9302c;
+}
+
+.acct-view-exp__btn--info {
+  color: #fff;
+  background: #5bc0de;
+  border-color: #46b8da;
+  min-height: 2.4rem;
+  padding: 0.45rem 1.1rem;
+}
+
+.acct-view-exp__confirm {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.acct-view-exp__period-block {
+  margin-bottom: 1.5rem;
+}
+
+.acct-view-exp__period-month {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.acct-view-exp__period-week {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--exp-line);
+  border-radius: 10px;
+  background: #fcfdff;
+}
+
+.acct-view-exp__period-week-title {
+  margin: 0 0 0.75rem;
+  text-align: center;
+  font-weight: 700;
+  color: #1a6aa8;
+}
+
+.acct-view-exp__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow: auto;
+  background: rgb(24 36 51 / 48%);
+  backdrop-filter: blur(2px);
+  left: var(--sidenav-width, 0);
+}
+
+.acct-view-exp__modal {
+  width: min(640px, 96%);
+  margin: 2.5rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgb(24 36 51 / 28%);
+  overflow: hidden;
+}
+
+.acct-view-exp__modal-head {
+  padding: 1rem 1.25rem;
+  background: #f7f9fc;
+  border-bottom: 1px solid var(--exp-line);
+}
+
+.acct-view-exp__modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.acct-view-exp__edit-form {
+  padding: 1.25rem;
+}
+
+.acct-view-exp__edit-group {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr);
+  gap: 0.65rem 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.acct-view-exp__edit-group:has(.acct-view-exp__textarea) {
+  align-items: start;
+}
+
+.acct-view-exp__edit-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-align: right;
+}
+
+.acct-view-exp__edit-group:has(.acct-view-exp__textarea) .acct-view-exp__edit-label {
+  margin-top: 0.55rem;
+}
+
+.acct-view-exp__textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.acct-view-exp__date-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.acct-view-exp__date-input {
+  padding-right: 2.75rem;
+  cursor: pointer;
+}
+
+.acct-view-exp__date-toggle {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--exp-accent);
+}
+
+:host ::ng-deep .acct-view-exp__date-toggle .mat-mdc-icon-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+.acct-view-exp__edit-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 1100px) {
+  .acct-view-exp__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .acct-view-exp__filters {
+    grid-template-columns: 1fr;
+  }
+
+  .acct-view-exp__heading {
+    font-size: 1.4rem;
+  }
+
+  .acct-view-exp__actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .acct-view-exp__edit-group,
+  .acct-view-exp__edit-group:has(.acct-view-exp__textarea) {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .acct-view-exp__edit-label,
+  .acct-view-exp__edit-group:has(.acct-view-exp__textarea) .acct-view-exp__edit-label {
+    text-align: left;
+    margin-top: 0;
+  }
+
+  .acct-view-exp__edit-actions {
+    flex-direction: column-reverse;
+  }
+
+  .acct-view-exp__edit-actions .acct-view-exp__btn {
+    width: 100%;
+    min-height: 2.4rem;
+  }
+
+  .acct-view-exp__overlay {
+    left: 0;
+  }
+}

@@ -1,0 +1,186 @@
+/* Create Expenditure Category — legacy centered lead + polished shell. */
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acct-exp-cat {
+  --exp-ink: #2a3f54;
+  --exp-muted: #73879c;
+  --exp-line: #d9dee4;
+  --exp-accent: #1a6aa8;
+  --exp-card: #ffffff;
+  --exp-shadow: 0 10px 28px rgb(42 63 84 / 8%);
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2.5rem 1.25rem 2.5rem;
+  color: var(--exp-ink);
+}
+
+.acct-exp-cat__header {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.acct-exp-cat__title {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--exp-ink);
+}
+
+.acct-exp-cat__alert {
+  margin: 0 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.acct-exp-cat__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-exp-cat__alert--warn {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border: 1px solid #faebcc;
+}
+
+.acct-exp-cat__card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  padding: 1.5rem 1.75rem 1.4rem;
+  background: var(--exp-card);
+  border: 1px solid var(--exp-line);
+  border-radius: 12px;
+  box-shadow: var(--exp-shadow);
+}
+
+.acct-exp-cat__label {
+  display: block;
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.acct-exp-cat__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.acct-exp-cat__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.acct-exp-cat__input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.65rem;
+  border: 1px solid #cfd6de;
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  background: #fff;
+  color: var(--exp-ink);
+  font-size: 1rem;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.acct-exp-cat__input::placeholder {
+  color: #9aa7b5;
+}
+
+.acct-exp-cat__input:focus {
+  outline: none;
+  border-color: var(--exp-accent);
+  box-shadow: 0 0 0 3px rgb(26 106 168 / 16%);
+}
+
+.acct-exp-cat__input[aria-invalid='true'] {
+  border-color: #d9534f;
+}
+
+.acct-exp-cat__field-error {
+  color: #a94442;
+  font-size: 0.88rem;
+}
+
+.acct-exp-cat__btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.65rem;
+  padding: 0.5rem 1.35rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.acct-exp-cat__btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.acct-exp-cat__btn--primary {
+  color: #fff;
+  background: linear-gradient(180deg, #3b8fd4 0%, #2f7dbd 100%);
+  border-color: #2e6da4;
+  box-shadow: 0 2px 0 rgb(46 109 164 / 25%);
+}
+
+.acct-exp-cat__btn--primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3586c8 0%, #286090 100%);
+}
+
+.acct-exp-cat__btn--primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+@media (max-width: 640px) {
+  .acct-exp-cat {
+    padding-top: 1.5rem;
+  }
+
+  .acct-exp-cat__title {
+    font-size: 1.4rem;
+  }
+
+  .acct-exp-cat__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acct-exp-cat__btn {
+    width: 100%;
+  }
+}

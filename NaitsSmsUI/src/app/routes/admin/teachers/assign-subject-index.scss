@@ -1,0 +1,123 @@
+.assignment-page {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  margin: 1.5rem 0 1rem;
+  text-align: center;
+  color: #b3261e;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.title-action {
+  display: inline-block;
+  padding-left: 2rem;
+}
+
+.selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.field-block {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.field-label {
+  font-weight: 600;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #c8d0d4;
+  border-radius: 10px;
+  font: inherit;
+  background: #fff;
+}
+
+.content-shell {
+  padding-top: 1.25rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.lead-heading {
+  margin: 0 0 0.85rem;
+  color: #1b5e7a;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.legacy-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.legacy-table th,
+.legacy-table td {
+  padding: 0.8rem 0.7rem;
+  border: 1px solid #d7d7d7;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.legacy-table thead th {
+  background: #eef4f2;
+  font-weight: 700;
+}
+
+.arm-gap {
+  padding-left: 1.2em;
+}
+
+.empty-state {
+  margin: 1rem 0 0;
+  color: #b3261e;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.loading-state,
+.error-state,
+.blank-state,
+.success-state {
+  padding: 1.5rem 0;
+  text-align: center;
+}
+
+.error-state {
+  color: #b3261e;
+}
+
+.success-state {
+  color: #16794c;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .selector-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title-action {
+    display: block;
+    padding-left: 0;
+    padding-top: 0.8rem;
+  }
+}

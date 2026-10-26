@@ -1,0 +1,91 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'styles/reboot';
+@use 'styles/themes';
+@use 'styles/colors';
+@use 'styles/grid';
+@use 'styles/helpers';
+@use 'styles/plugins';
+@use 'styles/custom';
+
+// :root {
+//   /* Keep drawer width in sync with Matero `--sidenav-width` (accounting expands it). */
+//   --app-sidenav-width: var(--sidenav-width);
+// }
+:root {
+  /* old: 240px; new: 265px (240 + 25) */
+  --app-sidenav-width: 100px;
+}
+/* Actual drawer width — must follow --sidenav-width so long menu labels are not clipped. */
+mat-sidenav.matero-sidenav {
+  width: var(--app-sidenav-width) !important;
+  min-width: var(--app-sidenav-width);
+}
+
+@import 'font-awesome/css/font-awesome.min.css';
+
+/* Record Income — Material datepicker panel (overlay, must be global). */
+.acct-rec-inc-datepicker.mat-datepicker-content,
+.mat-datepicker-content.acct-rec-inc-datepicker,
+.mat-datepicker-dialog .acct-rec-inc-datepicker {
+  border-radius: 14px !important;
+  box-shadow: 0 18px 40px rgb(42 63 84 / 22%) !important;
+  overflow: hidden;
+}
+
+.acct-rec-inc-datepicker .mat-calendar {
+  width: 100%;
+  background: #fff;
+  color: #2a3f54;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-header {
+  padding: 0.65rem 0.5rem 0.35rem;
+  background: linear-gradient(180deg, #3b8fd4 0%, #2f7dbd 100%);
+  color: #fff;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-controls {
+  margin: 0 0.35rem 0.35rem;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-period-button,
+.acct-rec-inc-datepicker .mat-calendar-previous-button,
+.acct-rec-inc-datepicker .mat-calendar-next-button {
+  color: #fff !important;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-table-header th {
+  color: #73879c;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-body-label {
+  color: #73879c;
+  font-weight: 600;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-body-cell-content {
+  border-radius: 50%;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-body-selected {
+  background-color: #1a6aa8 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgb(26 106 168 / 35%);
+}
+
+.acct-rec-inc-datepicker .mat-calendar-body-today:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+  border-color: #1a6aa8 !important;
+}
+
+.acct-rec-inc-datepicker .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover
+  > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+  background-color: rgb(26 106 168 / 12%);
+}
+
+.mat-datepicker-dialog .mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: 14px !important;
+  overflow: hidden;
+}

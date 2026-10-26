@@ -1,0 +1,196 @@
+.matero-auth-container {
+  --auth-nav-teal: #0f766e;
+  --auth-nav-teal-deep: #115e59;
+  --auth-nav-ink: #0f172a;
+  --auth-nav-muted: #64748b;
+  --auth-nav-display: 'Fraunces', 'Times New Roman', serif;
+  --auth-nav-body: 'Source Sans 3', 'Segoe UI', sans-serif;
+  --auth-nav-height: 3.85rem;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  min-height: 100dvh;
+  padding: 0;
+  background: #f8fafc;
+}
+
+app-auth-layout {
+  display: block;
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+app-auth-layout.auth-bleed,
+app-auth-layout.auth-bleed .matero-auth-container {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.matero-auth-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--auth-nav-height);
+  padding: 0.65rem clamp(1rem, 3vw, 2rem);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  font-family: var(--auth-nav-body);
+}
+
+.matero-auth-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--auth-nav-ink);
+  text-decoration: none;
+  font-family: var(--auth-nav-display);
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.matero-auth-nav__brand img {
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.matero-auth-nav__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem 0.25rem;
+}
+
+.matero-auth-nav__links a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.35rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.45rem;
+  color: var(--auth-nav-muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.matero-auth-nav__links a:hover,
+.matero-auth-nav__links a:focus-visible {
+  color: var(--auth-nav-teal-deep);
+  background: rgba(15, 118, 110, 0.08);
+  outline: none;
+}
+
+.matero-auth-nav__links a.is-active:not(.matero-auth-nav__cta) {
+  color: var(--auth-nav-teal-deep);
+}
+
+.matero-auth-nav__links a.is-active:not(.matero-auth-nav__cta)::after {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.3rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--auth-nav-teal);
+}
+
+.matero-auth-nav__cta {
+  margin-left: 0.35rem;
+  background: var(--auth-nav-teal);
+  color: #fff !important;
+  box-shadow: 0 6px 16px rgba(15, 118, 110, 0.22);
+}
+
+.matero-auth-nav__cta:hover,
+.matero-auth-nav__cta:focus-visible {
+  background: var(--auth-nav-teal-deep) !important;
+  color: #fff !important;
+}
+
+.matero-auth-nav__cta.is-active {
+  box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.25);
+}
+
+.matero-auth-nav__cta--dashboard {
+  background: var(--auth-nav-teal-deep);
+}
+
+.matero-auth-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--auth-nav-height);
+}
+
+.matero-auth-body > * {
+  flex: 1 1 auto;
+}
+
+/* Login: page fills the viewport; hero meets the menu edge */
+app-auth-layout.auth-bleed .matero-auth-body,
+.matero-auth-container.auth-bleed .matero-auth-body {
+  padding-top: 0;
+  min-height: 100dvh;
+  height: 100dvh;
+}
+
+app-auth-layout.auth-bleed .matero-auth-nav,
+.matero-auth-container.auth-bleed .matero-auth-nav {
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.16);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@media (max-width: 560px) {
+  .matero-auth-container {
+    --auth-nav-height: auto;
+  }
+
+  .matero-auth-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .matero-auth-nav__links {
+    justify-content: flex-start;
+  }
+
+  .matero-auth-nav__cta {
+    margin-left: 0;
+  }
+
+  .matero-auth-body {
+    padding-top: 6.5rem;
+  }
+
+  app-auth-layout.auth-bleed .matero-auth-body,
+  .matero-auth-container.auth-bleed .matero-auth-body {
+    padding-top: 0;
+  }
+}

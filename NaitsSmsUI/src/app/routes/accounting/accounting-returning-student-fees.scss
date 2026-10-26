@@ -1,0 +1,529 @@
+.acct-fresh {
+  --fresh-bg: #f4f7fb;
+  --fresh-card: #ffffff;
+  --fresh-border: #d9dee4;
+  --fresh-text: #2a3f54;
+  --fresh-muted: #73879c;
+  --fresh-accent: #26b99a;
+  --fresh-accent-soft: #e8f8f4;
+  --fresh-success: #26b99a;
+  --fresh-warn: #f0ad4e;
+  --fresh-danger: #e74c3c;
+  --fresh-shadow: 0 10px 30px rgb(42 63 84 / 8%);
+
+  padding: 1rem 0.75rem 2.5rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.card-panel {
+  background: var(--fresh-card);
+  border: 1px solid var(--fresh-border);
+  border-radius: 14px;
+  box-shadow: var(--fresh-shadow);
+}
+
+.acct-fresh__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.acct-fresh__header {
+  margin-bottom: 1.25rem;
+}
+
+.acct-fresh__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fresh-muted);
+}
+
+.acct-fresh__title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__subtitle {
+  margin: 0.5rem 0 0;
+  max-width: 44rem;
+  color: var(--fresh-muted);
+  line-height: 1.55;
+}
+
+.acct-fresh__alert {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}
+
+.acct-fresh__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-fresh__alert--warn {
+  color: #7a4b00;
+  background: #fff8eb;
+  border: 1px solid #f6dfa7;
+}
+
+.acct-fresh__empty {
+  max-width: 520px;
+  margin: 2.5rem auto;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  background: var(--fresh-card);
+  border: 1px solid var(--fresh-border);
+  border-radius: 14px;
+  box-shadow: var(--fresh-shadow);
+}
+
+.acct-fresh__empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: var(--fresh-accent-soft);
+  color: var(--fresh-accent);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.acct-fresh__empty-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__empty-text {
+  margin: 0;
+  color: var(--fresh-muted);
+  line-height: 1.6;
+}
+
+.acct-fresh__search {
+  padding: 1rem 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.acct-fresh__search-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+}
+
+.acct-fresh__search-input {
+  min-height: 2.65rem;
+  border-radius: 10px;
+  border: 1px solid #cfd8e3;
+  background: var(--fresh-bg);
+}
+
+.acct-fresh__search-btn {
+  min-width: 6.5rem;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #26b99a 0%, #1fa085 100%);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.acct-fresh__table-wrap {
+  padding: 1rem 1.15rem 1.15rem;
+}
+
+.acct-fresh__table-title {
+  margin: 0 0 0.85rem;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__table-scroll {
+  overflow-x: auto;
+}
+
+.acct-fresh__table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.acct-fresh__table th,
+.acct-fresh__table td {
+  padding: 0.65rem 0.55rem;
+  border: 1px solid #e3e8ef;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.acct-fresh__table thead th {
+  background: linear-gradient(180deg, var(--fresh-accent-soft) 0%, #fff 100%);
+  color: var(--fresh-text);
+  font-weight: 700;
+}
+
+.acct-fresh__table tbody tr:nth-child(even) {
+  background: #fafbfd;
+}
+
+.acct-fresh__pay-cell {
+  min-width: 280px;
+}
+
+.acct-fresh__inline-pay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.acct-fresh__mini-input {
+  width: 5.5rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.85rem;
+}
+
+.acct-fresh__date-input {
+  width: 7.25rem;
+  padding-right: 1.85rem;
+  cursor: pointer;
+}
+
+.acct-fresh__date-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.acct-fresh__date-toggle {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fresh-accent);
+}
+
+:host ::ng-deep .acct-fresh__date-toggle .mat-mdc-icon-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+}
+
+:host ::ng-deep .acct-fresh__date-toggle .mat-datepicker-toggle-default-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.acct-fresh__checkbox {
+  width: 1rem;
+  height: 1rem;
+}
+
+.acct-fresh__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1.25rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--fresh-border);
+}
+
+.acct-fresh__field-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__field-inline select {
+  min-height: 2.2rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.acct-fresh__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.acct-fresh__btn--primary {
+  background: linear-gradient(180deg, #26b99a 0%, #1fa085 100%);
+  color: #fff;
+  box-shadow: 0 6px 16px rgb(38 185 154 / 20%);
+}
+
+.acct-fresh__btn--danger {
+  background: linear-gradient(180deg, #e74c3c 0%, #cf4436 100%);
+  color: #fff;
+}
+
+.acct-fresh__btn--warn {
+  background: linear-gradient(180deg, #f0ad4e 0%, #ec971f 100%);
+  color: #fff;
+}
+
+.acct-fresh__btn--ghost {
+  background: #eef2f7;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__btn--sm {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+}
+
+.acct-fresh__btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.acct-fresh__btn-spin {
+  display: inline-block;
+}
+
+.acct-fresh__status-ok {
+  color: var(--fresh-success);
+  font-weight: 700;
+}
+
+.acct-fresh__outstanding-cell {
+  min-width: 8rem;
+}
+
+.acct-fresh__overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  /* Stay in the main content band — avoid sitting under the side menu */
+  left: var(--sidenav-width, 15rem);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 45%);
+}
+
+:host-context(.matero-sidenav-collapsed) .acct-fresh__overlay {
+  left: var(--sidenav-collapsed-width, 4rem);
+}
+
+@media (max-width: 959.98px) {
+  .acct-fresh__overlay {
+    left: 0;
+    z-index: 10000;
+  }
+}
+
+.acct-fresh__modal {
+  width: min(960px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1rem 1.15rem;
+}
+
+.acct-fresh__modal--wide {
+  width: min(1100px, 100%);
+}
+
+.acct-fresh__modal--receipt {
+  width: min(860px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.acct-fresh__modal-banner {
+  margin-bottom: 0.85rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  background: #fff4f2;
+  color: #922820;
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.acct-fresh__modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.acct-fresh__part-head {
+  margin-bottom: 0.85rem;
+  font-size: 0.95rem;
+  color: var(--fresh-text);
+}
+
+.acct-fresh__receipt-select {
+  display: block;
+  margin-top: 0.35rem;
+  min-height: 2rem;
+  border-radius: 8px;
+  border: 1px solid #cfd8e3;
+}
+
+.acct-fresh__reason {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid #cfd8e3;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.acct-fresh__receipt-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--fresh-muted);
+}
+
+.acct-fresh__receipt-body {
+  padding: 0.5rem;
+  border: 2px solid #dbe3ec;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.acct-fresh__cleared {
+  color: var(--fresh-success);
+  font-weight: 700;
+}
+
+.acct-fresh__uncleared {
+  color: var(--fresh-danger);
+  font-weight: 700;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__title {
+  margin: 0.45rem 0;
+  text-align: center;
+  color: #e74c3c;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__pid {
+  color: #2980b9;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print-page {
+  margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print--card {
+  border: 2px solid #dbe3ec;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 4em;
+  background: #fff;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print-page .acct-fresh-receipt-print--card:last-child {
+  margin-bottom: 0;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__header {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__logo-cell img {
+  width: 5.5em;
+  height: 5.5em;
+  object-fit: contain;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__sig {
+  width: 8em;
+  height: 2em;
+  object-fit: contain;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__grid {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__grid th,
+:host ::ng-deep .acct-fresh-receipt-print__grid td {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid #e3e8ef;
+  font-size: 0.88rem;
+  vertical-align: middle;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__grid th {
+  text-align: right;
+  font-weight: 700;
+  white-space: nowrap;
+  width: 18%;
+  background: #fafbfc;
+}
+
+:host ::ng-deep .acct-fresh-receipt-print__grid td {
+  text-align: left;
+}
+
+@media (max-width: 767px) {
+  .acct-fresh__title {
+    font-size: 1.45rem;
+  }
+
+  .acct-fresh__search-row {
+    grid-template-columns: 1fr;
+  }
+
+  .acct-fresh__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

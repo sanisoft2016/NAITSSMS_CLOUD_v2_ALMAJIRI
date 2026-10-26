@@ -1,0 +1,258 @@
+/* Legacy StudentPaymentHistory + SearchStudents + SelectedStudentPaymentHistory, lightly polished. */
+.acct-sph {
+  --sph-ink: #2a3f54;
+  --sph-muted: #73879c;
+  --sph-line: #ddd;
+  --sph-well: #f5f5f5;
+  --sph-accent: #1a6aa8;
+  --sph-ok: #3c763d;
+
+  padding: 0.5rem 0.75rem 2.5rem;
+  color: var(--sph-ink);
+}
+
+.acct-sph__page-title {
+  margin: 0.5rem 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.acct-sph__alert {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 4px;
+}
+
+.acct-sph__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-sph__well {
+  background: var(--sph-well);
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  padding: 1.15rem 1.25rem;
+  margin-bottom: 0.5rem;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 5%);
+}
+
+.acct-sph__search {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) minmax(12rem, 1fr) minmax(7rem, 10rem);
+  gap: 0.75rem 1rem;
+  align-items: center;
+  max-width: 900px;
+}
+
+.acct-sph__search .control-label {
+  margin: 0;
+  font-weight: 600;
+  text-align: right;
+}
+
+.acct-sph__search .form-control {
+  min-height: 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.4rem 0.65rem;
+  background: #fff;
+}
+
+.acct-sph__content {
+  max-width: 990px;
+  margin: 0 auto;
+  padding-top: 2em;
+}
+
+.acct-sph__loading {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 0;
+}
+
+.acct-sph__loading--modal {
+  padding: 3rem 0;
+}
+
+.acct-sph__empty {
+  color: var(--sph-muted);
+}
+
+.acct-sph__table-wrap {
+  overflow-x: auto;
+}
+
+.acct-sph__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.acct-sph__table th,
+.acct-sph__table td,
+.acct-sph__history-table th,
+.acct-sph__history-table td,
+.acct-sph__detail-table th,
+.acct-sph__detail-table td {
+  border: 1px solid var(--sph-line);
+  padding: 8px;
+  vertical-align: middle;
+}
+
+.acct-sph__table thead th {
+  background: #f9f9f9;
+  font-weight: 700;
+}
+
+.acct-sph__table.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+}
+
+.btn-xs {
+  padding: 1px 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+
+.btn-primary:hover {
+  background-color: #286090;
+  border-color: #204d74;
+}
+
+.btn-success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.btn-success:hover {
+  background-color: #449d44;
+  border-color: #398439;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+.btn-danger:hover {
+  background-color: #c9302c;
+  border-color: #ac2925;
+}
+
+.form-control.btn-primary {
+  width: 100%;
+}
+
+.lead {
+  font-size: 1.15rem;
+  font-weight: 300;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-danger {
+  color: #a94442 !important;
+}
+
+.acct-sph__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow: auto;
+  background: rgb(0 0 0 / 45%);
+  left: var(--sidenav-width, 0);
+}
+
+.acct-sph__modal {
+  width: min(700px, 96%);
+  margin: 1.5rem auto;
+  padding: 1em 1em 0.75em;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 5px 15px rgb(0 0 0 / 30%);
+}
+
+.acct-sph__history {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.acct-sph__history-table {
+  width: 100%;
+  max-width: 700px;
+  margin: 2.5em auto 0;
+  border-collapse: collapse;
+}
+
+.acct-sph__detail-table {
+  width: 100%;
+  max-width: 650px;
+  margin: 0.75rem auto 0.25rem;
+  border-collapse: collapse;
+}
+
+.acct-sph__no-pay {
+  margin-top: 1.5em;
+}
+
+.acct-sph__modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 0 0.25rem;
+  margin-top: 0.75rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+@media (max-width: 720px) {
+  .acct-sph__search {
+    grid-template-columns: 1fr;
+  }
+
+  .acct-sph__search .control-label {
+    text-align: left;
+  }
+
+  .acct-sph__overlay {
+    left: 0;
+  }
+}

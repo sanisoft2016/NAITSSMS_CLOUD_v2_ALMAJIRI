@@ -1,0 +1,471 @@
+<section class="admin-dashboard">
+  <header class="admin-dashboard__hero">
+    <div class="admin-dashboard__hero-copy">
+      <p class="admin-dashboard__eyebrow">School overview</p>
+      <h1 class="admin-dashboard__title">Dashboard</h1>
+      <p class="admin-dashboard__lead">
+        Current session pulse — enrolment mix and class leaders in one view.
+      </p>
+    </div>
+
+    <div class="admin-dashboard__hero-actions">
+      <a mat-stroked-button color="primary" routerLink="/admin">Registry home</a>
+      <button mat-flat-button color="primary" type="button" (click)="refresh()" [disabled]="isLoading()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="admin-dashboard__state" role="status">
+      <mat-progress-spinner diameter="42" mode="indeterminate" />
+      <p>Loading school summary…</p>
+    </div>
+  } @else if (loadFailed()) {
+    <div class="admin-dashboard__state admin-dashboard__state--error" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <p>Could not load the dashboard. Check that the API is running, then refresh.</p>
+      <button mat-flat-button color="primary" type="button" (click)="refresh()">Try again</button>
+    </div>
+  } @else if (!hasSummary()) {
+    <div class="admin-dashboard__state" role="status">
+      <mat-icon>event_busy</mat-icon>
+      <p>{{ emptyReason() || 'No dashboard data is available yet.' }}</p>
+      <a mat-stroked-button color="primary" routerLink="/admin/session-term-initialisation">
+        Open session &amp; term setup
+      </a>
+    </div>
+  } @else {
+    <div class="admin-dashboard__kpi-grid">
+      <article class="admin-dashboard__kpi admin-dashboard__kpi--session">
+        <span class="admin-dashboard__kpi-label">
+          <mat-icon>calendar_month</mat-icon>
+          Session
+        </span>
+        <strong class="admin-dashboard__kpi-value">{{ sessionLabel() }}</strong>
+      </article>
+
+      <article class="admin-dashboard__kpi admin-dashboard__kpi--term">
+        <span class="admin-dashboard__kpi-label">
+          <mat-icon>schedule</mat-icon>
+          Term
+        </span>
+        <strong class="admin-dashboard__kpi-value">{{ termLabel() }}</strong>
+      </article>
+
+      <article class="admin-dashboard__kpi admin-dashboard__kpi--students">
+        <span class="admin-dashboard__kpi-label">
+          <mat-icon>groups</mat-icon>
+          Students
+        </span>
+        <strong class="admin-dashboard__kpi-value">{{ totalStudents() | number }}</strong>
+      </article>
+
+      <article class="admin-dashboard__kpi admin-dashboard__kpi--teachers">
+        <span class="admin-dashboard__kpi-label">
+          <mat-icon>badge</mat-icon>
+          Teachers
+        </span>
+        <strong class="admin-dashboard__kpi-value">{{ totalTeachers() | number }}</strong>
+      </article>
+    </div>
+
+    <div class="admin-dashboard__stage">
+      <section class="admin-dashboard__panel admin-dashboard__panel--enrolment">
+        <header class="admin-dashboard__panel-head">
+          <div>
+            <h2>Class enrolment</h2>
+            <p>How students are distributed across classes</p>
+          </div>
+          @if (largestClass(); as topClass) {
+            <div class="admin-dashboard__enrolment-highlight">
+              <span>Largest class</span>
+              <strong>{{ topClass.label }}</strong>
+              <small>{{ topClass.count | number }} · {{ topClass.percent }}%</small>
+            </div>
+          }
+        </header>
+
+        @if (hasEnrollment()) {
+          <div class="admin-dashboard__enrolment-body">
+            <div class="admin-dashboard__pie-wrap">
+              <div class="admin-dashboard__pie-glow" aria-hidden="true"></div>
+              <div #enrolmentPie class="admin-dashboard__pie"></div>
+            </div>
+
+            <ul class="admin-dashboard__legend">
+              @for (row of classEnrollment(); track row.label) {
+                <li>
+                  <span class="admin-dashboard__swatch" [style.background]="row.color"></span>
+                  <div class="admin-dashboard__legend-copy">
+                    <strong>{{ row.label }}</strong>
+                    <span>{{ row.count | number }} students · {{ row.percent }}%</span>
+                  </div>
+                  <em>{{ row.percent }}%</em>
+                </li>
+              }
+            </ul>
+          </div>
+        } @else {
+          <p class="admin-dashboard__empty-note">No enrolled students were found for the current session.</p>
+        }
+      </section>
+
+      <section class="admin-dashboard__panel admin-dashboard__panel--performers">
+        <header class="admin-dashboard__panel-head">
+          <div>
+            <h2>Top performers</h2>
+            <p>Pick a class to see the leading three averages</p>
+          </div>
+        </header>
+
+        @if (hasTopPerformers()) {
+          <div class="admin-dashboard__class-rail" role="tablist" aria-label="Classes">
+            @for (group of topPerformers(); track group.classKey) {
+              <button
+                type="button"
+                class="admin-dashboard__class-chip"
+                role="tab"
+                [class.is-active]="selectedPerformers()?.classKey === group.classKey"
+                [style.--chip-accent]="group.accent"
+                [attr.aria-selected]="selectedPerformers()?.classKey === group.classKey"
+                (click)="selectClass(group.classKey)"
+              >
+                <span class="admin-dashboard__class-chip-dot" aria-hidden="true"></span>
+                <span class="admin-dashboard__class-chip-label">{{ group.classLabel }}</span>
+                <span class="admin-dashboard__class-chip-meta">{{ group.students.length }}</span>
+              </button>
+            }
+          </div>
+
+          @if (selectedPerformers(); as selected) {
+            <article class="admin-dashboard__podium" [style.--podium-accent]="selected.accent">
+              <div class="admin-dashboard__podium-banner">
+                <div>
+                  <p class="admin-dashboard__podium-kicker">Now viewing</p>
+                  <h3>{{ selected.classLabel }}</h3>
+                </div>
+                <mat-icon>emoji_events</mat-icon>
+              </div>
+
+              <ol class="admin-dashboard__podium-list">
+                @for (student of selected.students; track student.rankLabel + student.name; let i = $index) {
+                  <li [class]="'admin-dashboard__podium-row admin-dashboard__podium-row--' + (i + 1)">
+                    <span class="admin-dashboard__medal" aria-hidden="true">{{ student.rankLabel }}</span>
+                    <div class="admin-dashboard__podium-copy">
+                      <strong>{{ student.name }}</strong>
+                      <span>
+                        @if (student.armLabel) {
+                          Arm {{ student.armLabel }}
+                        } @else {
+                          —
+                        }
+                      </span>
+                    </div>
+                    <div class="admin-dashboard__score">
+                      <em>{{ student.average | number: '1.1-1' }}</em>
+                      <small>avg</small>
+                    </div>
+                  </li>
+                }
+              </ol>
+            </article>
+          }
+        } @else {
+          <p class="admin-dashboard__empty-note">
+            Assessment scores are not available yet for this term, so rankings cannot be shown.
+          </p>
+        }
+      </section>
+    </div>
+
+    <section class="admin-dashboard__attendance" aria-labelledby="attendance-summary-heading">
+      <header class="admin-dashboard__attendance-head">
+        <div>
+          <p class="admin-dashboard__eyebrow">Learner accountability</p>
+          <h2 id="attendance-summary-heading">Attendance summary</h2>
+          <p>
+            Last 30 days of the daily register — rates by arm, the attendance trend, and learners
+            most at risk of dropping out.
+          </p>
+        </div>
+        <a mat-stroked-button color="primary" routerLink="/admin/daily-attendance/summary">
+          Open full summary
+        </a>
+      </header>
+
+      @if (attendanceLoading()) {
+        <div class="admin-dashboard__attendance-state" role="status">
+          <mat-progress-spinner diameter="36" mode="indeterminate" />
+          <p>Loading learner attendance…</p>
+        </div>
+      } @else if (attendanceFailed()) {
+        <div class="admin-dashboard__attendance-state admin-dashboard__attendance-state--error" role="alert">
+          <mat-icon>error_outline</mat-icon>
+          <p>Attendance figures could not be loaded. Refresh to try again.</p>
+        </div>
+      } @else if (attendance(); as att) {
+          <div class="admin-dashboard__attendance-kpis">
+            <article class="admin-dashboard__att-kpi" [attr.data-tone]="attendanceRateTone()">
+              <span>
+                <mat-icon>fact_check</mat-icon>
+                Learner attendance
+              </span>
+              <strong>{{ att.learnerAttendanceRate | number: '1.0-1' }}%</strong>
+              <small>{{ att.fromDate | date: 'dd MMM' }} – {{ att.toDate | date: 'dd MMM yyyy' }}</small>
+            </article>
+
+            <article class="admin-dashboard__att-kpi">
+              <span>
+                <mat-icon>event_available</mat-icon>
+                Days registered
+              </span>
+              <strong>{{ att.daysRegistered | number }}</strong>
+              <small>School days with a register</small>
+            </article>
+
+            <article class="admin-dashboard__att-kpi">
+              <span>
+                <mat-icon>groups</mat-icon>
+                Learners on roll
+              </span>
+              <strong>{{ att.totalLearners | number }}</strong>
+              <small>Current enrolment</small>
+            </article>
+
+            <article class="admin-dashboard__att-kpi" [attr.data-tone]="att.atRiskLearners.length ? 'bad' : 'good'">
+              <span>
+                <mat-icon>warning_amber</mat-icon>
+                At-risk learners
+              </span>
+              <strong>{{ att.atRiskLearners.length | number }}</strong>
+              <small>3+ absences or below 60%</small>
+            </article>
+          </div>
+
+          <div class="admin-dashboard__attendance-grid">
+            <div class="admin-dashboard__attendance-panel">
+              <header>
+                <h3>Attendance by arm</h3>
+                <p>Sorted from lowest rate — late and excused count as present.</p>
+              </header>
+
+              @if (attendanceArms().length) {
+                <ul class="admin-dashboard__arm-list">
+                  @for (arm of attendanceArms(); track arm.classArmId) {
+                    <li>
+                      <div class="admin-dashboard__arm-meta">
+                        <strong>{{ arm.classArmLabel }}</strong>
+                        <span>{{ arm.learners | number }} learners · {{ arm.daysRegistered }} days</span>
+                      </div>
+                      <div class="admin-dashboard__arm-bar" [attr.data-tone]="rateTone(arm.attendanceRate)">
+                        <div class="admin-dashboard__arm-fill" [style.width]="rateBarWidth(arm.attendanceRate)"></div>
+                      </div>
+                      <em [attr.data-tone]="rateTone(arm.attendanceRate)">
+                        {{ arm.attendanceRate | number: '1.0-1' }}%
+                      </em>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <p class="admin-dashboard__empty-note">No arm registers have been taken in this period yet.</p>
+              }
+            </div>
+
+            <div class="admin-dashboard__attendance-panel">
+              <header>
+                <h3>Daily trend</h3>
+                <p>Centre-wide learner attendance across the period.</p>
+              </header>
+
+              @if (hasAttendanceTrend()) {
+                <div #attendanceTrend class="admin-dashboard__trend"></div>
+              } @else {
+                <p class="admin-dashboard__empty-note">Not enough daily marks yet to draw a trend.</p>
+              }
+            </div>
+
+            <div class="admin-dashboard__attendance-panel admin-dashboard__attendance-panel--risk">
+              <header>
+                <h3>Learners at risk</h3>
+                <p>Highest priority drop-out signals from the register.</p>
+              </header>
+
+              @if (atRiskPreview().length) {
+                <ul class="admin-dashboard__risk-list">
+                  @for (learner of atRiskPreview(); track learner.studentId) {
+                    <li>
+                      <div class="admin-dashboard__risk-copy">
+                        <strong>{{ learner.fullName }}</strong>
+                        <span>{{ learner.classArmLabel }} · {{ learner.identificationNo }}</span>
+                      </div>
+                      <div class="admin-dashboard__risk-stats">
+                        <span class="admin-dashboard__risk-rate">{{ learner.attendanceRate | number: '1.0-1' }}%</span>
+                        <small>{{ learner.riskReason }}</small>
+                      </div>
+                    </li>
+                  }
+                </ul>
+                @if (att.atRiskLearners.length > atRiskPreview().length) {
+                  <a class="admin-dashboard__risk-more" routerLink="/admin/daily-attendance/summary">
+                    View all {{ att.atRiskLearners.length }} at-risk learners
+                  </a>
+                }
+              } @else {
+                <p class="admin-dashboard__empty-note">
+                  No learners currently meet the drop-out risk thresholds. Keep the register going.
+                </p>
+              }
+            </div>
+          </div>
+      } @else {
+        <div class="admin-dashboard__attendance-state">
+          <mat-icon>event_busy</mat-icon>
+          <p>No attendance summary is available yet for this centre.</p>
+        </div>
+      }
+    </section>
+
+    <section class="admin-dashboard__panel admin-dashboard__panel--class-attendance">
+      <header class="admin-dashboard__panel-head">
+        <div>
+          <h2>Class attendance roll</h2>
+          <p>Pick a class, then an arm status, to see who is present, absent or late today</p>
+        </div>
+        @if (!classAttendanceOpen()) {
+          <button mat-flat-button color="primary" type="button" (click)="openClassAttendanceBoard()">
+            <mat-icon>fact_check</mat-icon>
+            Browse class attendance
+          </button>
+        } @else {
+          <button mat-stroked-button color="primary" type="button" (click)="closeClassAttendanceBoard()">
+            Close
+          </button>
+        }
+      </header>
+
+      @if (!classAttendanceOpen()) {
+        <p class="admin-dashboard__empty-note">
+          Attendance names stay hidden until you open this board and click a status button.
+        </p>
+      } @else {
+        @if (armAttendanceError() && !attendanceClassChips().length) {
+          <p class="admin-dashboard__empty-note">{{ armAttendanceError() }}</p>
+        } @else if (!attendanceClassChips().length) {
+          <div class="admin-dashboard__attendance-state" role="status">
+            <mat-progress-spinner diameter="36" mode="indeterminate" />
+            <p>Loading classes…</p>
+          </div>
+        } @else {
+          <div class="admin-dashboard__class-rail" role="tablist" aria-label="Classes for attendance">
+            @for (chip of attendanceClassChips(); track chip.classId) {
+              <button
+                type="button"
+                class="admin-dashboard__class-chip"
+                role="tab"
+                [class.is-active]="selectedAttendanceClass()?.classId === chip.classId"
+                [style.--chip-accent]="chip.accent"
+                [attr.aria-selected]="selectedAttendanceClass()?.classId === chip.classId"
+                (click)="selectAttendanceClass(chip.classId)"
+              >
+                <span class="admin-dashboard__class-chip-dot" aria-hidden="true"></span>
+                <span class="admin-dashboard__class-chip-label">{{ chip.classLabel }}</span>
+              </button>
+            }
+          </div>
+
+          @if (!selectedAttendanceClass()) {
+            <p class="admin-dashboard__empty-note">
+              Choose a class above to load today's per-arm attendance.
+            </p>
+          } @else if (armAttendanceLoading()) {
+            <div class="admin-dashboard__attendance-state" role="status">
+              <mat-progress-spinner diameter="36" mode="indeterminate" />
+              <p>Loading arms for {{ selectedAttendanceClass()?.classLabel }}…</p>
+            </div>
+          } @else if (armAttendanceError()) {
+            <p class="admin-dashboard__empty-note">{{ armAttendanceError() }}</p>
+          } @else if (selectedAttendanceClass(); as selectedClass) {
+            <article class="admin-dashboard__podium admin-dashboard__podium--attendance" [style.--podium-accent]="selectedClass.accent">
+              <div class="admin-dashboard__podium-banner">
+                <div>
+                  <p class="admin-dashboard__podium-kicker">Now viewing · {{ attendanceRollDate }}</p>
+                  <h3>{{ selectedClass.classLabel }}</h3>
+                </div>
+                <mat-icon>how_to_reg</mat-icon>
+              </div>
+
+              @if (armAttendanceBoards().length) {
+                <div class="admin-dashboard__arm-boards">
+                  @for (board of armAttendanceBoards(); track board.armId) {
+                    <div class="admin-dashboard__arm-board">
+                      <div class="admin-dashboard__arm-board-head">
+                        <strong>{{ board.armLabel }}</strong>
+                        <span>{{ board.total | number }} learner(s)</span>
+                      </div>
+
+                      <div class="admin-dashboard__status-rail" role="group" [attr.aria-label]="board.armLabel + ' status counts'">
+                        @for (bucket of board.buckets; track bucket.status) {
+                          <button
+                            type="button"
+                            class="admin-dashboard__status-chip"
+                            [class.admin-dashboard__status-chip--present]="bucket.cssClass === 'present'"
+                            [class.admin-dashboard__status-chip--absent]="bucket.cssClass === 'absent'"
+                            [class.admin-dashboard__status-chip--late]="bucket.cssClass === 'late'"
+                            [class.admin-dashboard__status-chip--excused]="bucket.cssClass === 'excused'"
+                            [class.is-active]="isStatusSelected(board.armId, bucket.status)"
+                            (click)="toggleStatusLearners(board.armId, bucket.status)"
+                          >
+                            <em>{{ bucket.learners.length }}</em>
+                            <span>{{ bucket.label }}</span>
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                @if (selectedStatusLearners(); as selectedStatus) {
+                  <div class="admin-dashboard__status-learners" [attr.data-tone]="selectedStatus.statusClass">
+                    <header>
+                      <div>
+                        <p class="admin-dashboard__podium-kicker">{{ selectedStatus.statusLabel }}</p>
+                        <h4>{{ selectedStatus.armLabel }}</h4>
+                      </div>
+                      <span>{{ selectedStatus.learners.length | number }} learner(s)</span>
+                    </header>
+
+                    @if (selectedStatus.learners.length) {
+                      <ol>
+                        @for (learner of selectedStatus.learners; track learner.personId; let i = $index) {
+                          <li>
+                            <span class="admin-dashboard__medal" aria-hidden="true">{{ i + 1 }}</span>
+                            <div class="admin-dashboard__podium-copy">
+                              <strong>{{ learner.fullName }}</strong>
+                              <span>{{ learner.identificationNo || 'No ID number' }}</span>
+                            </div>
+                          </li>
+                        }
+                      </ol>
+                    } @else {
+                      <p class="admin-dashboard__empty-note">
+                        No learners marked {{ selectedStatus.statusLabel.toLowerCase() }} in this arm today.
+                      </p>
+                    }
+                  </div>
+                } @else {
+                  <p class="admin-dashboard__empty-note">
+                    Click Present, Absent, Late or Excused to reveal learner names and ID numbers.
+                  </p>
+                }
+              } @else {
+                <p class="admin-dashboard__empty-note">No arm attendance was returned for this class.</p>
+              }
+            </article>
+          }
+        }
+      }
+    </section>
+  }
+</section>

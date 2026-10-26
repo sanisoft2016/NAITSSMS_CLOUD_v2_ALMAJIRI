@@ -1,0 +1,432 @@
+<section class="sms-index-page">
+  @if (smsStatus()) {
+    <p class="lead text-danger">{{ smsStatus() }}</p>
+  }
+
+  <header class="sms-toolbar">
+    <div class="sms-toolbar__intro">
+      <p class="sms-toolbar__eyebrow">Messaging</p>
+      <h1 class="sms-toolbar__title">Welcome to SMS Platform</h1>
+      <p class="sms-toolbar__lead">
+        Manage credentials, system registration, and account balance from here.
+      </p>
+    </div>
+
+    <div class="sms-toolbar__actions" role="group" aria-label="SMS platform actions">
+      <button
+        type="button"
+        class="sms-action sms-action--success"
+        (click)="getSystemSmsInfo()"
+        [disabled]="isLoading()"
+      >
+        <span class="sms-action__label">Get System SMS Info</span>
+      </button>
+      <button
+        type="button"
+        class="sms-action sms-action--info"
+        (click)="postSystemInformation()"
+        [disabled]="isLoading()"
+      >
+        <span class="sms-action__label">Submit System Information</span>
+      </button>
+      <button
+        type="button"
+        class="sms-action sms-action--primary"
+        (click)="updateSmsCredentials()"
+        [disabled]="isLoading()"
+      >
+        <span class="sms-action__label">Update SMS Credential</span>
+      </button>
+      <button
+        type="button"
+        class="sms-action sms-action--balance"
+        (click)="getSmsBalance()"
+        [disabled]="isLoading()"
+      >
+        <span class="sms-action__label">Get SMS Balance</span>
+      </button>
+    </div>
+
+    @if (balanceAmount() !== null) {
+      <div class="sms-balance-strip" role="status" aria-live="polite">
+        <div class="sms-balance-strip__item">
+          <span class="sms-balance-strip__label">Balance</span>
+          <strong class="sms-balance-strip__value">{{ balanceAmount() }}</strong>
+        </div>
+        <div class="sms-balance-strip__divider" aria-hidden="true"></div>
+        <div class="sms-balance-strip__item">
+          <span class="sms-balance-strip__label">Price per SMS</span>
+          <strong class="sms-balance-strip__value">{{ pricePerSms() }}</strong>
+        </div>
+      </div>
+    }
+  </header>
+
+  <!-- <div class="well search-well">
+    <form class="form-horizontal" (ngSubmit)="searchStudent()">
+      <div class="form-group search-form-row">
+        <label class="control-label col-md-3" for="parameter">Search Student:</label>
+        <div class="col-md-3">
+          <input
+            id="parameter"
+            class="form-control"
+            placeholder="Search"
+            name="parameter"
+            [(ngModel)]="searchParameter"
+            [ngModelOptions]="{ standalone: true }"
+            required
+            type="text" />
+        </div>
+        <div class="col-md-3">
+          <button type="button" class="btn btn-primary form-control" (click)="searchStudent()" [disabled]="isLoading()">
+            Search
+          </button>
+        </div>
+        <div class="col-md-3">
+          <button type="button" class="btn btn-info form-control" (click)="loadAllStudents()" [disabled]="isLoading()">
+            Get All Students
+          </button>
+        </div>
+      </div>
+    </form>
+  </div> -->
+
+  @if (students().length > 0) {
+    <div class="print-toolbar no-display-screen">
+      <button type="button" class="btn btn-primary printResult" (click)="printPage()">Print</button>
+    </div>
+  }
+
+  <!-- <div class="row page-content" id="pageContent">
+    @if (isLoading()) {
+      <p class="lead text-danger text-center">Loading...</p>
+    } @else if (students().length > 0) {
+      <div class="border-box" id="pageContentMain">
+        <div class="border-inner">
+          <table class="table table-bordered table-striped sms-students-table">
+            <tr>
+              <th colspan="7" class="text-center text-danger">
+                List of students and guardians GSM No. in the school
+              </th>
+            </tr>
+            <tr>
+              <th>S/No</th>
+              <th>Class Arm</th>
+              <th>Admission No</th>
+              <th>Student Name</th>
+              <th>Student Guardian Name</th>
+              <th>Telephone</th>
+              <th>
+                Pick
+                <input type="checkbox" id="selectAll" [checked]="allSelected()" (change)="toggleAll($any($event.target).checked)" />
+              </th>
+            </tr>
+
+            @for (student of students(); track student.id; let i = $index) {
+              <tr>
+                <td class="text-left">{{ i + 1 }}</td>
+                <td class="text-left">{{ student.classArm }}</td>
+                <td class="text-left">{{ student.idNo }}</td>
+                <td class="text-left">{{ student.fullName }}</td>
+                <td class="text-left">
+                  <input
+                    class="inline-input guardian-input"
+                    name="GuardianName"
+                    type="text"
+                    [(ngModel)]="student.guardianName"
+                    [ngModelOptions]="{ standalone: true }" />
+                </td>
+                <td class="text-left">
+                  <input
+                    class="inline-input tel-input"
+                    name="TelNo"
+                    type="text"
+                    [(ngModel)]="student.telNo"
+                    [ngModelOptions]="{ standalone: true }" />
+                </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    class="selections"
+                    [checked]="student.selected"
+                    (change)="toggleStudent(student.id, $any($event.target).checked)" />
+                </td>
+              </tr>
+            }
+
+            <tr>
+              <td colspan="7" class="text-right">
+                <button
+                  type="button"
+                  id="SaveChangesId"
+                  class="btn btn-primary printResult"
+                  (click)="updateStudentProfile()"
+                  [disabled]="isSavingProfile()">
+                  {{ isSavingProfile() ? 'Please Wait ...' : 'Save Changes' }}
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="7">
+                <div class="form-horizontal sms-compose" [formGroup]="smsForm">
+                  <hr />
+                  <div class="form-group">
+                    <label class="control-label col-md-2" for="SenderName">Sender name</label>
+                    <div class="col-md-10">
+                      <input
+                        id="SenderName"
+                        class="form-control"
+                        formControlName="senderName"
+                        maxlength="11"
+                        type="text" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="control-label col-md-2" for="Message">Message</label>
+                    <div class="col-md-10">
+                      <textarea
+                        id="Message"
+                        class="form-control"
+                        formControlName="message"
+                        placeholder="Type in your message"
+                        rows="4"
+                        (input)="touchSmsCounter()"></textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-md-12 col-md-offset-2 sms-send-actions">
+                      <button
+                        type="button"
+                        class="btn btn-danger btn-xs"
+                        id="SendSmsId"
+                        (click)="sendSms()"
+                        [disabled]="isSending()">
+                        {{ isSending() ? 'Please Wait ...' : 'Send' }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-xs send-express-btn"
+                        id="SendSmsExpressId"
+                        (click)="sendSmsExpress()"
+                        [disabled]="isSendingExpress()">
+                        {{ isSendingExpress() ? 'Please Wait ...' : 'Send Express' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <ul id="sms-counter" class="sms-counter">
+                  <li>Encoding: <span class="encoding">{{ smsCounter().encoding }}</span></li>
+                  <li>Length: <span class="length">{{ smsCounter().length }}</span></li>
+                  <li>Messages: <span id="noOfSms" class="messages">{{ smsCounter().messages }}</span></li>
+                  <li>Per Message: <span class="per_message">{{ smsCounter().perMessage }}</span></li>
+                  <li>Remaining: <span class="remaining">{{ smsCounter().remaining }}</span></li>
+                </ul>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    }
+  </div> -->
+
+  @if (isLoading()) {
+    <div class="ajax-loader" aria-hidden="true">
+      <span class="ajax-loader__spinner"></span>
+    </div>
+  }
+</section>
+
+@if (modalMode() !== 'none') {
+  <div class="ca-modal-backdrop" smsModalLayer (click)="closeModal()"></div>
+  <section
+    class="ca-modal details-popup"
+    smsModalLayer
+    role="dialog"
+    aria-modal="true"
+    [class.ca-modal--card]="modalMode() === 'systemInfo'"
+    aria-labelledby="school-sms-info-title"
+  >
+    <header class="ca-modal__header">
+      <button type="button" class="ca-modal__close" (click)="closeModal()" aria-label="Close">&times;</button>
+    </header>
+
+    <div class="ca-modal__body details-popup__body">
+      @if (modalMode() === 'systemInfo' && systemInfo()) {
+        <div class="system-info-panel">
+          <div class="system-info-panel__hero">
+            <p class="system-info-panel__eyebrow">Messaging</p>
+            <h2 id="school-sms-info-title">School Info</h2>
+            <p>Registration details used to send messages for this school.</p>
+          </div>
+
+          <dl class="system-info-list">
+            <div>
+              <dt>User Id</dt>
+              <dd>{{ systemInfo()?.userId || '—' }}</dd>
+            </div>
+            <div>
+              <dt>School Name</dt>
+              <dd>{{ systemInfo()?.schoolName || '—' }}</dd>
+            </div>
+            <div>
+              <dt>School Address</dt>
+              <dd>{{ systemInfo()?.schoolAddress || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Telephone</dt>
+              <dd>{{ systemInfo()?.telephone || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Email Address</dt>
+              <dd>{{ systemInfo()?.emailAddress || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Website</dt>
+              <dd>{{ systemInfo()?.website || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Motto</dt>
+              <dd>{{ systemInfo()?.motto || '—' }}</dd>
+            </div>
+            <div class="system-info-list__secret">
+              <dt>SMS API token</dt>
+              <dd>{{ systemInfo()?.smsApiToken || '—' }}</dd>
+            </div>
+            <div class="system-info-list__secret">
+              <dt>SMS API key</dt>
+              <dd>{{ systemInfo()?.smsApiKey || '—' }}</dd>
+            </div>
+          </dl>
+
+          <div class="system-info-footer">
+            <button type="button" class="system-info-close" (click)="closeModal()">Close</button>
+          </div>
+        </div>
+      }
+
+      @if (modalMode() === 'singleSms' && singleSmsStudent()) {
+        <div class="form-horizontal single-sms-panel" [formGroup]="singleSmsForm">
+          <h4>
+            Studend AdmissionNo:
+            <span class="text-danger">{{ singleSmsStudent()?.idNo }}</span>
+            Full name:
+            <span class="text-danger">{{ singleSmsStudent()?.fullName }}</span>,
+            Guardian name:
+            <span class="text-danger">{{ singleSmsStudent()?.guardianName }}</span>
+          </h4>
+          <hr />
+          <div class="form-group">
+            <label class="control-label col-md-2" for="SingleSenderName">Sender name</label>
+            <div class="col-md-10">
+              <input id="SingleSenderName" class="form-control" formControlName="senderName" maxlength="11" type="text" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-md-2" for="RecipientNo">Recipient No</label>
+            <div class="col-md-10">
+              <input id="RecipientNo" class="form-control" formControlName="recipientNo" type="text" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-md-2" for="SingleMessage">Message</label>
+            <div class="col-md-10">
+              <textarea
+                id="SingleMessage"
+                class="form-control"
+                formControlName="message"
+                placeholder="Type in your message"
+                rows="4"
+                (input)="touchSingleSmsCounter()"></textarea>
+            </div>
+          </div>
+          <ul class="sms-counter">
+            <li>Encoding: <span>{{ singleSmsCounter().encoding }}</span></li>
+            <li>Length: <span>{{ singleSmsCounter().length }}</span></li>
+            <li>Messages: <span>{{ singleSmsCounter().messages }}</span></li>
+            <li>Per Message: <span>{{ singleSmsCounter().perMessage }}</span></li>
+            <li>Remaining: <span>{{ singleSmsCounter().remaining }}</span></li>
+          </ul>
+          <div class="form-group modal-footer-actions">
+            <button
+              type="button"
+              class="btn btn-danger btn-xs pull-left"
+              id="SendSmsToSinglePersonId"
+              (click)="sendSmsToSinglePerson()"
+              [disabled]="isSendingSingle()">
+              {{ isSendingSingle() ? 'Please Wait ....' : 'Send' }}
+            </button>
+            <button type="button" class="btn btn-warning btn-xs pull-right" (click)="closeModal()">Cancel</button>
+            <div class="clear-both"></div>
+          </div>
+        </div>
+      }
+
+      @if (modalMode() === 'sendResult' && sendResult()) {
+        <div class="print-toolbar no-display-screen">
+          <button type="button" class="btn btn-primary btn-xs pull-left" (click)="printResultPage()">Print Page</button>
+          <button type="button" class="btn btn-warning btn-xs pull-right" (click)="closeModal()">Cancel</button>
+          <div class="clear-both"></div>
+        </div>
+
+        <div class="border-box" id="pageContent2nd">
+          <div class="border-inner result-inner">
+            <table class="table table-bordered table-striped send-result-table">
+              <tr>
+                <th colspan="8" class="text-center">
+                  Sent SMS Result: No. of SMS =
+                  <span class="text-danger">{{ sendResult()?.noOfSms }}</span>,
+                  Charge Per Ordinary No. =
+                  <span class="text-danger">{{ sendResult()?.costPerOrdinaryNo }}</span>,
+                  Charge Per MTN DND No. =
+                  <span class="text-danger charge-pad">{{ sendResult()?.costPerMtnDndNo }}</span>
+                  Overall Total Charge =
+                  <span class="text-blue">{{ sendResult()?.overallTotalCharge }}</span>
+                </th>
+              </tr>
+              <tr>
+                <th colspan="8" class="text-center">
+                  No. of MTN DND Lines =
+                  <span class="text-danger">{{ sendResult()?.noOfMtnDndNo }}</span>,
+                  Total Charges =
+                  <span class="text-danger">{{ sendResult()?.mtnDndTotalCharge }}</span>,
+                  No. of Ordinary Line =
+                  <span class="text-danger">{{ sendResult()?.noOfOrdinaryNo }}</span>,
+                  Total Charges =
+                  <span class="text-danger">{{ sendResult()?.ordinaryTotalCharge }}</span>,
+                  No. of Invalid Lines =
+                  <span class="text-danger">{{ sendResult()?.noOfInvalidNo }}</span>,
+                  Total Charges =
+                  <span class="text-danger">0</span>
+                </th>
+              </tr>
+              <tr>
+                <th>S/No</th>
+                <th>Class Arm</th>
+                <th>Admission No</th>
+                <th>Student Name</th>
+                <th>Student Guardian Name</th>
+                <th>Telephone</th>
+                <th>Status</th>
+                <th>Charges</th>
+              </tr>
+              @for (row of sendResult()?.rows; track row.telNo; let i = $index) {
+                <tr>
+                  <td class="text-left">{{ i + 1 }}</td>
+                  <td class="text-left">{{ row.classArm }}</td>
+                  <td class="text-left">{{ row.admsnNo }}</td>
+                  <td class="text-left">{{ row.fullName }}</td>
+                  <td class="text-left">{{ row.guardianName }}</td>
+                  <td class="text-left">{{ row.telNo }}</td>
+                  <td>{{ row.status }}</td>
+                  <td [innerHTML]="row.chargeHtml"></td>
+                </tr>
+              }
+            </table>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+}

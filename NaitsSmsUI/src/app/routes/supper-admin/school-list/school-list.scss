@@ -1,0 +1,325 @@
+.school-list-page {
+  display: block;
+  padding: 1.5rem;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(153, 204, 255, 0.18), transparent 28%),
+    linear-gradient(180deg, #fffef9 0%, #ffffff 48%, #f7faf8 100%);
+}
+
+.page-header {
+  margin-bottom: 1.25rem;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.15;
+}
+
+.school-count {
+  margin: 0.5rem 0 0;
+  font-weight: 500;
+  color: #333;
+}
+
+.school-count span {
+  color: #1565c0;
+  font-weight: 700;
+}
+
+.well-box {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  background: #f5f7f8;
+  border: 1px solid #e0e6e8;
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.search-label,
+.search-by {
+  font-weight: 600;
+  color: #304347;
+}
+
+.search-input,
+.search-select,
+.impl-select {
+  min-height: 38px;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid #c5ced1;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+}
+
+.search-input {
+  min-width: min(280px, 100%);
+  flex: 1 1 220px;
+}
+
+.search-select {
+  min-width: 180px;
+}
+
+.impl-select {
+  width: 100%;
+  min-width: 170px;
+}
+
+.page-content {
+  padding-top: 0.5rem;
+}
+
+.loading-state,
+.error-state,
+.lead-empty {
+  margin: 1rem 0;
+  color: #4d5b60;
+}
+
+.error-state {
+  color: #b42318;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.legacy-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 960px;
+}
+
+.legacy-table th,
+.legacy-table td {
+  padding: 0.8rem 0.7rem;
+  border: 1px solid #d7d7d7;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.legacy-table thead th {
+  background: #eef4f2;
+  font-weight: 700;
+}
+
+.action-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.legacy-btn {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 2px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.legacy-btn-xs {
+  min-height: 28px;
+  padding: 2px 12px;
+}
+
+.legacy-btn-warning {
+  background: #f0ad4e;
+  border-color: #eea236;
+  color: #fff;
+}
+
+.legacy-btn-success {
+  background: #5cb85c;
+  border-color: #4cae4c;
+  color: #fff;
+}
+
+.legacy-btn-danger {
+  background: #d9534f;
+  border-color: #d43f3a;
+  color: #fff;
+}
+
+.legacy-btn-primary {
+  background: #337ab7;
+  border-color: #2e6da4;
+  color: #fff;
+}
+
+.legacy-btn-info {
+  background: #5bc0de;
+  border-color: #46b8da;
+  color: #fff;
+}
+
+.legacy-btn-link {
+  background: transparent;
+  border-color: transparent;
+  color: #337ab7;
+  text-decoration: underline;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(16, 24, 28, 0.45);
+}
+
+.modal-dialog {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-wide {
+  width: min(820px, 100%);
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem 1rem;
+  box-shadow: 0 18px 48px rgba(16, 24, 28, 0.22);
+}
+
+.modal-content h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-danger {
+  color: #c62828;
+}
+
+.detail-list {
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+
+  > div {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.5rem;
+  }
+
+  dt {
+    margin: 0;
+    font-weight: 700;
+    color: #304347;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.school-details-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.logo-holder {
+  width: 16em;
+  height: 16em;
+  border: 3px double #9aa7ab;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.thumb-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e9ea;
+}
+
+.accountant-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.accountant-box {
+  border: 1px solid #cfd8dc;
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem;
+}
+
+.accountant-edit-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.edit-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.edit-row input {
+  min-height: 36px;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #c5ced1;
+  border-radius: 8px;
+}
+
+@media (max-width: 720px) {
+  .school-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logo-holder {
+    width: 100%;
+    max-width: 16em;
+    margin-inline: auto;
+  }
+
+  .detail-list > div,
+  .edit-row {
+    grid-template-columns: 1fr;
+  }
+}

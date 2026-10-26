@@ -1,0 +1,12 @@
+# Runtime-only image: build context is the publish output folder.
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+
+ENV ASPNETCORE_URLS=http://+:8080
+ENV MAP_ASPIRE_HEALTH_ENDPOINTS=true
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+
+EXPOSE 8080
+
+COPY . .
+ENTRYPOINT ["dotnet", "NAITSSMS.API.dll"]

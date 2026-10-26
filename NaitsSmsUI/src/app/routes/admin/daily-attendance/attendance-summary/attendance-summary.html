@@ -1,0 +1,235 @@
+<div class="attendance-shell">
+  <div class="header-card">
+    <div>
+      <p class="page-breadcrumb">Daily attendance</p>
+      <h2>Attendance summary</h2>
+      <p>
+        Attendance per arm for the chosen period, the learners most at risk of dropping out, and the
+        action that pushes these figures onto printed report cards.
+      </p>
+    </div>
+    <button type="button" class="secondary-button" (click)="goToFacilitatorRegister()">Facilitator register</button>
+  </div>
+
+  <div class="filter-card">
+    <div class="filter-grid period-filter-grid">
+      <mat-form-field appearance="outline" class="period-field" subscriptSizing="dynamic">
+        <mat-label>From – To</mat-label>
+        <mat-date-range-input [rangePicker]="periodPicker" [max]="maxDate">
+          <input
+            matStartDate
+            [(ngModel)]="rangeStart"
+            name="rangeStart"
+            placeholder="From"
+            (dateChange)="onRangeInputChange()"
+            (ngModelChange)="onRangeInputChange()" />
+          <input
+            matEndDate
+            [(ngModel)]="rangeEnd"
+            name="rangeEnd"
+            placeholder="To"
+            (dateChange)="onRangeInputChange()"
+            (ngModelChange)="onRangeInputChange()" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="periodPicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #periodPicker panelClass="attendance-range-panel"></mat-date-range-picker>
+      </mat-form-field>
+
+      <div class="field-block period-apply">
+        <button
+          type="button"
+          class="primary-button"
+          [disabled]="isLoading() || !rangeStart || !rangeEnd"
+          (click)="loadSummary()">
+          {{ isLoading() ? 'Loading...' : 'Apply period' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (summary) {
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <h3>{{ summary.schoolName || 'This centre' }}</h3>
+          <p>{{ summary.fromDate | date: 'dd MMM yyyy' }} to {{ summary.toDate | date: 'dd MMM yyyy' }}</p>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <span>Learners</span>
+          <strong>{{ summary.totalLearners }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>Facilitators</span>
+          <strong>{{ summary.totalFacilitators }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>Days registered</span>
+          <strong>{{ summary.daysRegistered }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>Learner attendance</span>
+          <strong>{{ summary.learnerAttendanceRate }}%</strong>
+        </div>
+        <div class="stat-card">
+          <span>Facilitator attendance</span>
+          <strong>{{ summary.facilitatorAttendanceRate }}%</strong>
+        </div>
+        <div class="stat-card">
+          <span>At-risk learners</span>
+          <strong>{{ summary.atRiskLearners.length }}</strong>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button type="button" class="secondary-button" (click)="printSummary()">Print</button>
+        <button type="button" class="primary-button" [disabled]="isSyncing" (click)="syncToReportCards()">
+          {{ isSyncing ? 'Syncing...' : 'Sync to report cards' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <h3>Attendance by arm</h3>
+          <p>Late and excused marks count towards attendance.</p>
+        </div>
+      </div>
+
+      @if (summary.arms.length) {
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th>Arm</th>
+              <th>Learners</th>
+              <th>Days</th>
+              <th>Present</th>
+              <th>Absent</th>
+              <th>Late</th>
+              <th>Excused</th>
+              <th>Attendance</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (arm of summary.arms; track arm.classArmId) {
+              <tr>
+                <td>{{ arm.classArmLabel }}</td>
+                <td>{{ arm.learners }}</td>
+                <td>{{ arm.daysRegistered }}</td>
+                <td>{{ arm.presentMarks }}</td>
+                <td>{{ arm.absentMarks }}</td>
+                <td>{{ arm.lateMarks }}</td>
+                <td>{{ arm.excusedMarks }}</td>
+                <td [class]="rateClass(arm.attendanceRate)">{{ arm.attendanceRate }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="empty-state">
+          <p>No register has been taken in this period yet.</p>
+        </div>
+      }
+    </div>
+
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <h3>Learners at risk</h3>
+          <p>Three or more consecutive absences, or below 60% attendance for the period.</p>
+        </div>
+      </div>
+
+      @if (summary.atRiskLearners.length) {
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th>Learner</th>
+              <th>ID no</th>
+              <th>Arm</th>
+              <th>Days</th>
+              <th>Present</th>
+              <th>Absent</th>
+              <th>Attendance</th>
+              <th>Last present</th>
+              <th>Flag</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (learner of summary.atRiskLearners; track learner.studentId) {
+              <tr>
+                <td>{{ learner.fullName }}</td>
+                <td>{{ learner.identificationNo }}</td>
+                <td>{{ learner.classArmLabel }}</td>
+                <td>{{ learner.daysRegistered }}</td>
+                <td>{{ learner.daysPresent }}</td>
+                <td>{{ learner.daysAbsent }}</td>
+                <td [class]="rateClass(learner.attendanceRate)">{{ learner.attendanceRate }}%</td>
+                <td>
+                  {{ learner.lastPresentDate ? (learner.lastPresentDate | date: 'dd MMM yyyy') : 'Never' }}
+                </td>
+                <td><span class="risk-badge">{{ learner.riskReason }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="empty-state">
+          <p>No learner is currently flagged for this period.</p>
+        </div>
+      }
+    </div>
+
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <h3>Facilitator attendance</h3>
+          <p>Lowest attendance first.</p>
+        </div>
+      </div>
+
+      @if (summary.facilitators.length) {
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th>Facilitator</th>
+              <th>Staff no</th>
+              <th>Days</th>
+              <th>Present</th>
+              <th>Absent</th>
+              <th>Attendance</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (facilitator of summary.facilitators; track facilitator.employeeId) {
+              <tr>
+                <td>{{ facilitator.fullName }}</td>
+                <td>{{ facilitator.staffNo }}</td>
+                <td>{{ facilitator.daysRegistered }}</td>
+                <td>{{ facilitator.daysPresent }}</td>
+                <td>{{ facilitator.daysAbsent }}</td>
+                <td [class]="rateClass(facilitator.attendanceRate)">{{ facilitator.attendanceRate }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="empty-state">
+          <p>No facilitator register has been taken in this period.</p>
+        </div>
+      }
+    </div>
+  } @else if (!isLoading()) {
+    <div class="result-card empty-state">
+      <h3>No data for this period</h3>
+      <p>Take a register first, or widen the date range.</p>
+    </div>
+  }
+</div>

@@ -1,0 +1,23 @@
+@if (context.siblings().length > 0) {
+  <div
+    class="student-sibling-switcher"
+    [class.student-sibling-switcher--single]="!context.hasMultipleSiblings()"
+  >
+    <label class="student-sibling-switcher__label" for="studentSiblingSelect">Student</label>
+    <select
+      id="studentSiblingSelect"
+      class="student-sibling-switcher__select form-control"
+      [ngModel]="context.selectedStudentId()"
+      (ngModelChange)="onSelectionChange($event)"
+      [disabled]="context.loading() || !context.hasMultipleSiblings()"
+      [attr.aria-busy]="context.loading()"
+    >
+      @for (sibling of context.siblings(); track sibling.id) {
+        <option [value]="sibling.id">{{ optionLabel(sibling) }}</option>
+      }
+    </select>
+    @if (context.error()) {
+      <p class="student-sibling-switcher__error">{{ context.error() }}</p>
+    }
+  </div>
+}

@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 420px;
+  margin-top: 12px;
+}
+
+.form-error {
+  display: block;
+  margin-top: 8px;
+}
+
+.actions {
+  margin-top: 12px;
+}

@@ -1,0 +1,76 @@
+<!-- Legacy Registry _Layout: container-fluid → _alert → body (padding-top: 1.5em) → Index.cshtml -->
+<section class="registry-index-page">
+  <div class="registry-index-container">
+    @if (showPageAlert()) {
+      <!-- Legacy Views/Shared/_alert.cshtml -->
+      <div class="registry-index-alert-spacer" aria-hidden="true"></div>
+      <div
+        class="alert alert-dismissable registry-index-alert text-center"
+        [class.alert-danger]="pageAlertType() === 'danger'"
+        [class.alert-warning]="pageAlertType() === 'warning'"
+        [class.alert-success]="pageAlertType() === 'success'"
+        [class.alert-info]="pageAlertType() === 'info'"
+        role="alert"
+      >
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="dismissPageAlert()"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+        <div class="registry-index-alert-body" [innerHTML]="pageMessageHtml()"></div>
+      </div>
+    }
+
+    <div class="registry-index-body">
+      <div class="registry-index-row">
+        @for (link of quickLinks; track link.id) {
+          <div class="registry-index-tile" [class.registry-index-tile--sms]="link.smsTile">
+            @if (link.smsTile) {
+              <a
+                class="registry-index-sms-link"
+                [routerLink]="link.route"
+                [attr.title]="link.description"
+              >
+                <span class="registry-index-sms-icon" aria-hidden="true">
+                  @if (link.faIcon) {
+                    <i [class]="link.faIcon + ' fa-3x'"></i>
+                  } @else {
+                    <mat-icon>{{ link.icon }}</mat-icon>
+                  }
+                </span>
+              </a>
+
+              <a class="registry-index-title-link" [routerLink]="link.route">
+                <h3>{{ link.title }}</h3>
+              </a>
+
+              <p class="registry-index-desc">{{ link.description }}</p>
+            } @else {
+              <a
+                class="registry-index-icon-link"
+                [class]="'registry-index-icon-link--' + link.accent"
+                [routerLink]="link.route"
+                [attr.title]="link.description"
+              >
+                @if (link.faIcon) {
+                  <i [class]="link.faIcon + ' fa-3x'" aria-hidden="true"></i>
+                } @else {
+                  <mat-icon>{{ link.icon }}</mat-icon>
+                }
+              </a>
+
+              <a class="registry-index-title-link" [routerLink]="link.route">
+                <h3>{{ link.title }}</h3>
+              </a>
+
+              <p class="registry-index-desc">{{ link.description }}</p>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

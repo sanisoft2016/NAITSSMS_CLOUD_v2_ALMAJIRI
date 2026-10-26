@@ -1,0 +1,442 @@
+/* View Income Category — legacy IncomeCategoryIndex, full-width polished shell. */
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acct-inc-list {
+  --inc-ink: #2a3f54;
+  --inc-muted: #73879c;
+  --inc-line: #d9dee4;
+  --inc-accent: #1a6aa8;
+  --inc-card: #ffffff;
+  --inc-shadow: 0 10px 28px rgb(42 63 84 / 8%);
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1.5rem 1.25rem 2.5rem;
+  color: var(--inc-ink);
+}
+
+.acct-inc-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 1.15rem;
+}
+
+.acct-inc-list__filters,
+.acct-inc-list__analysis-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+  width: 100%;
+  margin-bottom: 1.15rem;
+  padding: 1rem 1.15rem;
+  background: var(--inc-card);
+  border: 1px solid var(--inc-line);
+  border-radius: 12px;
+  box-shadow: var(--inc-shadow);
+  box-sizing: border-box;
+}
+
+.acct-inc-list__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.acct-inc-list__filter--wide {
+  grid-column: span 1;
+}
+
+.acct-inc-list__filter-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.acct-inc-list__select,
+.acct-inc-list__input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.45rem;
+  border: 1px solid #cfd6de;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  background: #fff;
+  color: var(--inc-ink);
+  font-size: 0.95rem;
+}
+
+.acct-inc-list__select:focus,
+.acct-inc-list__input:focus {
+  outline: none;
+  border-color: var(--inc-accent);
+  box-shadow: 0 0 0 3px rgb(26 106 168 / 16%);
+}
+
+.acct-inc-list__alert {
+  margin: 0 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.acct-inc-list__alert--success {
+  color: #3c763d;
+  background: #dff0d8;
+  border: 1px solid #d6e9c6;
+}
+
+.acct-inc-list__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-inc-list__panel {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--inc-card);
+  border: 1px solid var(--inc-line);
+  border-radius: 12px;
+  box-shadow: var(--inc-shadow);
+  overflow: hidden;
+  min-height: 10rem;
+  padding: 1.25rem 1.35rem 1.5rem;
+}
+
+.acct-inc-list__heading {
+  margin: 0 0 1.15rem;
+  text-align: center;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.acct-inc-list__lead {
+  margin: 0 0 1.25rem;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.acct-inc-list__accent {
+  color: #1a6aa8;
+}
+
+.acct-inc-list__danger {
+  color: #c9302c;
+  font-weight: 700;
+}
+
+.acct-inc-list__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.acct-inc-list__empty {
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+}
+
+.acct-inc-list__empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.85rem;
+  border-radius: 50%;
+  background: #eef3f8;
+  color: var(--inc-muted);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.acct-inc-list__empty-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.acct-inc-list__empty-title--danger {
+  color: #a94442;
+  padding: 2rem 1rem;
+}
+
+.acct-inc-list__empty-text {
+  margin: 0;
+  color: var(--inc-muted);
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.acct-inc-list__table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.acct-inc-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.acct-inc-list__table th,
+.acct-inc-list__table td {
+  padding: 0.95rem 1.15rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--inc-line);
+  text-align: left;
+}
+
+.acct-inc-list__table td:first-child {
+  width: 100%;
+}
+
+.acct-inc-list__table--nested td:first-child {
+  width: auto;
+}
+
+.acct-inc-list__table thead th {
+  background: #f7f9fc;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--inc-muted);
+  border-bottom: 1px solid var(--inc-line);
+}
+
+.acct-inc-list__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.acct-inc-list__table tbody tr:hover td {
+  background: #fafcfe;
+}
+
+.acct-inc-list__footer-row td {
+  background: #fafcfe;
+  font-weight: 600;
+}
+
+.acct-inc-list__total-label {
+  text-align: right !important;
+}
+
+.acct-inc-list__actions-head,
+.acct-inc-list__actions-cell {
+  text-align: right;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.acct-inc-list__actions {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.acct-inc-list__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.acct-inc-list__btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.acct-inc-list__btn--primary {
+  color: #fff;
+  background: #337ab7;
+  border-color: #2e6da4;
+}
+
+.acct-inc-list__btn--primary:hover:not(:disabled) {
+  background: #286090;
+}
+
+.acct-inc-list__btn--success {
+  color: #fff;
+  background: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.acct-inc-list__btn--success:hover:not(:disabled) {
+  background: #449d44;
+}
+
+.acct-inc-list__btn--edit {
+  color: #fff;
+  background: #337ab7;
+  border-color: #2e6da4;
+}
+
+.acct-inc-list__btn--edit:hover:not(:disabled) {
+  background: #286090;
+  border-color: #204d74;
+}
+
+.acct-inc-list__btn--delete {
+  color: #fff;
+  background: #d9534f;
+  border-color: #d43f3a;
+}
+
+.acct-inc-list__btn--delete:hover:not(:disabled) {
+  background: #c9302c;
+  border-color: #ac2925;
+}
+
+.acct-inc-list__period-block {
+  margin-bottom: 1.5rem;
+}
+
+.acct-inc-list__period-month {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.acct-inc-list__period-week {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--inc-line);
+  border-radius: 10px;
+  background: #fcfdff;
+}
+
+.acct-inc-list__period-week-title {
+  margin: 0 0 0.75rem;
+  text-align: center;
+  font-weight: 700;
+  color: #1a6aa8;
+}
+
+.acct-inc-list__analysis-result {
+  margin-top: 0.5rem;
+}
+
+.acct-inc-list__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow: auto;
+  background: rgb(24 36 51 / 48%);
+  backdrop-filter: blur(2px);
+  left: var(--sidenav-width, 0);
+}
+
+.acct-inc-list__modal {
+  width: min(520px, 96%);
+  margin: 2.5rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgb(24 36 51 / 28%);
+  overflow: hidden;
+}
+
+.acct-inc-list__modal-head {
+  padding: 1rem 1.25rem;
+  background: #f7f9fc;
+  border-bottom: 1px solid var(--inc-line);
+}
+
+.acct-inc-list__modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.acct-inc-list__edit-form {
+  padding: 1.25rem;
+}
+
+.acct-inc-list__edit-group {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.acct-inc-list__edit-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.acct-inc-list__edit-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+@media (max-width: 1100px) {
+  .acct-inc-list__filters,
+  .acct-inc-list__analysis-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .acct-inc-list__filters,
+  .acct-inc-list__analysis-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .acct-inc-list__heading {
+    font-size: 1.4rem;
+  }
+
+  .acct-inc-list__actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .acct-inc-list__edit-actions {
+    flex-direction: column-reverse;
+  }
+
+  .acct-inc-list__edit-actions .acct-inc-list__btn {
+    width: 100%;
+    min-height: 2.4rem;
+  }
+
+  .acct-inc-list__overlay {
+    left: 0;
+  }
+}

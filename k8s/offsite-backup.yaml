@@ -1,0 +1,117 @@
+# Off-server copy of everything needed to rebuild this VPS: nightly database backups (Silkcoat and
+# the three NAITS schools), uploaded files, the static websites and the nginx configuration.
+# Destination: Google Drive, remote "gdrive" from Secret rclone-config-secret, folder vps-backups/.
+# Files are only ever added on Drive (rclone copy), except database backups older than
+# DB_KEEP_DAYS, which are deleted there to stay within the Drive quota.
+#
+# k8s/scripts/rebuild-server.sh pulls the same folders back, so keep the layout below in sync
+# with its "files" stage.
+#
+# Run once by hand:  kubectl create job --from=cronjob/offsite-backup offsite-backup-manual
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: offsite-backup-config
+  namespace: default
+data:
+  OFFSITE_REMOTE: gdrive
+  OFFSITE_PATH: vps-backups
+  DB_KEEP_DAYS: "90"
+  offsite.sh: |
+    #!/bin/sh
+    set -u
+    cp /rclone-config/rclone.conf /tmp/rclone.conf
+    DEST="${OFFSITE_REMOTE}:${OFFSITE_PATH}"
+    rc() { rclone --config /tmp/rclone.conf --transfers 2 --checkers 4 --skip-links --stats 0 "$@"; }
+    fail=0
+
+    for d in silkcoat naitsasms naitssmshills naitssmsama; do
+      echo "db/$d"
+      rc copy "/src/db/$d" "$DEST/db/$d" --max-age "${DB_KEEP_DAYS}d" --exclude '.*' || fail=1
+    done
+    for d in /src/files/* /src/www/* /src/nginx; do
+      rel="${d#/src/}"
+      echo "$rel"
+      rc copy "$d" "$DEST/$rel" || fail=1
+    done
+    rc delete "$DEST/db" --min-age "${DB_KEEP_DAYS}d" || fail=1
+
+    echo "Drive usage for $DEST:"
+    rc size "$DEST" || fail=1
+    [ "$fail" -eq 0 ] && echo "Off-site copy OK." || echo "Off-site copy had errors (see above)."
+    exit "$fail"
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: offsite-backup
+  namespace: default
+  labels:
+    app: offsite-backup
+spec:
+  # After the last nightly database backup (Ama, 03:00) and before backup-monitor (04:30).
+  schedule: "45 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: rclone
+              image: rclone/rclone:1.68.2
+              command: ["sh", "/scripts/offsite.sh"]
+              envFrom:
+                - configMapRef:
+                    name: offsite-backup-config
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              volumeMounts:
+                - { name: scripts,              mountPath: /scripts,                     readOnly: true }
+                - { name: rclone-config,        mountPath: /rclone-config,               readOnly: true }
+                - { name: db-silkcoat,          mountPath: /src/db/silkcoat,             readOnly: true }
+                - { name: db-naitsasms,         mountPath: /src/db/naitsasms,            readOnly: true }
+                - { name: db-naitssmshills,     mountPath: /src/db/naitssmshills,        readOnly: true }
+                - { name: db-naitssmsama,       mountPath: /src/db/naitssmsama,          readOnly: true }
+                - { name: files-silkcoat,       mountPath: /src/files/silkcoat-uploads,  readOnly: true }
+                - { name: files-naitsasms,      mountPath: /src/files/naitsasms-wwwroot, readOnly: true }
+                - { name: files-naitssmshills,  mountPath: /src/files/naitssmshills-wwwroot, readOnly: true }
+                - { name: files-naitssmsama,    mountPath: /src/files/naitssmsama-wwwroot,   readOnly: true }
+                - { name: www-silkcoatnigeria,  mountPath: /src/www/silkcoatnigeria,     readOnly: true }
+                - { name: www-ourschoolonline,  mountPath: /src/www/ourschoolonline,     readOnly: true }
+                - { name: www-hills,            mountPath: /src/www/ourschoolonline-hills, readOnly: true }
+                - { name: www-ama,              mountPath: /src/www/ourschoolonline-ama,   readOnly: true }
+                - { name: nginx,                mountPath: /src/nginx,                   readOnly: true }
+          volumes:
+            - name: scripts
+              configMap:
+                name: offsite-backup-config
+                items:
+                  - key: offsite.sh
+                    path: offsite.sh
+            - name: rclone-config
+              secret:
+                secretName: rclone-config-secret
+            - { name: db-silkcoat,         hostPath: { path: /sani/tmp/database-backups,                 type: DirectoryOrCreate } }
+            - { name: db-naitsasms,        hostPath: { path: /sani/tmp/naittsasms/database-backups,      type: DirectoryOrCreate } }
+            - { name: db-naitssmshills,    hostPath: { path: /sani/tmp/naitssmshills/database-backups,   type: DirectoryOrCreate } }
+            - { name: db-naitssmsama,      hostPath: { path: /sani/tmp/naitssmsama/database-backups,     type: DirectoryOrCreate } }
+            - { name: files-silkcoat,      hostPath: { path: /sani/tmp/file-upload,                      type: DirectoryOrCreate } }
+            - { name: files-naitsasms,     hostPath: { path: /sani/tmp/naittsasms/wwwroot,               type: DirectoryOrCreate } }
+            - { name: files-naitssmshills, hostPath: { path: /sani/tmp/naitssmshills/wwwroot,            type: DirectoryOrCreate } }
+            - { name: files-naitssmsama,   hostPath: { path: /sani/tmp/naitssmsama/wwwroot,              type: DirectoryOrCreate } }
+            - { name: www-silkcoatnigeria, hostPath: { path: /var/www/silkcoatnigeria,                   type: DirectoryOrCreate } }
+            - { name: www-ourschoolonline, hostPath: { path: /var/www/ourschoolonline,                   type: DirectoryOrCreate } }
+            - { name: www-hills,           hostPath: { path: /var/www/ourschoolonline-hills,             type: DirectoryOrCreate } }
+            - { name: www-ama,             hostPath: { path: /var/www/ourschoolonline-ama,               type: DirectoryOrCreate } }
+            - { name: nginx,               hostPath: { path: /etc/nginx,                                 type: Directory } }

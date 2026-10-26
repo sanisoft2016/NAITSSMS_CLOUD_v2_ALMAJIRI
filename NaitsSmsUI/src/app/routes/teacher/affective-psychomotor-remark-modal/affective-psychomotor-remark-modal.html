@@ -1,0 +1,121 @@
+<div class="remark-backdrop" (click)="closeModal()"></div>
+
+<section class="remark-modal" role="dialog" aria-modal="true">
+  <div class="remark-modal__body">
+    @if (loading()) {
+      <p class="lead text-center">Loading remark...</p>
+    } @else if (mode() === 'empty') {
+      <p class="lead text-danger text-center">
+        {{ message() || 'Failed! environment has not yet been prepared. Contact registry Officer.' }}
+      </p>
+      <div class="remark-footer">
+        <button type="button" class="btn btn-danger" (click)="closeModal()">Close</button>
+      </div>
+    } @else {
+      <p class="text-center student-meta">
+        <strong>Id No. </strong><span class="highlight">{{ admissionNo }}</span>
+        <strong class="pad-left">Student's Name: </strong><span class="highlight">{{ studentName }}</span>
+        <strong class="pad-left">Class: </strong>
+        <span class="highlight">{{ studentClass }} {{ studentArm }}</span>
+      </p>
+
+      <div class="comments-row">
+        <div class="comment-block">
+          <div>Teacher's comments:</div>
+          <textarea
+            rows="2"
+            cols="28"
+            placeholder="Performance Comments"
+            [ngModel]="teacherComment()"
+            (ngModelChange)="teacherComment.set($event)"
+          ></textarea>
+        </div>
+        <div class="comment-block">
+          <div>School head's comments:</div>
+          <textarea
+            rows="2"
+            cols="28"
+            placeholder="Performance Comments"
+            [ngModel]="schoolHeadComment()"
+            (ngModelChange)="schoolHeadComment.set($event)"
+          ></textarea>
+        </div>
+        <div class="attendance-block">
+          Attendance:
+          <input
+            type="number"
+            class="score-input"
+            id="attendanceNo"
+            [ngModel]="attendance()"
+            (ngModelChange)="setAttendance($event)"
+            (focusout)="onAttendanceFocusOut($event)"
+          />
+          {{ totalAttendance() }}
+        </div>
+      </div>
+
+      <p class="lead text-center">Affective and Psychomotor Remark</p>
+
+      <div class="assessment-grid">
+        <table class="table table-bordered">
+          <tr>
+            <td colspan="2" class="text-center">AFFECTIVE ASSESSMENT</td>
+          </tr>
+          <tr>
+            <th>Items Name</th>
+            <th>Scores</th>
+          </tr>
+          @for (item of affectiveItems(); track item.itemId) {
+            <tr>
+              <td>{{ item.itemsName }}</td>
+              <td>
+                <input
+                  class="score-input affectivePsycho"
+                  type="number"
+                  [attr.name]="item.itemId"
+                  [attr.id]="'Id' + item.itemId"
+                  [ngModel]="item.score"
+                  (ngModelChange)="updateItemScore(item.itemId, $event)"
+                  (focusout)="onScoreFocusOut(item.itemId, $event)"
+                />
+              </td>
+            </tr>
+          }
+        </table>
+
+        <table class="table table-bordered">
+          <tr>
+            <td colspan="2" class="text-center">PSYCHOMOTOR ASSESSMENT</td>
+          </tr>
+          <tr>
+            <th>Items Name</th>
+            <th>Scores</th>
+          </tr>
+          @for (item of psychomotorItems(); track item.itemId) {
+            <tr>
+              <td>{{ item.itemsName }}</td>
+              <td>
+                <input
+                  class="score-input affectivePsycho"
+                  type="number"
+                  [attr.name]="item.itemId"
+                  [attr.id]="'Id' + item.itemId"
+                  [ngModel]="item.score"
+                  (ngModelChange)="updateItemScore(item.itemId, $event)"
+                  (focusout)="onScoreFocusOut(item.itemId, $event)"
+                />
+              </td>
+            </tr>
+          }
+        </table>
+      </div>
+
+      <div class="remark-footer">
+        <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="submitEntries()">
+          {{ saving() ? 'Please Wait ...' : 'Submit' }}
+        </button>
+        <button type="button" class="btn btn-danger" (click)="closeModal()">Close</button>
+      </div>
+    }
+  </div>
+</section>

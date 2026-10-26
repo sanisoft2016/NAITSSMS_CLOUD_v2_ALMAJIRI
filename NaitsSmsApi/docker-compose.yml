@@ -1,0 +1,32 @@
+# Optional standalone Docker Compose for NAITSSMS.API
+# Prefer `dotnet run --project NAITSSMS.AppHost` for local Aspire orchestration.
+#
+# From NaitsSmsApi/:
+#   docker compose up --build
+#
+# Override secrets via environment or a .env file (do not commit secrets).
+
+services:
+  naits-api:
+    build:
+      context: .
+      dockerfile: NAITSSMS.API/Dockerfile
+    image: naits-api:local
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      MAP_ASPIRE_HEALTH_ENDPOINTS: "true"
+      DOTNET_RUNNING_IN_CONTAINER: "true"
+      # Stable host fingerprint when WMI/DMI is unavailable (Linux containers).
+      NAITS_UNIQUE_SYSTEM_ID: "naits-local-docker"
+      # Prefer User Secrets / env injection over baking passwords into images:
+      # ConnectionStrings__DefaultConnection: Host=...;Database=...;Username=...;Password=...
+      # JWT__Secret: ...
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

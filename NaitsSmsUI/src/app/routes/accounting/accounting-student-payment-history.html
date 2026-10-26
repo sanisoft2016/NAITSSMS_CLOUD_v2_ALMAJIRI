@@ -1,0 +1,158 @@
+<section class="acct-sph">
+  <h4 class="acct-sph__page-title">Student Payment History Index</h4>
+
+  @if (error()) {
+    <div class="acct-sph__alert acct-sph__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <!-- Legacy StudentPaymentHistory.cshtml search well -->
+  <div class="acct-sph__well well">
+    <div class="acct-sph__search form-horizontal">
+      <label class="control-label" for="parameter">Search Student:</label>
+      <input
+        id="parameter"
+        class="form-control"
+        placeholder="Search"
+        name="parameter"
+        type="text"
+        [ngModel]="searchParameter()"
+        (ngModelChange)="searchParameter.set($event)"
+        (keydown.enter)="$event.preventDefault(); searchStudents()"
+        required
+      />
+      <button type="button" class="btn btn-primary form-control" (click)="searchStudents()" style="color: #ffffff; background-color: #007bff;">
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="acct-sph__content" id="pageContent">
+    @if (searching()) {
+      <div class="acct-sph__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (hasSearched()) {
+      @if (orderedStudents().length === 0) {
+        <p class="lead text-center acct-sph__empty">
+          Sorry! No student's name matched the letter you have typed.
+        </p>
+      } @else {
+        <div class="acct-sph__table-wrap">
+          <table class="table table-bordered table-striped acct-sph__table">
+            <thead>
+              <tr>
+                <th>SNo</th>
+                <th>Admision No.</th>
+                <th>Full Name</th>
+                <th>Class Arm</th>
+                <th>Class Category</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of orderedStudents(); track item.studentLevelPaymentId; let sno = $index) {
+                <tr>
+                  <td>{{ sno + 1 }}</td>
+                  <td>{{ item.admisionNo }}</td>
+                  <td>{{ item.fullName }}</td>
+                  <td>{{ item.classLabel }} {{ armLabel(item.armName) }}</td>
+                  <td>{{ classCategoryLabel(item.classCategoryStatus) }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-success btn-xs"
+                      (click)="openPaymentHistory(item)"
+                    >
+                      Payment History
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+
+  @if (showHistoryModal()) {
+    <div class="acct-sph__overlay" role="dialog" aria-modal="true">
+      <div class="acct-sph__modal">
+        @if (historyLoading()) {
+          <div class="acct-sph__loading acct-sph__loading--modal">
+            <mat-spinner diameter="36"></mat-spinner>
+          </div>
+        } @else if (history(); as h) {
+          <div class="acct-sph__history">
+            @if (h.terms.length === 0) {
+              <p class="lead text-danger acct-sph__no-pay">
+                Sorry! {{ h.studentName }} with admission number of "{{ h.admsnNo }}" has not made any
+                payment so far.
+              </p>
+            } @else {
+              <table class="table table-bordered acct-sph__history-table">
+                <tbody>
+                  <tr>
+                    <td colspan="6">
+                      <strong>Name: </strong>{{ h.studentName }},
+                      <strong>Admission Number: </strong>{{ h.admsnNo }}
+                    </td>
+                  </tr>
+
+                  @for (item of h.terms; track $index) {
+                    <tr>
+                      <th>Session</th>
+                      <th>TermStatus</th>
+                      <th>Total Payment</th>
+                      <th>Discount</th>
+                      <th>ActualFees</th>
+                      <th>Outstanding</th>
+                    </tr>
+                    <tr>
+                      <td>{{ item.session }}</td>
+                      <td>{{ termLabel(item.termStatus) }}</td>
+                      <td>{{ formatNaira(termTotalPaid(item)) }}</td>
+                      <td>{{ formatPlain(item.discount) }}</td>
+                      <td>{{ formatPlain(item.actualFees) }}</td>
+                      <td>{{ formatPlain(termOutstanding(item)) }}</td>
+                    </tr>
+                    <tr>
+                      <td colspan="6" class="text-center">
+                        <strong>Payment Details</strong>
+                        <table class="table table-bordered acct-sph__detail-table">
+                          <thead>
+                            <tr>
+                              <th>Payment Type</th>
+                              <th>Date</th>
+                              <th>Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (each of item.studentTermlyFeesHistory; track $index) {
+                              <tr>
+                                <td class="text-left">{{ paymentTypeLabel(each.paymentType) }}</td>
+                                <td class="text-left">{{ each.paymentDate }}</td>
+                                <td class="text-left">{{ formatPlain(each.amountPaid) }}</td>
+                              </tr>
+                            }
+                            <tr>
+                              <th colspan="2" class="text-right">Total:</th>
+                              <td class="text-left">{{ formatNaira(termTotalPaid(item)) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+          <div class="acct-sph__modal-footer">
+            <button type="button" class="btn btn-danger" (click)="closeHistoryModal()">Close</button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

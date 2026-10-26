@@ -1,0 +1,195 @@
+/* Legacy Teacher/AssignedSubjectAndArm.cshtml — full-width Matero content layout */
+
+.assigned-subject-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0.5rem 0 1.5rem;
+}
+
+.page-header {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.45;
+  text-align: center;
+  color: #a94442;
+}
+
+.page-message {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.page-message--center {
+  text-align: center;
+}
+
+.page-message--danger {
+  color: #a94442;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1rem;
+  width: 100%;
+}
+
+.table-panel {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: pointer;
+  user-select: none;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.btn-xs {
+  padding: 0.25rem 0.5rem;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+.btn-warning {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.legacy-table {
+  width: 100%;
+  min-width: 720px;
+  margin: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background-color: #fff;
+}
+
+.col-sno {
+  width: 5rem;
+}
+
+.col-subject {
+  width: 34%;
+}
+
+.col-class-arm {
+  width: 34%;
+}
+
+.col-menu {
+  width: 14rem;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #ddd;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.legacy-table th,
+.legacy-table td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  text-align: left;
+  word-break: break-word;
+}
+
+.legacy-table th {
+  font-weight: 700;
+  background: #fafafa;
+}
+
+.cell-sno {
+  text-align: center;
+}
+
+.cell-menu {
+  text-align: center;
+}
+
+.load-student-btn {
+  min-width: 9.5rem;
+  max-width: 100%;
+  white-space: normal;
+}
+
+@media (min-width: 992px) {
+  .action-row {
+    justify-content: space-evenly;
+  }
+}
+
+@media (max-width: 767px) {
+  .assigned-subject-page {
+    padding-top: 0.25rem;
+  }
+
+  .action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-row .btn {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .legacy-table th,
+  .legacy-table td {
+    padding: 0.65rem 0.75rem;
+  }
+}

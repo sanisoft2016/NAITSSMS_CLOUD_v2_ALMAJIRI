@@ -1,0 +1,31 @@
+<section class="change-profile-image-page">
+  <header class="change-profile-image-page__header">
+    <div>
+      <p class="change-profile-image-page__eyebrow">Account</p>
+      <h1>Change Profile Image</h1>
+      <p>Upload a JPEG or PNG image (auto-compressed to max 100kb) for your account avatar.</p>
+    </div>
+    <a mat-stroked-button routerLink="/profile/overview">Back to profile</a>
+  </header>
+
+  <div class="change-profile-image-card">
+    <img class="change-profile-image-card__preview" [src]="previewUrl()" alt="Profile preview" />
+
+    <label class="change-profile-image-card__file">
+      <span>{{ isCompressing() ? 'Compressing…' : 'Choose image' }}</span>
+      <input
+        type="file"
+        accept="image/jpeg,image/png"
+        (change)="onImageSelected($event)"
+        [disabled]="isSubmitting() || isCompressing()"
+      />
+    </label>
+
+    <div class="change-profile-image-card__actions">
+      <a mat-stroked-button routerLink="/profile/overview">Cancel</a>
+      <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="isSubmitting() || isCompressing()">
+        {{ isSubmitting() ? 'Saving…' : 'Save image' }}
+      </button>
+    </div>
+  </div>
+</section>

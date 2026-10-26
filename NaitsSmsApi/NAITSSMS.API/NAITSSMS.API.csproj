@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+    <!-- Avoid apphost .exe; Windows Application Control blocks unsigned executables in local Debug. -->
+    <UseAppHost Condition="'$(Configuration)' == 'Debug'">false</UseAppHost>
+    <DefaultItemExcludes>$(DefaultItemExcludes);_copilot_build\**\*;_copilot_build_validate\**\*</DefaultItemExcludes>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>d2f2eee5-f865-40de-9bdd-4f90e7f84770</UserSecretsId>
+  </PropertyGroup>
+
+  <!-- Release / publish: faster cold start + throughput without risky trimming (EF/AutoMapper). -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <TieredCompilation>true</TieredCompilation>
+    <TieredPGO>true</TieredPGO>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <PublishTrimmed>false</PublishTrimmed>
+    <DebuggerSupport>false</DebuggerSupport>
+    <EventSourceSupport>false</EventSourceSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NAITSSMS.Application\NAITSSMS.Application.csproj" />
+    <ProjectReference Include="..\NAITSSMS.Infrastructure\NAITSSMS.Infrastructure.csproj" />
+    <ProjectReference Include="..\NAITSSMS.ServiceDefaults\NAITSSMS.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+    <Content Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+    <EmbeddedResource Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+    <None Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\Api\RegistryOtherMethodController.cs" />
+  </ItemGroup>
+
+</Project>

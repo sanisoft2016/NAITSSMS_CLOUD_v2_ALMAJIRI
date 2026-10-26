@@ -1,0 +1,315 @@
+<div class="student-registration-shell">
+	<div class="student-registration-card">
+		<div class="header">
+			<div class="header-copy">
+				<h1 class="page-title">{{ pageTitle }}</h1>
+			</div>
+			<span class="spacer"></span>
+			<div class="header-actions">
+				<button type="button" class="action-button secondary" (click)="goBack()">
+					<mat-icon>arrow_back</mat-icon>
+					<span>Go Back</span>
+				</button>
+				<button
+					type="button"
+					class="action-button primary"
+					(click)="onSubmit()"
+					[disabled]="isSubmitting() || !hasRegistrationContext"
+				>
+					<mat-icon>save</mat-icon>
+					<span>{{ submitLabel }}</span>
+				</button>
+			</div>
+		</div>
+
+		@if (contextMessage) {
+			<div class="context-message">{{ contextMessage }}</div>
+		}
+
+		@if (errorMessage()) {
+			<p class="status-message error-message">{{ errorMessage() }}</p>
+		}
+
+		@if (isLoading()) {
+			<p class="status-message">Loading registration defaults...</p>
+		}
+
+		<form [formGroup]="form" class="student-form" novalidate>
+			<section class="section-block">
+				<div class="student-top-layout">
+					<div class="student-top-fields">
+						<div class="field-shell">
+							<label class="field-label" for="idNo">Admission No.</label>
+							<input id="idNo" class="field-control" type="text" formControlName="idNo" />
+							@if (form.controls.idNo.touched && form.controls.idNo.invalid) {
+								<span class="field-error">Admission number is required.</span>
+							}
+						</div>
+
+						<div class="field-shell">
+							<label class="field-label" for="firstName">First Name</label>
+							<input id="firstName" class="field-control" type="text" formControlName="firstName" />
+							@if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+								<span class="field-error">First name is required.</span>
+							}
+						</div>
+
+						<div class="field-shell">
+							<label class="field-label" for="middleName">Middle Name</label>
+							<input id="middleName" class="field-control" type="text" formControlName="middleName" />
+						</div>
+
+						<div class="field-shell">
+							<label class="field-label" for="surName">Sur Name</label>
+							<input id="surName" class="field-control" type="text" formControlName="surName" />
+							@if (form.controls.surName.touched && form.controls.surName.invalid) {
+								<span class="field-error">Sur name is required.</span>
+							}
+						</div>
+					</div>
+
+					<div class="passport-panel">
+						<div class="passport-field">
+							<span class="passport-label">Passport</span>
+							<div class="passport-source-actions">
+								<input
+									#cameraInput
+									id="passportCameraUpload"
+									class="passport-file-hidden"
+									type="file"
+									accept="image/*"
+									capture="environment"
+									(change)="onPassportSelected($event)"
+								/>
+								<input
+									#browseInput
+									id="passportBrowseUpload"
+									class="passport-file-hidden"
+									type="file"
+									accept="image/*,.jpg,.jpeg,.png,.gif,.heic,.heif,.webp"
+									(change)="onPassportSelected($event)"
+								/>
+								<button
+									type="button"
+									class="passport-source-btn camera"
+									(click)="cameraInput.click()"
+								>
+									<mat-icon>photo_camera</mat-icon>
+									<span>Open camera</span>
+								</button>
+								<button
+									type="button"
+									class="passport-source-btn browse"
+									(click)="browseInput.click()"
+								>
+									<mat-icon>folder_open</mat-icon>
+									<span>Browse folders</span>
+								</button>
+							</div>
+							<p class="passport-hint">Take a photo or choose an image, then crop to passport size (max 14KB).</p>
+						</div>
+
+						<div
+							#imageHolder
+							id="image-holder"
+							class="passport-frame"
+							[class.passport-frame--ready]="!!passportSourceUrl"
+						>
+							@if (passportSourceUrl) {
+								<img
+									#previewImg
+									id="preview-img"
+									class="thumb-image"
+									[src]="passportSourceUrl"
+									alt="Student passport preview"
+									(load)="onPassportImageLoaded($event)"
+									draggable="false"
+								/>
+								@if (showCropUi) {
+									<div
+										id="crop-frame"
+										class="crop-frame"
+										[style.left.px]="cropLeft"
+										[style.top.px]="cropTop"
+										[style.width.px]="cropDisplayWidth"
+										[style.height.px]="cropDisplayHeight"
+										(mousedown)="onCropPointerDown($event)"
+										(touchstart)="onCropPointerDown($event)"
+									></div>
+								}
+							} @else if (passportPreviewUrl) {
+								<img [src]="passportPreviewUrl" alt="Student passport preview" class="passport-preview" />
+							} @else {
+								<div class="passport-placeholder">Passport preview frame</div>
+							}
+						</div>
+
+						@if (showCropUi) {
+							<button type="button" class="crop-use-btn" (click)="cropAndUsePassport()">Crop &amp; Use</button>
+						}
+					</div>
+				</div>
+
+				<div class="grid two-column student-details-grid">
+					<div class="field-shell date-field">
+						<label class="field-label" for="dateOfBirth">Date Of Birth</label>
+						<div class="legacy-date-input-wrap">
+							<input
+								id="dateOfBirth"
+								class="field-control legacy-date-input"
+								type="text"
+								formControlName="dateOfBirth"
+								[matDatepicker]="dateOfBirthPicker"
+								placeholder="yyyy-mm-dd"
+								autocomplete="off"
+							/>
+							<mat-datepicker-toggle class="legacy-date-toggle" [for]="dateOfBirthPicker"></mat-datepicker-toggle>
+							<mat-datepicker #dateOfBirthPicker startView="month" [touchUi]="true" panelClass="legacy-calendar-panel"></mat-datepicker>
+						</div>
+						@if (form.controls.dateOfBirth.touched && form.controls.dateOfBirth.invalid) {
+							<span class="field-error">Date of birth is required.</span>
+						}
+					</div>
+
+					<div class="field-shell date-field">
+						<label class="field-label" for="dateOfAdmsn">Date Of Admission</label>
+						<div class="legacy-date-input-wrap">
+							<input
+								id="dateOfAdmsn"
+								class="field-control legacy-date-input"
+								type="text"
+								formControlName="dateOfAdmsn"
+								[matDatepicker]="dateOfAdmsnPicker"
+								placeholder="yyyy-mm-dd"
+								autocomplete="off"
+							/>
+							<mat-datepicker-toggle class="legacy-date-toggle" [for]="dateOfAdmsnPicker"></mat-datepicker-toggle>
+							<mat-datepicker #dateOfAdmsnPicker startView="month" [touchUi]="true" panelClass="legacy-calendar-panel"></mat-datepicker>
+						</div>
+						@if (form.controls.dateOfAdmsn.touched && form.controls.dateOfAdmsn.invalid) {
+							<span class="field-error">Date of admission is required.</span>
+						}
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="placeOfBirth">Place Of Birth</label>
+						<input id="placeOfBirth" class="field-control" type="text" formControlName="placeOfBirth" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="status">Student Status</label>
+						<select id="status" class="field-control" formControlName="status">
+							@for (option of statusOptions; track option.value) {
+								<option [ngValue]="option.value">{{ option.label }}</option>
+							}
+						</select>
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="gender">Gender</label>
+						<select id="gender" class="field-control" formControlName="gender">
+							@for (option of genderOptions; track option.value) {
+								<option [ngValue]="option.value">{{ option.label }}</option>
+							}
+						</select>
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="religion">Religion</label>
+						<select id="religion" class="field-control" formControlName="religion">
+							@for (option of religionOptions; track option.value) {
+								<option [ngValue]="option.value">{{ option.label }}</option>
+							}
+						</select>
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="classCategory">Class Category</label>
+						<select id="classCategory" class="field-control" formControlName="classCategory">
+							@if (isSeniorClass) {
+								<option [ngValue]="noCategory" disabled>Select category</option>
+								@for (option of seniorCategoryOptions; track option.value) {
+									<option [ngValue]="option.value">{{ option.label }}</option>
+								}
+							} @else {
+								@for (option of classCategoryOptions; track option.value) {
+									<option [ngValue]="option.value">{{ option.label }}</option>
+								}
+							}
+						</select>
+						@if (form.controls.classCategory.touched && form.controls.classCategory.invalid) {
+							<span class="field-error">Select Science, Art or Commercial for SS classes.</span>
+						}
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="bloodGroup">Blood Group</label>
+						<input id="bloodGroup" class="field-control" type="text" formControlName="bloodGroup" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="transferedFromWhere">Transfered From Where</label>
+						<input id="transferedFromWhere" class="field-control" type="text" formControlName="transferedFromWhere" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="studentMobileNo">Student Mobile No.</label>
+						<input id="studentMobileNo" class="field-control" type="text" formControlName="studentMobileNo" />
+					</div>
+				</div>
+			</section>
+
+			<section class="section-block">
+				<div class="section-heading">
+					<h3>Guardian / Parent Information</h3>
+					<p>Parent and guardian contact details aligned to the lower part of the registration form.</p>
+				</div>
+
+				<div class="grid two-column">
+					<div class="field-shell">
+						<label class="field-label" for="guardiansName">Guardian's Name</label>
+						<input id="guardiansName" class="field-control" type="text" formControlName="guardiansName" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="relationship">Relationship</label>
+						<input id="relationship" class="field-control" type="text" formControlName="relationship" />
+					</div>
+
+					<div class="field-shell full-width">
+						<label class="field-label" for="guardianAddress">Guardian Address</label>
+						<textarea id="guardianAddress" class="field-control" rows="4" formControlName="guardianAddress"></textarea>
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="occupation">Occupation</label>
+						<input id="occupation" class="field-control" type="text" formControlName="occupation" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="mobileNumber">Mobile Number</label>
+						<input id="mobileNumber" class="field-control" type="text" formControlName="mobileNumber" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="homeNumber">Home Number</label>
+						<input id="homeNumber" class="field-control" type="text" formControlName="homeNumber" />
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="emailAddress">Email Address</label>
+						<input id="emailAddress" class="field-control" type="email" formControlName="emailAddress" />
+						@if (form.controls.emailAddress.touched && form.controls.emailAddress.invalid) {
+							<span class="field-error">Enter a valid email address.</span>
+						}
+					</div>
+
+					<div class="field-shell">
+						<label class="field-label" for="country">Country</label>
+						<input id="country" class="field-control" type="text" formControlName="country" />
+					</div>
+				</div>
+			</section>
+		</form>
+	</div>
+</div>

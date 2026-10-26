@@ -1,0 +1,194 @@
+<section class="acct-emp-inc">
+  <header class="acct-emp-inc__header">
+    <h1 class="acct-emp-inc__heading">List of employees</h1>
+  </header>
+
+  @if (flashSuccess()) {
+    <div class="acct-emp-inc__alert acct-emp-inc__alert--success" role="status">
+      {{ flashSuccess() }}
+    </div>
+  }
+  @if (flashWarn()) {
+    <div class="acct-emp-inc__alert acct-emp-inc__alert--warn" role="status">{{ flashWarn() }}</div>
+  }
+  @if (error()) {
+    <div class="acct-emp-inc__alert acct-emp-inc__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="acct-emp-inc__panel" id="pageContent">
+    @if (loading()) {
+      <div class="acct-emp-inc__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (employees().length === 0) {
+      <p class="acct-emp-inc__empty">Sorry! No registered employee</p>
+    } @else {
+      <div class="acct-emp-inc__table-wrap">
+        <table class="acct-emp-inc__table">
+          <thead>
+            <tr>
+              <th colspan="4" class="acct-emp-inc__table-title">List of employees</th>
+            </tr>
+            <tr>
+              <th>S/No</th>
+              <th>Full Name</th>
+              <th>Status</th>
+              <th class="acct-emp-inc__actions-head">Command Buttons</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of employees(); track row.id; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ row.fullName }}</td>
+                <td>
+                  @if (!isTeacher(row)) {
+                    <span class="acct-emp-inc__status-hl">{{ statusLabel(row) }}</span>
+                  } @else {
+                    {{ statusLabel(row) }}
+                  }
+                </td>
+                <td class="acct-emp-inc__actions-cell">
+                  <div class="acct-emp-inc__actions">
+                    @if (hasStructure(row)) {
+                      <button
+                        type="button"
+                        class="acct-emp-inc__btn acct-emp-inc__btn--view"
+                        (click)="openViewStructure(row)"
+                      >
+                        View Income Structure
+                      </button>
+                      <button
+                        type="button"
+                        class="acct-emp-inc__btn acct-emp-inc__btn--delete"
+                        (click)="deleteStructure(row)"
+                      >
+                        Delete
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="acct-emp-inc__btn acct-emp-inc__btn--set"
+                        (click)="openSetStructure(row)"
+                      >
+                        Set Income Structure
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (showModal()) {
+    <div class="acct-emp-inc__overlay" role="dialog" aria-modal="true" (click)="closeModal()">
+      <div class="acct-emp-inc__modal" (click)="$event.stopPropagation()">
+        <div class="acct-emp-inc__modal-head">
+          <button type="button" class="acct-emp-inc__modal-close" aria-label="Close" (click)="closeModal()">
+            ×
+          </button>
+        </div>
+
+        @if (modalLoading()) {
+          <div class="acct-emp-inc__loading acct-emp-inc__loading--modal">
+            <mat-spinner diameter="32"></mat-spinner>
+          </div>
+        } @else {
+          <div class="acct-emp-inc__edit-form">
+            <p class="acct-emp-inc__modal-lead">
+              {{ modalTitle() }}
+              <br />
+              @if (modalMode() === 'set') {
+                Current employee:
+              } @else {
+                Employee's name:
+              }
+              <span class="acct-emp-inc__name">{{ fullName() }}</span>
+            </p>
+
+            <p class="acct-emp-inc__total-row">
+              <label class="acct-emp-inc__total-label" for="totalIncome2nd">Total:</label>
+              <input
+                id="totalIncome2nd"
+                name="totalIncome2nd"
+                type="text"
+                class="acct-emp-inc__input acct-emp-inc__total-input"
+                readonly
+                [value]="totalDisplay()"
+              />
+            </p>
+
+            <hr class="acct-emp-inc__divider" />
+
+            <div class="acct-emp-inc__edit-group">
+              <label class="acct-emp-inc__edit-label" for="EmployeeQualificationStatus"
+                >Qualification</label
+              >
+              <select
+                id="EmployeeQualificationStatus"
+                name="EmployeeQualificationStatus"
+                class="acct-emp-inc__input"
+                [ngModel]="qualification()"
+                (ngModelChange)="qualification.set(+$event)"
+              >
+                @for (opt of qualifications(); track opt.value) {
+                  <option [value]="opt.value">{{ opt.text }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="acct-emp-inc__edit-group">
+              <label class="acct-emp-inc__edit-label" for="BasicSalary">Basic Salary</label>
+              <input
+                id="BasicSalary"
+                name="BasicSalary"
+                type="text"
+                inputmode="decimal"
+                class="acct-emp-inc__input"
+                [ngModel]="basicSalaryDisplay()"
+                (ngModelChange)="onBasicSalaryInput($event)"
+                (focusout)="recalculateTotal()"
+              />
+            </div>
+
+            <div class="acct-emp-inc__edit-group">
+              <label class="acct-emp-inc__edit-label" for="Allowance">Allowance</label>
+              <input
+                id="Allowance"
+                name="Allowance"
+                type="text"
+                inputmode="decimal"
+                class="acct-emp-inc__input"
+                [ngModel]="allowanceDisplay()"
+                (ngModelChange)="onAllowanceInput($event)"
+                (focusout)="recalculateTotal()"
+              />
+            </div>
+
+            <div class="acct-emp-inc__edit-actions">
+              <button
+                type="button"
+                class="acct-emp-inc__btn acct-emp-inc__btn--create"
+                [disabled]="saving()"
+                (click)="submitStructure()"
+              >
+                Create
+              </button>
+              <button
+                type="button"
+                class="acct-emp-inc__btn acct-emp-inc__btn--delete"
+                (click)="closeModal()"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

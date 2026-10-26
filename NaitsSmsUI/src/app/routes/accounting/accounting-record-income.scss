@@ -1,0 +1,241 @@
+/* Record Income — legacy RegisterIncome, full-width centered shell. */
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acct-rec-inc {
+  --inc-ink: #2a3f54;
+  --inc-muted: #73879c;
+  --inc-line: #d9dee4;
+  --inc-accent: #1a6aa8;
+  --inc-card: #ffffff;
+  --inc-shadow: 0 10px 28px rgb(42 63 84 / 8%);
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 2rem 1.25rem 2.5rem;
+  color: var(--inc-ink);
+}
+
+.acct-rec-inc__header {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.acct-rec-inc__title {
+  margin: 0 0 0.45rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.acct-rec-inc__subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.acct-rec-inc__date {
+  color: #31708f;
+  font-weight: 600;
+}
+
+.acct-rec-inc__week {
+  color: #1a6aa8;
+  font-weight: 600;
+}
+
+.acct-rec-inc__alert {
+  margin: 0 0 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.acct-rec-inc__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-rec-inc__alert--warn {
+  color: #8a6d3b;
+  background: #fcf8e3;
+  border: 1px solid #faebcc;
+}
+
+.acct-rec-inc__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.acct-rec-inc__card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 1.5rem 1.75rem 1.4rem;
+  background: var(--inc-card);
+  border: 1px solid var(--inc-line);
+  border-radius: 12px;
+  box-shadow: var(--inc-shadow);
+}
+
+.acct-rec-inc__group {
+  display: grid;
+  grid-template-columns: minmax(10rem, 14rem) minmax(12rem, 1fr);
+  gap: 0.65rem 1.15rem;
+  align-items: center;
+  margin-bottom: 1.15rem;
+}
+
+.acct-rec-inc__group--top {
+  align-items: start;
+}
+
+.acct-rec-inc__label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-align: right;
+}
+
+.acct-rec-inc__group--top .acct-rec-inc__label {
+  margin-top: 0.55rem;
+}
+
+.acct-rec-inc__control {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 2.65rem;
+  border: 1px solid #cfd6de;
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  background: #fff;
+  color: var(--inc-ink);
+  font-size: 1rem;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.acct-rec-inc__textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.acct-rec-inc__control:focus {
+  outline: none;
+  border-color: var(--inc-accent);
+  box-shadow: 0 0 0 3px rgb(26 106 168 / 16%);
+}
+
+.acct-rec-inc__date-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.acct-rec-inc__date-input {
+  padding-right: 2.75rem;
+  cursor: pointer;
+}
+
+.acct-rec-inc__date-toggle {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--inc-accent);
+}
+
+:host ::ng-deep .acct-rec-inc__date-toggle .mat-mdc-icon-button {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+
+:host ::ng-deep .acct-rec-inc__date-toggle .mat-datepicker-toggle-default-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.acct-rec-inc__actions {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: calc(14rem + 1.15rem);
+}
+
+.acct-rec-inc__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.65rem;
+  padding: 0.5rem 1.45rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.acct-rec-inc__btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.acct-rec-inc__btn--primary {
+  color: #fff;
+  background: linear-gradient(180deg, #3b8fd4 0%, #2f7dbd 100%);
+  border-color: #2e6da4;
+  box-shadow: 0 2px 0 rgb(46 109 164 / 25%);
+}
+
+.acct-rec-inc__btn--primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3586c8 0%, #286090 100%);
+}
+
+.acct-rec-inc__btn--primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+@media (max-width: 720px) {
+  .acct-rec-inc__title {
+    font-size: 1.4rem;
+  }
+
+  .acct-rec-inc__group,
+  .acct-rec-inc__group--top {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .acct-rec-inc__label,
+  .acct-rec-inc__group--top .acct-rec-inc__label {
+    text-align: center;
+    margin-top: 0;
+  }
+
+  .acct-rec-inc__actions {
+    padding-left: 0;
+  }
+
+  .acct-rec-inc__btn {
+    width: 100%;
+  }
+}

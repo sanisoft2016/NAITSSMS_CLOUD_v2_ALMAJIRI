@@ -1,0 +1,208 @@
+.broadsheet-report {
+  padding: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #111;
+  background: #fff;
+}
+
+.broadsheet-report__header,
+.broadsheet-report__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.broadsheet-report__header-row {
+  height: 10em;
+}
+
+.broadsheet-report__spacer {
+  width: 5% !important;
+}
+
+.broadsheet-report__logo-cell {
+  width: 16% !important;
+  border: 0 !important;
+  text-align: right;
+}
+
+.broadsheet-report__logo {
+  width: 9em;
+  height: 9em;
+  object-fit: contain;
+}
+
+.broadsheet-report__title-cell {
+  width: 64% !important;
+  border: 0 !important;
+  text-align: center;
+  padding-top: 1em;
+  font-size: 12px !important;
+}
+
+.broadsheet-report__school-name {
+  display: inline-block;
+  width: 100%;
+  font-weight: 800;
+  font-size: large;
+  letter-spacing: 4px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.broadsheet-report__motto {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #00f;
+  font-weight: 700;
+}
+
+.broadsheet-report__report-title {
+  font-weight: 700;
+}
+
+.broadsheet-report__upper {
+  text-transform: uppercase;
+}
+
+.broadsheet-report__arm {
+  padding-top: 1em;
+  overflow-x: auto;
+}
+
+.broadsheet-report__arm-title {
+  text-align: left;
+}
+
+.broadsheet-report__table {
+  table-layout: auto;
+  width: max-content;
+  min-width: 100%;
+  margin-bottom: 2em;
+}
+
+.mytable-head th,
+.mytable-body td,
+.mytable-body th {
+  border: 1px solid #ddd;
+  padding: 2px 4px;
+  vertical-align: middle;
+  background: #fff;
+}
+
+.broadsheet-report__header th,
+.broadsheet-report__header td {
+  background: #fff;
+}
+
+.broadsheet-report__serial-col,
+.broadsheet-report__serial-cell {
+  width: 1%;
+  min-width: 2.5em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.broadsheet-report__admission-col,
+.broadsheet-report__admission-cell {
+  width: 1%;
+  min-width: 11em;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.broadsheet-report__name-col,
+.broadsheet-report__name-cell {
+  width: auto;
+  min-width: 14em;
+  white-space: nowrap;
+  text-align: left;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.broadsheet-report__score-cell {
+  text-align: center;
+}
+
+.broadsheet-report__fail {
+  color: red;
+}
+
+.broadsheet-report .rotate {
+  vertical-align: bottom;
+  height: 140px;
+  width: 1%;
+  min-width: 2.4em;
+  max-width: 3.2em;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+}
+
+.broadsheet-report .rotate > div {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  margin: 0 auto;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.broadsheet-report .rotate > div > span {
+  font-size: 12px;
+  letter-spacing: 2px;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: block;
+}
+
+.broadsheet-report__summary th {
+  text-align: left;
+  font-weight: 700;
+}
+
+@media print {
+  .broadsheet-report {
+    padding: 0;
+  }
+
+  .broadsheet-report__header {
+    page-break-after: avoid;
+    break-after: avoid-page;
+  }
+
+  .broadsheet-report__arm {
+    overflow: visible;
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  .broadsheet-report__arm:first-of-type {
+    page-break-before: avoid;
+    break-before: avoid-page;
+    padding-top: 0.5em;
+  }
+
+  .broadsheet-report__arm + .broadsheet-report__arm {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  .broadsheet-report__table {
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+
+  .mytable-body {
+    page-break-inside: avoid;
+    break-inside: avoid-page;
+  }
+}

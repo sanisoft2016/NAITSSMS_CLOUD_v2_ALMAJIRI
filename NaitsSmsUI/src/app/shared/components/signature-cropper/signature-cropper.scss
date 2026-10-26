@@ -1,0 +1,98 @@
+.sig-cropper {
+  display: block;
+}
+
+.sig-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sig-hint {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.file-hidden {
+  display: none;
+}
+
+.sig-error {
+  color: #b00020;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.sig-preview {
+  margin-top: 12px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  overflow: auto;
+}
+
+.sig-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Self-contained button styles so the component looks correct on any host page. */
+.sig-btn {
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  background: #fff;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.sig-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sig-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sig-btn--primary {
+  border-color: transparent;
+  background: var(--mat-sys-primary, #1976d2);
+  color: var(--mat-sys-on-primary, #fff);
+}
+
+.sig-btn--primary:hover:not(:disabled) {
+  background: var(--mat-sys-primary, #1565c0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.sig-btn--camera {
+  border-color: #0d6efd;
+  background: #0d6efd;
+  color: #fff;
+}
+
+.sig-btn--camera:hover:not(:disabled) {
+  background: #0b5ed7;
+}
+
+/* Crop UX hardening (frame + handles are created via JS with inline styles). */
+#image-holder,
+#crop-frame {
+  touch-action: none;
+  -ms-touch-action: none;
+  user-select: none;
+}
+
+body.no-scroll {
+  touch-action: none;
+  overscroll-behavior: contain;
+}

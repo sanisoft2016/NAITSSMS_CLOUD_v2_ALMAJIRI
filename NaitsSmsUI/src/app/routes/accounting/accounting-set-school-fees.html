@@ -1,0 +1,111 @@
+<section class="acct-fees">
+  @if (loading()) {
+    <div class="acct-fees__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (!hasCurrentTerm()) {
+    <div class="acct-fees__empty">
+      <span class="acct-fees__empty-icon" aria-hidden="true">!</span>
+      <p class="acct-fees__empty-title">Setup required</p>
+      <p class="acct-fees__empty-text">
+        Something needs to be done somewhere before here. Contact admin personnel for assistance.
+      </p>
+    </div>
+  } @else {
+    <form id="SavePrices" class="acct-fees__form" (submit)="$event.preventDefault()">
+      <header class="acct-fees__header">
+        <div>
+          <p class="acct-fees__eyebrow">Student Fees Management</p>
+          <h1 class="acct-fees__title">Fees Settings</h1>
+          <p class="acct-fees__subtitle">
+            Set registration fees for freshers and termly school fees for returning students.
+          </p>
+        </div>
+      </header>
+
+      @if (error()) {
+        <div class="acct-fees__alert acct-fees__alert--error" role="alert">{{ error() }}</div>
+      }
+      @if (success()) {
+        <div class="acct-fees__alert acct-fees__alert--success" role="status">{{ success() }}</div>
+      }
+
+      <div class="acct-fees__panels">
+        <section class="acct-fees__panel acct-fees__panel--fresh">
+          <div class="acct-fees__panel-head">
+            <span class="acct-fees__panel-badge">Freshers</span>
+            <h2 class="acct-fees__panel-title">Registration fees</h2>
+            <p class="acct-fees__panel-desc">Amounts charged to newly admitted students by class level.</p>
+          </div>
+
+          <div class="acct-fees__grid">
+            @for (field of freshFields; track field.key) {
+              <label class="acct-fees__field" [attr.for]="field.key">
+                <span class="acct-fees__field-label">{{ field.label }}</span>
+                <span class="acct-fees__input-wrap">
+                  <span class="acct-fees__currency">₦</span>
+                  <input
+                    type="text"
+                    class="form-control numericField acct-fees__input"
+                    [id]="field.key"
+                    [name]="field.key"
+                    inputmode="decimal"
+                    placeholder="0.00"
+                    [ngModel]="fieldValue(field.key)"
+                    (ngModelChange)="onFeeKeyup(field.key, $event)"
+                  />
+                </span>
+              </label>
+            }
+          </div>
+        </section>
+
+        <section class="acct-fees__panel acct-fees__panel--return">
+          <div class="acct-fees__panel-head">
+            <span class="acct-fees__panel-badge acct-fees__panel-badge--return">Returning</span>
+            <h2 class="acct-fees__panel-title">School fees</h2>
+            <p class="acct-fees__panel-desc">Termly fees for students continuing in the school.</p>
+          </div>
+
+          <div class="acct-fees__grid">
+            @for (field of retnFields; track field.key) {
+              <label class="acct-fees__field" [attr.for]="field.key">
+                <span class="acct-fees__field-label">{{ field.label }}</span>
+                <span class="acct-fees__input-wrap">
+                  <span class="acct-fees__currency">₦</span>
+                  <input
+                    type="text"
+                    class="form-control numericField acct-fees__input"
+                    [id]="field.key"
+                    [name]="field.key"
+                    inputmode="decimal"
+                    placeholder="0.00"
+                    [ngModel]="fieldValue(field.key)"
+                    (ngModelChange)="onFeeKeyup(field.key, $event)"
+                  />
+                </span>
+              </label>
+            }
+          </div>
+        </section>
+      </div>
+
+      <footer class="acct-fees__actions">
+        <button
+          type="button"
+          class="acct-fees__submit"
+          [disabled]="saving()"
+          (click)="submitForm()"
+        >
+          @if (saving()) {
+            <mat-spinner class="acct-fees__submit-spin" diameter="18"></mat-spinner>
+            <span>Saving…</span>
+          } @else {
+            <span>Save fees</span>
+          }
+        </button>
+        <p class="acct-fees__hint">Changes apply to the current academic term.</p>
+      </footer>
+    </form>
+  }
+</section>

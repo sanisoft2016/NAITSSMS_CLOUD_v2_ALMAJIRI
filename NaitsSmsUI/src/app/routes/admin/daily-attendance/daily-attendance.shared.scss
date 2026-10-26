@@ -1,0 +1,549 @@
+.attendance-shell {
+  display: grid;
+  gap: 20px;
+  padding: 18px 8px 36px;
+}
+
+.header-card,
+.filter-card,
+.result-card {
+  border: 1px solid #dbcdb4;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffef8 0%, #ffffff 100%);
+  box-shadow: 0 14px 28px rgba(67, 50, 28, 0.08);
+}
+
+.header-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 24px 28px;
+}
+
+.page-breadcrumb {
+  margin: 0 0 6px;
+  color: #8a6330;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.header-card h2,
+.result-head h3,
+.empty-state h3 {
+  margin: 0;
+  color: #3d2d16;
+  font-family: Cambria, Georgia, serif;
+}
+
+.header-card p,
+.helper-copy,
+.result-head p,
+.empty-state p {
+  margin: 10px 0 0;
+  color: #685847;
+  line-height: 1.6;
+}
+
+.filter-card,
+.result-card {
+  padding: 22px 24px;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.period-filter-grid {
+  grid-template-columns: minmax(280px, 1.4fr) auto;
+  align-items: center;
+}
+
+.field-block {
+  display: grid;
+  gap: 8px;
+  color: #574431;
+  font-weight: 600;
+}
+
+.field-block select,
+.field-block input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #dbcaa9;
+  border-radius: 12px;
+  background: #fffdf8;
+  color: #3d2d16;
+  font: inherit;
+}
+
+.period-apply {
+  align-self: center;
+}
+
+.period-field {
+  width: 100%;
+  max-width: 420px;
+}
+
+.period-field .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+/* Shared input rules clip Material date fields — reset them inside the period picker. */
+.filter-card .period-field input {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: 1.4;
+}
+
+.filter-card .period-field {
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    height: auto;
+    min-height: 56px;
+    border-radius: 14px;
+    background: #fffdf8;
+  }
+
+  ::ng-deep .mdc-notched-outline__leading,
+  ::ng-deep .mdc-notched-outline__notch,
+  ::ng-deep .mdc-notched-outline__trailing {
+    border-color: #dbcaa9 !important;
+  }
+
+  ::ng-deep .mat-mdc-form-field-flex {
+    align-items: center;
+    min-height: 56px;
+  }
+
+  ::ng-deep .mat-mdc-form-field-infix {
+    min-height: 48px;
+    padding-top: 14px;
+    padding-bottom: 12px;
+    width: auto;
+  }
+
+  ::ng-deep .mat-mdc-floating-label,
+  ::ng-deep .mdc-floating-label {
+    color: #8a6330 !important;
+  }
+
+  ::ng-deep .mat-date-range-input-container {
+    align-items: center;
+    height: auto;
+  }
+
+  ::ng-deep .mat-start-date,
+  ::ng-deep .mat-end-date,
+  ::ng-deep input.mat-mdc-input-element {
+    color: #3d2d16;
+    font-size: 14px;
+    line-height: 1.45;
+    height: 24px;
+  }
+
+  ::ng-deep .mat-datepicker-toggle {
+    color: #8a6330;
+    margin-right: 2px;
+  }
+
+  ::ng-deep .mat-mdc-form-field:hover .mdc-notched-outline__leading,
+  ::ng-deep .mat-mdc-form-field:hover .mdc-notched-outline__notch,
+  ::ng-deep .mat-mdc-form-field:hover .mdc-notched-outline__trailing,
+  ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+  ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+  ::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+    border-color: #b99a63 !important;
+  }
+}
+
+.date-field {
+  max-width: 280px;
+}
+
+/* Popup calendar — warm cream theme matching the attendance shell. */
+::ng-deep .attendance-range-panel.mat-datepicker-content,
+::ng-deep .attendance-range-panel {
+  border-radius: 18px !important;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(67, 50, 28, 0.22) !important;
+}
+
+::ng-deep .attendance-range-panel .mat-datepicker-content-container,
+::ng-deep .attendance-range-panel.mat-datepicker-content {
+  background:
+    radial-gradient(circle at top left, rgba(185, 154, 99, 0.18), transparent 44%),
+    linear-gradient(180deg, #fffef8 0%, #ffffff 100%);
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-period-button,
+::ng-deep .attendance-range-panel .mat-calendar-controls {
+  color: #3d2d16;
+  font-family: Cambria, Georgia, serif;
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-body-label {
+  color: #8a6330;
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-table-header th {
+  color: #8b7a63;
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-body-cell-content {
+  border-radius: 999px;
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-body-in-range::before {
+  background: rgba(185, 154, 99, 0.22);
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-body-in-range > .mat-calendar-body-cell-content,
+::ng-deep .attendance-range-panel .mat-calendar-body-range-start > .mat-calendar-body-cell-content,
+::ng-deep .attendance-range-panel .mat-calendar-body-range-end > .mat-calendar-body-cell-content,
+::ng-deep .attendance-range-panel .mat-calendar-body-selected {
+  background-color: #8a6330 !important;
+  color: #fff !important;
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-body-today:not(.mat-calendar-body-selected):not(
+    .mat-calendar-body-range-start
+  ):not(.mat-calendar-body-range-end) {
+  border-color: #8a6330;
+}
+
+::ng-deep .attendance-range-panel .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover
+  > .mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-compar) {
+  background: rgba(138, 99, 48, 0.12);
+}
+
+.helper-copy {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #eef6ea;
+  color: #32613d;
+}
+
+.warning-copy {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fdf1e3;
+  color: #8a5a1c;
+}
+
+.result-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.legacy-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.legacy-table th,
+.legacy-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eadfcf;
+  color: #463520;
+}
+
+.legacy-table th {
+  background: #f8f0df;
+  text-align: left;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.legacy-table tbody tr:hover {
+  background: #fffdf5;
+}
+
+.row-index {
+  width: 56px;
+  color: #8b7a63;
+}
+
+.status-col {
+  width: 420px;
+}
+
+.status-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.status-toggle button {
+  min-width: 82px;
+  padding: 8px 12px;
+  border: 1px solid #dbcaa9;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #5a4423;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.status-toggle button:hover {
+  border-color: #b99a63;
+}
+
+.status-toggle button.active.status-present {
+  border-color: #2c6b41;
+  background: #2c6b41;
+  color: #fff;
+}
+
+.status-toggle button.active.status-absent {
+  border-color: #9d2f2f;
+  background: #9d2f2f;
+  color: #fff;
+}
+
+.status-toggle button.active.status-late {
+  border-color: #a9741a;
+  background: #a9741a;
+  color: #fff;
+}
+
+.status-toggle button.active.status-excused {
+  border-color: #2a5c86;
+  background: #2a5c86;
+  color: #fff;
+}
+
+.remark-input {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #e4d8c1;
+  border-radius: 10px
+;
+  background: #fffdf8;
+  font: inherit;
+}
+
+.tally-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tally-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #f7eedc;
+  color: #5a4423;
+  font-weight: 700;
+}
+
+.tally-chip strong {
+  font-size: 18px;
+}
+
+.tally-chip.present {
+  background: #e6f2e9;
+  color: #245c37;
+}
+
+.tally-chip.absent {
+  background: #f8e6e6;
+  color: #8b2727;
+}
+
+.tally-chip.late {
+  background: #fbf0dd;
+  color: #8a5a1c;
+}
+
+.tally-chip.excused {
+  background: #e6eef6;
+  color: #24506f;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  padding: 16px 18px;
+  border: 1px solid #e4d8c1;
+  border-radius: 14px;
+  background: #fffdf8;
+}
+
+.stat-card span {
+  display: block;
+  color: #8b7a63;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 8px;
+  color: #3d2d16;
+  font-size: 26px;
+  font-family: Cambria, Georgia, serif;
+}
+
+.empty-state {
+  padding: 14px 8px 8px;
+}
+
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.primary-button,
+.secondary-button {
+  min-width: 160px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: #165f84;
+  color: #fff;
+}
+
+.secondary-button {
+  background: #efe5d1;
+  color: #4b381b;
+}
+
+.primary-button[disabled],
+.secondary-button[disabled] {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.error-banner {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8e6e6;
+  color: #8b2727;
+  font-weight: 600;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f8e6e6;
+  color: #8b2727;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rate-strong {
+  color: #245c37;
+  font-weight: 700;
+}
+
+.rate-weak {
+  color: #8b2727;
+  font-weight: 700;
+}
+
+@media (max-width: 960px) {
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .period-filter-grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .status-col {
+    width: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .header-card,
+  .filter-grid,
+  .period-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-card,
+  .filter-card,
+  .result-card {
+    padding: 18px;
+  }
+
+  .period-field,
+  .date-field {
+    max-width: none;
+  }
+
+  .legacy-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .action-row,
+  .secondary-button,
+  .primary-button {
+    width: 100%;
+  }
+}
+
+@media print {
+  .page-header,
+  .menu-category,
+  .filter-card,
+  .action-row,
+  .status-toggle,
+  .remark-input {
+    display: none !important;
+  }
+
+  .attendance-shell {
+    padding: 0;
+  }
+
+  .header-card,
+  .result-card {
+    border: 0;
+    background: #fff;
+    box-shadow: none;
+  }
+}

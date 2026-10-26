@@ -1,0 +1,192 @@
+<mat-card class="licensing-page" appearance="outlined">
+  <div class="back-row">
+    <button mat-raised-button color="primary" type="button" (click)="goBack()">Go Back</button>
+  </div>
+
+  @if (page) {
+    <h3 class="page-title">
+      School Software Licensing Page,
+      <strong>Expiring Date:</strong>
+      <span class="expiry">{{ page.expiringDate || 'Not yet set' }}</span>
+    </h3>
+
+    <div class="school-meta">
+      <p>
+        School Name: <span class="meta-value">{{ page.schoolName || '-' }}</span>
+        Tel: <span class="meta-value">{{ page.schoolTelephone || '-' }}</span>
+      </p>
+
+      <div class="feature-row">
+        <span class="feature-label">Feature implementation type:</span>
+        @if (page.featureImplementationType != null) {
+          <mat-form-field appearance="outline" class="feature-select">
+            <mat-select [(ngModel)]="selectedFeatureType" (selectionChange)="onFeatureTypeChange()">
+              @for (opt of featureOptions; track opt.value) {
+                <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        }
+        <span class="students-label">
+          Total Students: <span class="meta-value">{{ page.totalStudents || '0' }}</span>
+        </span>
+      </div>
+
+      <p>Address: <span class="meta-value">{{ page.schoolAddress || '-' }}</span></p>
+    </div>
+
+    <div class="action-row">
+      <button mat-raised-button color="primary" type="button" (click)="loadSubscriptionHistory()">
+        Subscription History
+      </button>
+      <button mat-stroked-button color="primary" type="button" (click)="openLastSubscriptionInfo()">
+        Get Last Subscription Info
+      </button>
+      <button mat-raised-button color="accent" type="button" (click)="openNewSubscription()">
+        New Subscription
+      </button>
+      <button mat-raised-button color="primary" type="button" (click)="openUpdateStudents()">
+        Update Number of Students
+      </button>
+    </div>
+
+    @if (showHistory) {
+      <div class="history-block">
+        @if (history.length) {
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Subscription Id</th>
+                <th>Payment Date</th>
+                <th>Expiry Date</th>
+                <th>Charges</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of history; track $index) {
+                <tr>
+                  <td>{{ row.subscriptionId }}</td>
+                  <td>{{ row.paymentDateLong || row.paymentDate }}</td>
+                  <td>{{ row.expiryDateLong || row.expiryDate }}</td>
+                  <td>{{ row.charges }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="empty-msg">No subscription so far.</p>
+        }
+      </div>
+    }
+  }
+</mat-card>
+
+@if (modalOpen) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-content">
+        @if (modalMode === 'last') {
+          @if (lastInfo?.hasSubscription) {
+            <p>Last Subscription Details</p>
+            <div class="last-info">
+              <strong>Subscription Id:</strong>
+              <span class="meta-value">{{ lastInfo?.subscriptionId || 'No Id' }}</span>
+              |
+              <strong>Subscription Key:</strong>
+              <span class="meta-value">{{ lastInfo?.registrationKey || 'No key' }}</span>
+              |
+              <strong>Expiry Date:</strong>
+              <span class="meta-value">{{ lastInfo?.expiryDate || '' }}</span>
+            </div>
+          } @else {
+            <p class="empty-msg">No subscription so far.</p>
+          }
+          <div class="modal-footer">
+            <button mat-raised-button color="primary" type="button" (click)="closeModal()">Close</button>
+          </div>
+        }
+
+        @if (modalMode === 'new') {
+          <p>
+            School Name: <span class="meta-value">{{ page?.schoolName }}</span>
+            Tel: <span class="meta-value">{{ page?.schoolTelephone }}</span>
+            Address: <span class="meta-value">{{ page?.schoolAddress }}</span>
+          </p>
+          <hr />
+          <div class="subscription-form">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Expiry Date</mat-label>
+              <input
+                matInput
+                [matDatepicker]="expiryPicker"
+                [(ngModel)]="expiryDate"
+                [min]="minExpiryDate"
+                name="expiryDate"
+                required
+              />
+              <mat-datepicker-toggle matIconSuffix [for]="expiryPicker"></mat-datepicker-toggle>
+              <mat-datepicker #expiryPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Subscription Id</mat-label>
+              <input matInput [(ngModel)]="subscriptionId" name="subscriptionId" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Charges</mat-label>
+              <input matInput [(ngModel)]="charges" name="charges" required />
+            </mat-form-field>
+          </div>
+          <div class="modal-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              (click)="submitSubscriptionKey()"
+              [disabled]="isSubmitting()"
+            >
+              Create
+            </button>
+            @if (createResultHtml) {
+              <div class="reg-key">{{ createResultHtml }}</div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button mat-stroked-button type="button" (click)="closeModal()">Close</button>
+          </div>
+        }
+
+        @if (modalMode === 'students') {
+          <p>
+            School Name: <span class="meta-value">{{ page?.schoolName }}</span>
+            Tel: <span class="meta-value">{{ page?.schoolTelephone }}</span>
+            Address: <span class="meta-value">{{ page?.schoolAddress }}</span>
+          </p>
+          <hr />
+          <div class="form-grid">
+            <label for="noOfStudents">No. of Students</label>
+            <input id="noOfStudents" type="text" [(ngModel)]="noOfStudents" required />
+          </div>
+          <div class="modal-actions">
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              (click)="submitNumberOfStudents()"
+              [disabled]="isSubmitting()"
+            >
+              Create
+            </button>
+            @if (studentsResultMessage) {
+              <div class="reg-key">{{ studentsResultMessage }}</div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button mat-stroked-button type="button" (click)="closeModal()">Close</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,44 @@
+<section class="acct-inc-cat">
+  <header class="acct-inc-cat__header">
+    <h1 class="acct-inc-cat__title">Create Income Category</h1>
+  </header>
+
+  @if (error()) {
+    <div class="acct-inc-cat__alert acct-inc-cat__alert--error" role="alert">{{ error() }}</div>
+  }
+  @if (warn()) {
+    <div class="acct-inc-cat__alert acct-inc-cat__alert--warn" role="status">{{ warn() }}</div>
+  }
+
+  <form class="acct-inc-cat__card" (submit)="$event.preventDefault(); save()">
+    <label class="acct-inc-cat__label" for="CategoryName">Category Name</label>
+
+    <div class="acct-inc-cat__row">
+      <div class="acct-inc-cat__field">
+        <input
+          id="CategoryName"
+          name="CategoryName"
+          type="text"
+          class="acct-inc-cat__input"
+          maxlength="50"
+          placeholder="e.g. Donation, Grant, Other income…"
+          [ngModel]="categoryName()"
+          (ngModelChange)="categoryName.set($event); fieldError.set(''); warn.set('')"
+          [attr.aria-invalid]="!!fieldError()"
+        />
+        @if (fieldError()) {
+          <span class="acct-inc-cat__field-error">{{ fieldError() }}</span>
+        }
+      </div>
+
+      <button type="submit" class="acct-inc-cat__btn acct-inc-cat__btn--primary" [disabled]="saving()">
+        @if (saving()) {
+          <mat-spinner diameter="18"></mat-spinner>
+          Saving…
+        } @else {
+          Save
+        }
+      </button>
+    </div>
+  </form>
+</section>

@@ -1,0 +1,116 @@
+<section class="profile-overview">
+  <header class="profile-overview__header">
+    <div>
+      <p class="profile-overview__eyebrow">Account</p>
+      <h1>Profile overview</h1>
+      <p>Signed-in user and school registration details.</p>
+    </div>
+    <div class="profile-overview__actions">
+      <button mat-stroked-button type="button" (click)="refresh()" [disabled]="isLoading()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <a mat-flat-button color="primary" routerLink="/admin/school-registration">Edit school profile</a>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="profile-overview__state" role="status">
+      <mat-progress-spinner diameter="40" mode="indeterminate" />
+      <p>Loading profile…</p>
+    </div>
+  } @else if (loadFailed()) {
+    <div class="profile-overview__state profile-overview__state--error" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <p>Could not load the school profile. Check that the API is running, then refresh.</p>
+      <button mat-flat-button color="primary" type="button" (click)="refresh()">Try again</button>
+    </div>
+  } @else {
+    <div class="profile-overview__grid">
+      <article class="profile-panel">
+        <header class="profile-panel__head">
+          <h2>Account</h2>
+          <p>Current signed-in user</p>
+        </header>
+
+        <div class="account-identity">
+          <img
+            class="account-identity__avatar"
+            [src]="user().avatar || 'images/avatar-default.jpg'"
+            alt="User avatar"
+            width="80"
+            height="80" />
+          <div>
+            <h3>{{ displayName() }}</h3>
+            <p class="account-identity__email">{{ user().email || '—' }}</p>
+            @if (roleLabels().length) {
+              <ul class="role-list">
+                @for (role of roleLabels(); track role) {
+                  <li>{{ role }}</li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+
+        <p class="account-username">Username: {{ userName() || '—' }}</p>
+      </article>
+
+      <article class="profile-panel profile-panel--school">
+        <header class="profile-panel__head">
+          <h2>School</h2>
+          <p>Registration profile for this school</p>
+        </header>
+
+        <div class="school-identity">
+          @if (logoUrl()) {
+            <img [src]="logoUrl()" alt="School logo" class="school-identity__logo" />
+          } @else {
+            <div class="school-identity__logo school-identity__logo--placeholder" aria-hidden="true">
+              <mat-icon>apartment</mat-icon>
+            </div>
+          }
+          <div>
+            <h3>{{ school()?.schoolName || 'School not found' }}</h3>
+            @if (school()?.motto) {
+              <p class="school-identity__motto">{{ school()?.motto }}</p>
+            }
+          </div>
+        </div>
+
+        <dl class="profile-dl">
+          <div>
+            <dt>Registration Id</dt>
+            <dd>{{ registrationId() || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Address</dt>
+            <dd>{{ school()?.schoolAddress || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Telephone</dt>
+            <dd>{{ school()?.telephone || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>{{ school()?.emailAddress || '—' }}</dd>
+          </div>
+          <div>
+            <dt>P.O. Address</dt>
+            <dd>{{ school()?.poAddress || '—' }}</dd>
+          </div>
+          <div>
+            <dt>Website</dt>
+            <dd>
+              @if (school()?.website) {
+                <a [href]="school()?.website" target="_blank" rel="noopener noreferrer">{{ school()?.website }}</a>
+              } @else {
+                —
+              }
+            </dd>
+          </div>
+        </dl>
+      </article>
+    </div>
+  }
+</section>

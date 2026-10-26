@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Two-factor authentication (optional)</h2>
+
+<mat-dialog-content>
+  @if (!canManage()) {
+    <p class="two-factor-setup__hint">
+      Optional authenticator 2FA is available for admin roles (SAOfficer, Registry, HeadAdmin, Admin).
+    </p>
+  } @else if (enabled() && !setupStarted()) {
+    <p class="two-factor-setup__hint">
+      2FA is currently <strong>enabled</strong> for your admin account. Enter a code from your authenticator app to
+      turn it off.
+    </p>
+    <form class="two-factor-setup__form" [formGroup]="disableForm" (ngSubmit)="disable()" id="disable-2fa-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Authenticator code</mat-label>
+        <input matInput formControlName="code" autocomplete="one-time-code" inputmode="numeric" />
+      </mat-form-field>
+    </form>
+  } @else {
+    <p class="two-factor-setup__hint">
+      Optional: protect your admin login with an authenticator app (Google Authenticator, Microsoft Authenticator,
+      etc.). You can leave this off if you prefer.
+    </p>
+
+    @if (!setupStarted()) {
+      <p class="two-factor-setup__status">Status: {{ enabled() ? 'Enabled' : 'Disabled' }}</p>
+    } @else {
+      @if (qrUrl()) {
+        <img class="two-factor-setup__qr" [src]="qrUrl()" alt="Authenticator QR code" width="180" height="180" />
+      }
+      <p class="two-factor-setup__key">
+        Manual key:
+        <code>{{ sharedKey() }}</code>
+      </p>
+      <form class="two-factor-setup__form" [formGroup]="enableForm" (ngSubmit)="enable()" id="enable-2fa-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm with 6-digit code</mat-label>
+          <input matInput formControlName="code" autocomplete="one-time-code" inputmode="numeric" />
+        </mat-form-field>
+      </form>
+    }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()" [disabled]="isSubmitting()">Close</button>
+
+  @if (canManage() && enabled() && !setupStarted()) {
+    <button mat-flat-button color="warn" type="submit" form="disable-2fa-form" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Disabling…' : 'Disable 2FA' }}
+    </button>
+  } @else if (canManage() && !setupStarted()) {
+    <button mat-flat-button color="primary" type="button" (click)="startSetup()" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Preparing…' : 'Set up 2FA' }}
+    </button>
+  } @else if (canManage() && setupStarted()) {
+    <button mat-flat-button color="primary" type="submit" form="enable-2fa-form" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Enabling…' : 'Enable 2FA' }}
+    </button>
+  }
+</mat-dialog-actions>

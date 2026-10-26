@@ -1,0 +1,133 @@
+<section class="session-term-page">
+  <p id="pageLabel" class="page-label" [class.page-label--editing]="showEditor()">
+    Academic Session
+
+    <button type="button" class="legacy-btn legacy-btn-warning" (click)="refreshPage()" [disabled]="isLoading()">Refresh page</button>
+
+    <span class="prep-action-group">
+      <select
+        #termSelect
+        class="term-select"
+        [value]="selectedTerm()"
+        (change)="updateSelectedTerm(termSelect.value)"
+        [disabled]="isLoading()"
+        aria-label="Academic Term">
+        @for (term of termOptions; track term.value) {
+          <option [value]="term.value">{{ term.label }}</option>
+        }
+      </select>
+
+      <button
+        type="button"
+        class="legacy-btn legacy-btn-success"
+        (click)="prepareAssessmentEnvironment()"
+        [disabled]="isLoading() || !currentSession()"
+        [title]="currentSession() ? 'Prepare assessment environment' : 'Create a current academic session first'">
+        Process
+      </button>
+    </span>
+  </p>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <div id="content" class="content-slot">
+    @if (showEditor()) {
+      <div class="editor-panel">
+        <form class="session-form" [formGroup]="sessionForm" (ngSubmit)="submitSession()">
+          <div class="editor-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Session</mat-label>
+              <input matInput formControlName="session" placeholder="2025/2026" maxlength="9" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                @for (status of statusOptions; track status.value) {
+                  <mat-option [value]="status.value">{{ status.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="editor-actions">
+            <button type="submit" class="legacy-btn legacy-btn-primary" [disabled]="isLoading()">
+              {{ isEditing() ? 'Save changes' : 'Add New Session' }}
+            </button>
+            <button type="button" class="legacy-btn legacy-btn-default" (click)="cancelEdit()" [disabled]="isLoading()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+
+  @if (!showEditor() && !hasSessions()) {
+    <p class="create-action">
+      <button type="button" id="btnCreate" class="legacy-btn legacy-btn-primary" (click)="beginCreate()" [disabled]="isLoading()">
+        Add New Session
+      </button>
+    </p>
+  }
+
+  <div class="session-panel">
+    <p class="current-term-line">
+      <strong>Current Term: </strong><span class="current-term-value">{{ currentSessionLabel() }}</span>
+    </p>
+
+    @if (hasSessions()) {
+      <div class="table-wrap">
+        <table class="session-table">
+          <colgroup>
+            <col class="col-sno" />
+            <col class="col-session" />
+            <col class="col-status" />
+            <col class="col-actions" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="col-sno">S/No</th>
+              <th class="col-session">Session</th>
+              <th class="col-status">Status</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (session of sessions(); track session.id; let index = $index) {
+              <tr>
+                <td class="col-sno">{{ index + 1 }}</td>
+                <td class="col-session">{{ session.session }}</td>
+                <td class="col-status">
+                  <span
+                    class="status-badge"
+                    [class.status-badge--current]="session.status === 0"
+                    [class.status-badge--previous]="session.status === 1">
+                    {{ getStatusLabel(session.status) }}
+                  </span>
+                </td>
+                <td class="col-actions">
+                  <div class="action-cell">
+                    <button type="button" class="legacy-btn legacy-btn-warning legacy-btn-xs" (click)="beginEdit(session)">
+                      Edit
+                    </button>
+                    <button type="button" class="legacy-btn legacy-btn-danger legacy-btn-xs" (click)="deleteSession(session)">
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="empty-state">Welcome. You can now start creating Academic Session</p>
+    }
+  </div>
+</section>

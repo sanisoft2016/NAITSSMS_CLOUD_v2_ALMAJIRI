@@ -1,0 +1,762 @@
+<div class="commission">
+  <header class="commission__header">
+    <div>
+      <p class="commission__eyebrow">National Commission for Almajiri and Out-of-School Children Education</p>
+      <h1>Programme overview</h1>
+      <p class="commission__subtitle">
+        @if (directory(); as dir) {
+          {{ dir.totalCentres }} learning centres in {{ dir.states }} states across {{ dir.zones }} geopolitical
+          zones ·
+        }
+        Every figure is computed from registers and scores entered at the centres.
+      </p>
+    </div>
+
+    <div class="commission__controls">
+      <mat-form-field appearance="outline" class="period-field period-field--header" subscriptSizing="dynamic">
+        <mat-label>From – To</mat-label>
+        <mat-date-range-input [rangePicker]="periodPicker" [max]="maxDate">
+          <input matStartDate [(ngModel)]="rangeStart" name="rangeStart" placeholder="From" />
+          <input matEndDate [(ngModel)]="rangeEnd" name="rangeEnd" placeholder="To" />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="periodPicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #periodPicker panelClass="commission-range-panel"></mat-date-range-picker>
+      </mat-form-field>
+
+      <button
+        mat-flat-button
+        class="header-apply"
+        [disabled]="attendanceLoading() || !rangeStart || !rangeEnd"
+        (click)="refreshAll()"
+      >
+        <mat-icon>refresh</mat-icon>
+        Apply
+      </button>
+    </div>
+  </header>
+
+  @if (attendanceLoading() && !oversight()) {
+    <div class="commission__loading">
+      <mat-spinner diameter="42"></mat-spinner>
+      <p>Collecting registers from programme centres...</p>
+    </div>
+  } @else if (attendanceFailed()) {
+    <div class="commission__error">
+      <mat-icon>error_outline</mat-icon>
+      <div>
+        <h3>Could not load programme oversight</h3>
+        <p>{{ errorMessage() || 'Please try again.' }}</p>
+      </div>
+      <button mat-stroked-button (click)="refreshAll()">Retry</button>
+    </div>
+  } @else if (oversight(); as data) {
+    <section class="attendance-panel">
+      <section class="commission__kpis">
+        <article class="kpi">
+          <span class="kpi__label">Learning centres</span>
+          <strong class="kpi__value">{{ data.totalCentres | number }}</strong>
+          <span class="kpi__foot">
+            {{ data.statesSummary.length }} states · {{ data.zonesSummary.length }} zones
+          </span>
+        </article>
+
+        <article class="kpi">
+          <span class="kpi__label">Learners on roll</span>
+          <strong class="kpi__value">{{ data.totalLearners | number }}</strong>
+          <span class="kpi__foot">
+            {{ data.femaleLearners | number }} girls ({{ share(data.femaleLearners, data.totalLearners) }}%)
+          </span>
+        </article>
+
+        <article class="kpi">
+          <span class="kpi__label">Facilitators</span>
+          <strong class="kpi__value">{{ data.totalFacilitators | number }}</strong>
+          <span class="kpi__foot">Verified on the daily register</span>
+        </article>
+
+        <button
+          type="button"
+          class="kpi kpi--button kpi--leavers"
+          [attr.aria-expanded]="leaversOpen()"
+          aria-controls="leaversDetails"
+          (click)="toggleLeavers()"
+        >
+          <span class="kpi__label">Moved on to school or skills</span>
+          <strong class="kpi__value" [class]="rateTone(data.transitions.transitionRate)">
+            {{ data.transitions.transitionRate }}%
+          </strong>
+          <span class="kpi__foot">
+            {{ data.transitions.toFormalSchool }} to formal school · {{ data.transitions.toVocational }} to
+            vocational, of {{ data.transitions.leavers }} leavers
+          </span>
+          <span class="kpi__action">{{ leaversOpen() ? 'Hide leavers' : 'View leavers and where they went' }}</span>
+        </button>
+      </section>
+
+      <section class="commission__kpis">
+        <article class="kpi">
+          <span class="kpi__label">Learners present {{ dayLabel(data) }}</span>
+          <strong class="kpi__value" [class]="rateTone(data.learnerAttendanceRateToday)">
+            {{ data.learnerAttendanceRateToday }}%
+          </strong>
+          <span class="kpi__foot">
+            {{ data.learnersPresentToday | number }} present / {{ data.learnersAbsentToday | number }} absent
+          </span>
+        </article>
+
+        <article class="kpi">
+          <span class="kpi__label">Facilitators present {{ dayLabel(data) }}</span>
+          <strong class="kpi__value" [class]="rateTone(data.facilitatorAttendanceRateToday)">
+            {{ data.facilitatorAttendanceRateToday }}%
+          </strong>
+          <span class="kpi__foot">
+            {{ data.facilitatorsPresentToday | number }} present /
+            {{ data.facilitatorsAbsentToday | number }} absent
+          </span>
+        </article>
+
+        <article class="kpi" [class.kpi--alert]="data.centresWithOverdueRegister > 0">
+          <span class="kpi__label">Centres reporting {{ dayLabel(data) }}</span>
+          <strong class="kpi__value">{{ data.centresReportingToday }} / {{ data.totalCentres }}</strong>
+          <span class="kpi__foot">{{ data.centresWithOverdueRegister }} centre(s) with an overdue register</span>
+        </article>
+
+        <button
+          type="button"
+          class="kpi kpi--alert kpi--button"
+          [attr.aria-expanded]="atRiskDetailsOpen()"
+          aria-controls="atRiskLearnerDetails"
+          (click)="toggleAtRiskDetails()"
+        >
+          <span class="kpi__label">Learners at risk</span>
+          <strong class="kpi__value">{{ data.totalAtRiskLearners | number }}</strong>
+          <span class="kpi__foot">Absence runs or attendance below 60%</span>
+          <span class="kpi__action">
+            {{ atRiskDetailsOpen() ? 'Hide learner list' : 'View named learners' }}
+          </span>
+        </button>
+      </section>
+
+      <nav class="attendance-tabs" aria-label="Programme oversight views">
+        <button type="button" [class.active]="attendanceView() === 'overview'" (click)="setAttendanceView('overview')">
+          <mat-icon>dashboard</mat-icon>
+          <span>Centres</span>
+        </button>
+        <button type="button" [class.active]="attendanceView() === 'areas'" (click)="setAttendanceView('areas')">
+          <mat-icon>map</mat-icon>
+          <span>States &amp; zones</span>
+        </button>
+        <button type="button" [class.active]="attendanceView() === 'defaults'" (click)="setAttendanceView('defaults')">
+          <mat-icon>notification_important</mat-icon>
+          <span>Overdue registers</span>
+          <em>{{ data.defaultedCentres.length }}</em>
+        </button>
+        <button type="button" [class.active]="attendanceView() === 'class-arms'" (click)="setAttendanceView('class-arms')">
+          <mat-icon>assignment_turned_in</mat-icon>
+          <span>Class/arm detail</span>
+        </button>
+        <button type="button" [class.active]="attendanceView() === 'trends'" (click)="setAttendanceView('trends')">
+          <mat-icon>timeline</mat-icon>
+          <span>Trends</span>
+        </button>
+      </nav>
+
+      @if (leaversOpen()) {
+        <section id="leaversDetails" class="panel leavers-panel">
+          <header class="panel__head at-risk-panel__head">
+            <div>
+              <h3>Learners who have left the programme</h3>
+              <p>
+                Where each leaver went: a formal school, vocational training, or withdrawn. Most recent first.
+                Select a learner to open the full record.
+              </p>
+            </div>
+            <button type="button" class="at-risk-panel__close leavers-panel__close" (click)="toggleLeavers()">Close</button>
+          </header>
+
+          @if (leaversLoading()) {
+            <div class="leavers-panel__loading"><mat-spinner diameter="28" /></div>
+          } @else if (leavers(); as list) {
+            <div class="leavers-filter" role="group" aria-label="Filter leavers by outcome">
+              <button type="button" [class.active]="leaversFilter() === 'all'" (click)="setLeaversFilter('all')">
+                All <em>{{ leaversCount('all') }}</em>
+              </button>
+              <button type="button" [class.active]="leaversFilter() === 'formal'" (click)="setLeaversFilter('formal')">
+                Formal school <em>{{ leaversCount('formal') }}</em>
+              </button>
+              <button type="button" [class.active]="leaversFilter() === 'vocational'" (click)="setLeaversFilter('vocational')">
+                Vocational <em>{{ leaversCount('vocational') }}</em>
+              </button>
+              <button type="button" [class.active]="leaversFilter() === 'withdrawn'" (click)="setLeaversFilter('withdrawn')">
+                Withdrawn <em>{{ leaversCount('withdrawn') }}</em>
+              </button>
+            </div>
+
+            @if (filteredLeavers().length) {
+              <div class="table-scroll">
+                <table class="commission-table leavers-table">
+                  <thead>
+                    <tr>
+                      <th>Learner</th>
+                      <th>ID number</th>
+                      <th>Centre</th>
+                      <th>Last level</th>
+                      <th>Category</th>
+                      <th>Outcome</th>
+                      <th>Where they went</th>
+                      <th>Date left</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (leaver of filteredLeavers(); track leaver.studentId) {
+                      <tr class="clickable" (click)="openLearner(leaver.studentId)">
+                        <td>
+                          <strong>{{ leaver.fullName || 'Name unavailable' }}</strong>
+                          @if (leaver.gender) {
+                            <small class="leavers-table__sub">{{ leaver.gender }}</small>
+                          }
+                        </td>
+                        <td>{{ leaver.identificationNo || '—' }}</td>
+                        <td>
+                          {{ leaver.centreName || 'Unnamed centre' }}
+                          @if (leaver.state) {
+                            <small class="leavers-table__sub">{{ leaver.state }}</small>
+                          }
+                        </td>
+                        <td>{{ leaver.lastLevel || '—' }}</td>
+                        <td>{{ leaver.category || '—' }}</td>
+                        <td>
+                          <span
+                            class="flag"
+                            [class.flag--good]="leaver.outcome === 'formal'"
+                            [class.flag--warn]="leaver.outcome === 'vocational'"
+                            [class.flag--bad]="leaver.outcome === 'withdrawn'"
+                          >
+                            {{ leaver.outcomeLabel }}
+                          </span>
+                        </td>
+                        <td>{{ leaver.destination || '—' }}</td>
+                        <td>{{ leaver.leftOn ? (leaver.leftOn | date: 'dd MMM yyyy') : '—' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <p class="panel__empty">No leaver with this outcome.</p>
+            }
+          }
+        </section>
+      }
+
+      @if (atRiskDetailsOpen()) {
+        <section id="atRiskLearnerDetails" class="panel at-risk-panel">
+          <header class="panel__head at-risk-panel__head">
+            <div>
+              <h3>Learners at risk of dropping out</h3>
+              <p>
+                Named learners flagged by the register between {{ data.fromDate | date: 'dd MMM yyyy' }} and
+                {{ data.toDate | date: 'dd MMM yyyy' }}. Select a learner to open the full record.
+              </p>
+            </div>
+            <button type="button" class="at-risk-panel__close" (click)="toggleAtRiskDetails()">Close</button>
+          </header>
+
+          @if (data.atRiskLearners.length) {
+            <div class="table-scroll">
+              <table class="commission-table at-risk-table">
+                <thead>
+                  <tr>
+                    <th>Learner</th>
+                    <th>ID number</th>
+                    <th>Centre</th>
+                    <th>Level</th>
+                    <th>Attendance</th>
+                    <th>Why flagged</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (learner of data.atRiskLearners; track learner.studentId) {
+                    <tr class="clickable" (click)="openLearner(learner.studentId)">
+                      <td><strong>{{ learner.fullName || 'Name unavailable' }}</strong></td>
+                      <td>{{ learner.identificationNo || '—' }}</td>
+                      <td>{{ learner.centreName || 'Unnamed centre' }}</td>
+                      <td>{{ learner.classArmLabel || '—' }}</td>
+                      <td [class]="rateTone(learner.attendanceRate)">{{ learner.attendanceRate }}%</td>
+                      <td>
+                        <span
+                          class="flag"
+                          [class.flag--bad]="learner.currentAbsenceStreak >= 3"
+                          [class.flag--warn]="learner.currentAbsenceStreak < 3"
+                        >
+                          {{ learner.reason }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else {
+            <p class="panel__empty">No learner is currently at risk in the selected period.</p>
+          }
+        </section>
+      }
+
+      <section class="panel" [hidden]="attendanceView() !== 'overview'">
+        <header class="panel__head">
+          <h3>Centre accountability</h3>
+          <p>Overdue registers first, then lowest attendance. Select a centre to open its full record.</p>
+        </header>
+
+        @if (data.centres.length) {
+          <div class="table-scroll">
+            <table class="commission-table">
+              <thead>
+                <tr>
+                  <th>Centre</th>
+                  <th>State</th>
+                  <th>Learners</th>
+                  <th>Girls</th>
+                  <th>Facilitators</th>
+                  <th>Learner attendance</th>
+                  <th>Facilitator attendance</th>
+                  <th>At risk</th>
+                  <th>Last register</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of data.centres; track row.centreId) {
+                  <tr (click)="openCentre(row)" class="clickable">
+                    <td>
+                      <strong>{{ row.centreName || 'Unnamed centre' }}</strong>
+                      <span class="muted">{{ row.centreType || row.location }}</span>
+                    </td>
+                    <td>
+                      {{ row.state }}
+                      <span class="muted">{{ row.zone }}</span>
+                    </td>
+                    <td>{{ row.learners | number }}</td>
+                    <td>{{ row.femaleLearners | number }}</td>
+                    <td>{{ row.facilitators | number }}</td>
+                    <td [class]="rateTone(row.learnerAttendanceRate)">{{ row.learnerAttendanceRate }}%</td>
+                    <td [class]="rateTone(row.facilitatorAttendanceRate)">{{ row.facilitatorAttendanceRate }}%</td>
+                    <td>{{ row.atRiskLearners }}</td>
+                    <td>{{ row.lastRegisterDate ? (row.lastRegisterDate | date: 'EEE dd MMM') : 'Never' }}</td>
+                    <td>
+                      @if (row.neverSubmitted) {
+                        <span class="flag flag--bad">No class register</span>
+                      } @else if (row.classRegisterOverdue) {
+                        <span class="flag flag--bad">Class: {{ row.daysSinceLastRegister }} school day(s) missed</span>
+                      }
+                      @if (row.staffRegisterOverdue) {
+                        <span class="flag flag--bad">Staff: {{ row.staffDaysSinceLastRegister }} school day(s) missed</span>
+                      }
+                      @if (!row.registerOverdue) {
+                        <span class="flag flag--good">Up to date</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="panel__empty">No programme centres yet.</p>
+        }
+      </section>
+
+      <section class="areas-view" [hidden]="attendanceView() !== 'areas'">
+        <article class="panel">
+          <header class="panel__head">
+            <h3>By geopolitical zone</h3>
+            <p>Lowest learner attendance first.</p>
+          </header>
+          <div class="table-scroll">
+            <table class="commission-table">
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  <th>Centres</th>
+                  <th>Learners</th>
+                  <th>Girls</th>
+                  <th>Facilitators</th>
+                  <th>Learner attendance</th>
+                  <th>Facilitator attendance</th>
+                  <th>At risk</th>
+                  <th>Overdue</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (area of data.zonesSummary; track area.name) {
+                  <tr>
+                    <td><strong>{{ area.name }}</strong></td>
+                    <td>{{ area.centres }}</td>
+                    <td>{{ area.learners | number }}</td>
+                    <td>{{ area.femaleLearners | number }}</td>
+                    <td>{{ area.facilitators }}</td>
+                    <td [class]="rateTone(area.learnerAttendanceRate)">{{ area.learnerAttendanceRate }}%</td>
+                    <td [class]="rateTone(area.facilitatorAttendanceRate)">{{ area.facilitatorAttendanceRate }}%</td>
+                    <td>{{ area.atRiskLearners }}</td>
+                    <td>{{ area.centresOverdue }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <header class="panel__head">
+            <h3>By state</h3>
+            <p>Lowest learner attendance first.</p>
+          </header>
+          <div class="table-scroll">
+            <table class="commission-table">
+              <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Zone</th>
+                  <th>Centres</th>
+                  <th>Learners</th>
+                  <th>Girls</th>
+                  <th>Learner attendance</th>
+                  <th>Facilitator attendance</th>
+                  <th>At risk</th>
+                  <th>Overdue</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (area of data.statesSummary; track area.name) {
+                  <tr>
+                    <td><strong>{{ area.name }}</strong></td>
+                    <td>{{ area.zone }}</td>
+                    <td>{{ area.centres }}</td>
+                    <td>{{ area.learners | number }}</td>
+                    <td>{{ area.femaleLearners | number }}</td>
+                    <td [class]="rateTone(area.learnerAttendanceRate)">{{ area.learnerAttendanceRate }}%</td>
+                    <td [class]="rateTone(area.facilitatorAttendanceRate)">{{ area.facilitatorAttendanceRate }}%</td>
+                    <td>{{ area.atRiskLearners }}</td>
+                    <td>{{ area.centresOverdue }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <header class="panel__head">
+            <h3>Girls and boys</h3>
+            <p>Learner attendance over the selected period.</p>
+          </header>
+          <div class="gender-split">
+            <div>
+              <span class="kpi__label">Girls</span>
+              <strong class="kpi__value" [class]="rateTone(data.femaleAttendanceRate)">{{ data.femaleAttendanceRate }}%</strong>
+              <span class="kpi__foot">{{ data.femaleLearners | number }} on roll</span>
+            </div>
+            <div>
+              <span class="kpi__label">Boys</span>
+              <strong class="kpi__value" [class]="rateTone(data.maleAttendanceRate)">{{ data.maleAttendanceRate }}%</strong>
+              <span class="kpi__foot">{{ data.maleLearners | number }} on roll</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+        <section class="defaulted-view" [hidden]="attendanceView() !== 'defaults'">
+          <header class="view-heading">
+            <div>
+              <p class="view-heading__eyebrow">Outstanding submissions</p>
+              <h3>Centres with overdue registers</h3>
+              <p>
+                Only centres with one or more missing registers are shown — a class register kept by each form
+                master, or the staff register kept by the centre administrator. Expected days are
+                school days (Mon–Fri, less public holidays) up to today. Select a centre to see the exact dates and responsible
+                form masters.
+              </p>
+            </div>
+            <span class="view-heading__count">{{ data.defaultedCentres.length }} centre(s)</span>
+          </header>
+
+          @if (data.defaultedCentres.length) {
+            <div class="defaulted-grid">
+              @for (centre of data.defaultedCentres; track centre.centreId) {
+                <button type="button" class="defaulted-card" (click)="openDefaultedCentre(centre)">
+                  <span class="defaulted-card__icon"><mat-icon>event_busy</mat-icon></span>
+                  <span class="defaulted-card__body">
+                    <strong>{{ centre.centreName || 'Unnamed centre' }}</strong>
+                    <span>{{ centre.affectedClassArms }} register(s) affected</span>
+                  </span>
+                  <span class="defaulted-card__count">
+                    <strong>{{ centre.missingSubmissionCount }}</strong>
+                    missing
+                  </span>
+                  <mat-icon class="defaulted-card__arrow">chevron_right</mat-icon>
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="all-clear">
+              <mat-icon>verified</mat-icon>
+              <div>
+                <h4>All expected registers were submitted</h4>
+                <p>No centre has an outstanding weekday submission in the selected period.</p>
+              </div>
+            </div>
+          }
+        </section>
+
+        <section class="panel class-arm-view" [hidden]="attendanceView() !== 'class-arms'">
+          <header class="panel__head view-heading">
+            <div>
+              <p class="view-heading__eyebrow">Submission accountability</p>
+              <h3>Class and arm status</h3>
+              <p>
+                Class and staff registers with missing days, grouped by centre, for the selected period. Expected days are
+                school days (Mon–Fri, less public holidays) up to today.
+              </p>
+            </div>
+            <span class="view-heading__count">
+              {{ defaultedClassArmsByCentre().length }} centre(s)
+            </span>
+          </header>
+
+          @if (defaultedClassArmsByCentre().length) {
+            <div class="class-arm-groups">
+              @for (centre of defaultedClassArmsByCentre(); track centre.centreId) {
+                <article class="class-arm-group">
+                  <header class="class-arm-group__head">
+                    <div>
+                      <h4>{{ centre.centreName || 'Unnamed centre' }}</h4>
+                      <p>
+                        {{ centre.affectedClassArms }} register(s) with missing days ·
+                        {{ centre.missingSubmissionCount }} missing submission(s)
+                      </p>
+                    </div>
+                  </header>
+
+                  <div class="table-scroll">
+                    <table class="commission-table class-arm-table">
+                      <thead>
+                        <tr>
+                          <th>Class</th>
+                          <th>Arm</th>
+                          <th>Kept by</th>
+                          <th>On register</th>
+                          <th>Submitted</th>
+                          <th>Missing</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (status of centre.classArms; track status.classArmId) {
+                          <tr>
+                            <td>{{ status.className || 'Not set' }}</td>
+                            <td>{{ status.classArmName || 'Not set' }}</td>
+                            <td>{{ status.formMasterName || 'Not assigned' }}</td>
+                            <td>
+                              {{ status.enrolledLearners | number }}
+                              {{ status.isStaffRegister ? 'facilitators' : 'learners' }}
+                            </td>
+                            <td>{{ status.submittedDates }}/{{ status.expectedSubmissions }}</td>
+                            <td>{{ status.missingDates.length }}</td>
+                            <td>
+                              <span class="submission-badge" [class]="submissionTone(status)">
+                                @if (status.missingDates.length === 0) {
+                                  Complete
+                                } @else if (status.neverSubmitted) {
+                                  Not submitted
+                                } @else {
+                                  Incomplete
+                                }
+                              </span>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <p class="panel__empty">
+              No missing class or staff registers were found for the programme centres in this period.
+            </p>
+          }
+        </section>
+
+        <section class="commission__charts" [hidden]="attendanceView() !== 'trends'">
+          <article class="panel">
+            <header class="panel__head">
+              <h3>Attendance trend</h3>
+              <p>
+                {{ data.fromDate | date: 'dd MMM yyyy' }} to {{ data.toDate | date: 'dd MMM yyyy' }}
+              </p>
+            </header>
+            @if (data.dailyTrend.length) {
+              <div #trendHost class="panel__chart"></div>
+            } @else {
+              <p class="panel__empty">No register has been submitted in this period.</p>
+            }
+          </article>
+
+          <article class="panel">
+            <header class="panel__head">
+              <h3>Enrolment by centre</h3>
+              <p>Learners and facilitators per programme centre</p>
+            </header>
+            @if (data.enrolmentByCentre.length) {
+              <div #enrolmentHost class="panel__chart"></div>
+            } @else {
+              <p class="panel__empty">No centres in the programme yet.</p>
+            }
+          </article>
+        </section>
+
+        <ng-template #defaultedCentreModal>
+          @if (selectedDefaultedCentre(); as centre) {
+            <div class="default-modal-backdrop" (click)="closeDefaultedCentre()">
+              <section
+                class="default-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="defaultCentreTitle"
+                (click)="$event.stopPropagation()"
+              >
+                <header class="default-modal__head">
+                  <div>
+                    <p>Outstanding attendance submissions</p>
+                    <h3 id="defaultCentreTitle">{{ centre.centreName || 'Unnamed centre' }}</h3>
+                    <span>
+                      {{ centre.missingSubmissionCount }} missing submission(s) across
+                      {{ centre.affectedClassArms }} register(s)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="default-modal__close"
+                    aria-label="Close defaulted centre details"
+                    (click)="closeDefaultedCentre()"
+                  >
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </header>
+
+                <div class="default-modal__content">
+                  <div class="table-scroll">
+                    <table class="commission-table default-arms-table">
+                      <thead>
+                        <tr>
+                          <th>Register</th>
+                          <th>Kept by</th>
+                          <th>On register</th>
+                          <th>Submitted</th>
+                          <th>Status</th>
+                          <th>Menu</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (arm of centre.classArms; track arm.classArmId) {
+                          <tr>
+                            <td>
+                              <strong class="class-arm-cell">
+                                {{ arm.className || 'Not set' }}
+                                <span>{{ arm.classArmName || 'Not set' }}</span>
+                              </strong>
+                            </td>
+                            <td>{{ arm.formMasterName || 'Not assigned' }}</td>
+                            <td>
+                              {{ arm.enrolledLearners | number }}
+                              {{ arm.isStaffRegister ? 'facilitators' : 'learners' }}
+                            </td>
+                            <td>{{ arm.submittedDates }}/{{ arm.expectedSubmissions }}</td>
+                            <td>
+                              <span class="missing-count">
+                                @if (arm.neverSubmitted) {
+                                  Never submitted
+                                } @else {
+                                  {{ arm.missingDates.length }} missing
+                                }
+                              </span>
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                class="missing-dates-button"
+                                (click)="openMissingDates(arm)"
+                              >
+                                <mat-icon>calendar_month</mat-icon>
+                                Dates not submitted
+                                <span>{{ arm.missingDates.length }}</span>
+                              </button>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            @if (selectedMissingDatesArm(); as arm) {
+              <div class="dates-modal-backdrop" (click)="closeMissingDates()">
+                <section
+                  class="dates-modal"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="missingDatesTitle"
+                  (click)="$event.stopPropagation()"
+                >
+                  <header class="dates-modal__head">
+                    <div>
+                      <p>Attendance register defaults</p>
+                      <h3 id="missingDatesTitle">Dates not submitted</h3>
+                      <span>
+                        {{ arm.className || 'Class not set' }} ·
+                        {{ arm.classArmName || 'Arm not set' }} ·
+                        {{ arm.formMasterName || 'Form master not assigned' }}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      class="dates-modal__close"
+                      aria-label="Close dates not submitted"
+                      (click)="closeMissingDates()"
+                    >
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </header>
+
+                  <div class="dates-modal__content">
+                    <div class="dates-modal__summary">
+                      <span>{{ arm.missingDates.length }}</span>
+                      <div>
+                        <strong>Missing register date(s)</strong>
+                        <small>{{ arm.centreName || 'Unnamed centre' }}</small>
+                      </div>
+                    </div>
+
+                    <div class="missing-date-list missing-date-list--modal">
+                      @for (missingDate of arm.missingDates; track missingDate) {
+                        <time [attr.datetime]="missingDate">
+                          <mat-icon>event_busy</mat-icon>
+                          {{ missingDate | date: 'EEEE, dd MMMM yyyy' }}
+                        </time>
+                      } @empty {
+                        <p class="dates-modal__empty">No missing submission dates were found.</p>
+                      }
+                    </div>
+                  </div>
+                </section>
+              </div>
+            }
+          }
+        </ng-template>
+    </section>
+  }
+</div>

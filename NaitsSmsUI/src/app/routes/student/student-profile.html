@@ -1,0 +1,91 @@
+<section class="student-profile-page">
+  @if (loading) {
+    <div class="loader">Loading student profile…</div>
+  } @else if (errorMessage) {
+    <p class="empty-message">{{ errorMessage }}</p>
+  } @else if (!hasAdmissionNo) {
+    <p class="empty-message">Sorry! No student Admission Number matched your entery.</p>
+  } @else if (profile) {
+    <h4 class="page-title">Student Details</h4>
+
+    <div class="profile-panel">
+      <div class="profile-col">
+        <dl class="dl-horizontal">
+          <dt>Admission No.</dt>
+          <dd>{{ profile.idNo }}</dd>
+
+          <dt>First Name</dt>
+          <dd>{{ firstName }}</dd>
+
+          <dt>Middle Name</dt>
+          <dd>{{ middleName }}</dd>
+
+          <dt>Sur Name</dt>
+          <dd>{{ surName }}</dd>
+
+          <dt>Date Of Birth</dt>
+          <dd>{{ profile.dateOfBirth | date: 'mediumDate' }}</dd>
+
+          <dt>Place Of Birth</dt>
+          <dd>{{ profile.placeOfBirth }}</dd>
+
+          <dt>Blood Group</dt>
+          <dd>{{ profile.bloodGroup }}</dd>
+
+          <dt>Date Of Admission</dt>
+          <dd>{{ profile.dateOfAdmsn | date: 'mediumDate' }}</dd>
+
+          <dt>Transfered From Where</dt>
+          <dd>{{ profile.transferedFromWhere }}</dd>
+
+          <dt>Guardian's Name</dt>
+          <dd>{{ profile.guardiansName }}</dd>
+
+          <dt>Relationship</dt>
+          <dd>{{ profile.relationship }}</dd>
+
+          <dt>Address</dt>
+          <dd>{{ profile.guardianAddress }}</dd>
+
+          <dt>Occupation</dt>
+          <dd>{{ profile.occupation }}</dd>
+
+          <dt>Contact Mobile No</dt>
+          <dd>{{ profile.mobileNumber }}</dd>
+
+          <dt>Contact Home No</dt>
+          <dd>{{ profile.homeNumber }}</dd>
+
+          <dt>Start Class</dt>
+          <dd>{{ profile.startClass }}</dd>
+        </dl>
+      </div>
+
+      <div class="profile-col">
+        <div class="passport-frame">
+          <img class="thumb-image" [src]="passportUrl" alt="Student passport" (error)="onPassportError($event)" />
+        </div>
+
+        <dl class="dl-horizontal">
+          <dt>Current Class</dt>
+          <dd>{{ classLabel }} <span class="arm">{{ armLabel }}</span></dd>
+
+          <dt>Student Status</dt>
+          <dd>{{ profile.status }}</dd>
+
+          <dt>Religion</dt>
+          <dd>{{ profile.religion }}</dd>
+
+          <dt>Contact Email</dt>
+          <dd>{{ profile.emailAddress }}</dd>
+
+          <dt>Student Mobile No</dt>
+          <dd>{{ profile.studentMobileNo }}</dd>
+
+          <dt>Country</dt>
+          <dd>{{ profile.country }}</dd>
+        </dl>
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,269 @@
+<mat-card class="teachers-page" appearance="outlined">
+  <header class="page-header">
+    <div>
+      <h2>Teachers / Other Employees Index Page</h2>
+    </div>
+
+    <button mat-raised-button color="primary" type="button" (click)="openCbtUserHandler()">
+      CBT User Handler
+    </button>
+  </header>
+
+  <section class="quick-links">
+    <button type="button" class="quick-link warning" (click)="openEmployeesRegistration()">
+      <span class="quick-icon"><mat-icon>edit_square</mat-icon></span>
+      <span class="quick-title">Employees</span>
+      <span class="quick-copy">Registration</span>
+    </button>
+
+    <button type="button" class="quick-link danger" (click)="listOfRegisteredTeachers()">
+      <span class="quick-icon"><mat-icon>list</mat-icon></span>
+      <span class="quick-title">List of</span>
+      <span class="quick-copy">Registered Employees</span>
+    </button>
+
+    <button type="button" class="quick-link success" (click)="openSubjectTeacherAssignment()">
+      <span class="quick-icon"><mat-icon>assignment_ind</mat-icon></span>
+      <span class="quick-title">Assignment</span>
+      <span class="quick-copy">Subject Teacher</span>
+    </button>
+
+    <button type="button" class="quick-link info" (click)="listOfSubjectTeacher()">
+      <span class="quick-icon"><mat-icon>view_list</mat-icon></span>
+      <span class="quick-title">List of</span>
+      <span class="quick-copy">Subject Teachers</span>
+    </button>
+
+    <button type="button" class="quick-link primary" (click)="openFormMasterAssignment()">
+      <span class="quick-icon"><mat-icon>co_present</mat-icon></span>
+      <span class="quick-title">Assignment</span>
+      <span class="quick-copy">Form Master</span>
+    </button>
+
+    <button type="button" class="quick-link amber" (click)="listOfFormMasters()">
+      <span class="quick-icon"><mat-icon>fact_check</mat-icon></span>
+      <span class="quick-title">List of</span>
+      <span class="quick-copy">Form Masters</span>
+    </button>
+  </section>
+
+  <mat-divider></mat-divider>
+
+  <section id="pageContent" class="page-content">
+    @if (isLoading()) {
+      <div class="loading-state">Loading...</div>
+    } @else if (errorMessage()) {
+      <div class="error-state">{{ errorMessage() }}</div>
+    } @else if (activeView === 'registered') {
+      <section class="panel-shell">
+        <div class="well-box">
+          <div class="search-row">
+            <label class="search-label" for="registered-teachers-search">Search Employees:</label>
+            <input
+              id="registered-teachers-search"
+              class="search-input"
+              type="text"
+              placeholder="Search"
+              [(ngModel)]="registeredSearchTerm"
+              (keyup.enter)="submitRegisteredSearch()"
+            />
+            <button mat-raised-button color="primary" type="button" (click)="submitRegisteredSearch()">Search</button>
+          </div>
+        </div>
+
+        @if (displayRegisteredTeachers.length > 0) {
+          <p class="lead-heading">List of Registered Employees</p>
+
+          <div class="table-wrap">
+            <table class="legacy-table registered-table">
+              <thead>
+                <tr>
+                  <th>S/No</th>
+                  <th>Full Name</th>
+                  <th>Id No.</th>
+                  <th>User Name</th>
+                  <th>Phone Number</th>
+                  <th>Employee Status</th>
+                  <th>Time Status</th>
+                  <th>Commands</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (employee of displayRegisteredTeachers; track trackByEmployee($index, employee); let index = $index) {
+                  <tr>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ teacherFullName(employee.user) }}</td>
+                    <td>{{ employee.employeeIdNo || '-' }}</td>
+                    <td>{{ employee.user?.userName || '-' }}</td>
+                    <td>{{ employee.user?.phoneNumber || '-' }}</td>
+                    <td>
+                      @if (isNonTeacher(employee)) {
+                        <span class="status-highlight">{{ employee.employeeStatus }}</span>
+                      } @else {
+                        {{ employee.employeeStatus || '-' }}
+                      }
+                    </td>
+                    <td>{{ timeStatusLabel(employee.timeStatus) }}</td>
+                    <td>
+                      <div class="action-strip">
+                        <button class="legacy-btn legacy-btn-default legacy-btn-xs" type="button" (click)="editTeacher(employee)">
+                          Edit
+                        </button>
+
+                        <button class="legacy-btn legacy-btn-delete legacy-btn-xs" type="button" (click)="deleteTeacher(employee)">
+                          Delete
+                        </button>
+
+                        @if (isAccountDisabled(employee)) {
+                          <button
+                            class="legacy-btn legacy-btn-danger legacy-btn-xs"
+                            type="button"
+                            (click)="enableUser(employee.id)"
+                          >
+                            Enable Account
+                          </button>
+                        } @else {
+                          <button
+                            class="legacy-btn legacy-btn-default legacy-btn-xs"
+                            type="button"
+                            (click)="disableUser(employee.id)"
+                          >
+                            Disable Account
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="empty-state">{{ registeredEmptyMessage }}</p>
+        }
+      </section>
+    } @else if (activeView === 'subject') {
+      <section class="panel-shell">
+        <div class="well-box">
+          <div class="search-row subject-search-row">
+            <label class="search-label" for="subject-teachers-search">Search Teacher</label>
+            <input
+              id="subject-teachers-search"
+              class="search-input"
+              type="text"
+              placeholder="Search"
+              [(ngModel)]="subjectSearchTerm"
+              (keyup.enter)="submitSubjectSearch()"
+            />
+            <button mat-raised-button color="primary" type="button" (click)="submitSubjectSearch()">Search</button>
+          </div>
+        </div>
+
+        @if (displaySubjectTeachers.length > 0) {
+          @if (subjectSuccessMessage) {
+            <p class="success-message">{{ subjectSuccessMessage }}</p>
+          }
+
+          <p class="lead-heading">List of Subjects Teachers</p>
+
+          <div class="table-wrap">
+            <table class="legacy-table subject-table">
+              <thead>
+                <tr>
+                  <th>SNo</th>
+                  <th>Full Name</th>
+                  <th>Subject</th>
+                  <th>Class</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (assignment of displaySubjectTeachers; track trackBySubjectAssignment($index, assignment); let index = $index) {
+                  <tr>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ teacherFullName(assignment.employee?.user) }}</td>
+                    <td>{{ assignment.subject?.subjectName || '-' }}</td>
+                    <td>{{ subjectClassLabel(assignment) }} <span class="arm-gap">{{ armLabel(assignment.arm?.armName) }}</span></td>
+                    <td>
+                      <button
+                        mat-stroked-button
+                        color="warn"
+                        type="button"
+                        (click)="unassignSubjectTeacher({ fullName: teacherFullName(assignment.employee?.user), assignmentId: assignment.id })"
+                      >
+                        Un-Assign
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="empty-state">{{ subjectEmptyMessage }}</p>
+        }
+      </section>
+    } @else if (activeView === 'form') {
+      <section class="panel-shell">
+        <div class="well-box">
+          <div class="search-row subject-search-row">
+            <label class="search-label" for="form-teachers-search">Search Teacher:</label>
+            <input
+              id="form-teachers-search"
+              class="search-input"
+              type="text"
+              placeholder="Search"
+              [(ngModel)]="formSearchTerm"
+              (keyup.enter)="submitFormSearch()"
+            />
+            <button mat-raised-button color="primary" type="button" (click)="submitFormSearch()">Search</button>
+          </div>
+        </div>
+
+        @if (displayFormTeachers.length > 0) {
+          @if (formSuccessMessage) {
+            <p class="success-message">{{ formSuccessMessage }}</p>
+          }
+
+          <p class="lead-heading">List of Form Masters</p>
+
+          <div class="table-wrap">
+            <table class="legacy-table form-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>User Name</th>
+                  <th>Class Assigned</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (assignment of displayFormTeachers; track trackByFormAssignment($index, assignment)) {
+                  <tr>
+                    <td>{{ teacherFullName(assignment.employee?.user) }}</td>
+                    <td>{{ assignment.employee?.user?.userName || '-' }}</td>
+                    <td>{{ formClassLabel(assignment) }} <span class="arm-gap">{{ armLabel(assignment.arm?.armName) }}</span></td>
+                    <td>
+                      <button
+                        mat-stroked-button
+                        color="warn"
+                        type="button"
+                        (click)="unassignFormTeacher({ fullName: teacherFullName(assignment.employee?.user), assignmentId: assignment.id })"
+                      >
+                        Un-Assign
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="empty-state">{{ formEmptyMessage }}</p>
+        }
+      </section>
+    } @else {
+      <div class="blank-state"></div>
+    }
+  </section>
+</mat-card>

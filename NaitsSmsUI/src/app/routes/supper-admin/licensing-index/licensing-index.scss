@@ -1,0 +1,150 @@
+.licensing-page {
+  display: block;
+  padding: 1.5rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fffef9 0%, #ffffff 48%, #f7faf8 100%);
+}
+
+.back-row {
+  margin-bottom: 1rem;
+}
+
+.page-title {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.expiry {
+  color: #1565c0;
+  font-weight: 700;
+}
+
+.school-meta {
+  max-width: 900px;
+}
+
+.meta-value {
+  color: #1565c0;
+  padding-right: 1.5rem;
+}
+
+.feature-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin: 0.75rem 0;
+}
+
+.feature-label,
+.students-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.feature-select {
+  min-width: 280px;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.history-block {
+  margin-top: 1.25rem;
+  max-width: 1100px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #d7d7d7;
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+}
+
+.empty-msg {
+  color: #b42318;
+  font-weight: 600;
+  text-align: center;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-dialog {
+  width: min(210mm, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 0.65rem 0.85rem;
+  align-items: center;
+  margin: 0.75rem 0 1rem;
+}
+
+.form-grid input {
+  height: 36px;
+  padding: 0 0.55rem;
+  border: 1px solid #c9c9c9;
+  border-radius: 6px;
+}
+
+.subscription-form {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.subscription-form .full-width {
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.reg-key {
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.modal-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.last-info {
+  margin: 0.75rem 0 1rem;
+  line-height: 1.6;
+}

@@ -1,0 +1,512 @@
+<section class="acct-pay">
+  <header class="acct-pay__header">
+    <h1 class="acct-pay__heading">Monthly payroll</h1>
+    <p class="acct-pay__lead">
+      Please select the year and month you wish to generate the payroll
+    </p>
+  </header>
+
+  @if (flashSuccess()) {
+    <div class="acct-pay__alert acct-pay__alert--success" role="status">{{ flashSuccess() }}</div>
+  }
+  @if (error()) {
+    <div class="acct-pay__alert acct-pay__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <form class="acct-pay__card" (submit)="$event.preventDefault(); previewSlip()">
+    <div class="acct-pay__form-row">
+      <label class="acct-pay__label" for="paymentDate">Select appropriate year/Month</label>
+      <div class="acct-pay__date-wrap">
+        <input
+          id="paymentDate"
+          name="paymentDate"
+          type="text"
+          class="acct-pay__input acct-pay__date-input"
+          placeholder="dd/mm/yyyy"
+          autocomplete="off"
+          readonly
+          [matDatepicker]="paymentDatePicker"
+          [ngModel]="paymentDate()"
+          (ngModelChange)="paymentDate.set($event)"
+          (click)="paymentDatePicker.open()"
+        />
+        <mat-datepicker-toggle
+          class="acct-pay__date-toggle"
+          [for]="paymentDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker
+          #paymentDatePicker
+          panelClass="acct-rec-inc-datepicker"
+          [touchUi]="true"
+        ></mat-datepicker>
+      </div>
+      <button
+        type="button"
+        class="acct-pay__btn acct-pay__btn--primary"
+        [disabled]="loading()"
+        (click)="previewSlip()"
+      >
+        Preview for payment slip
+      </button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="acct-pay__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  }
+
+  @if (viewMode() === 'slip') {
+    <div class="acct-pay__overlay" role="dialog" aria-modal="true">
+      <div class="acct-pay__modal acct-pay__modal--wide">
+        <div class="acct-pay__modal-head">
+          <button type="button" class="acct-pay__modal-close" aria-label="Close" (click)="closeSlip()">
+            ×
+          </button>
+        </div>
+
+        @if (rows().length === 0) {
+          <div class="acct-pay__empty">
+            <p class="acct-pay__empty-text">Sorry! No employee payment structure created.</p>
+            <button type="button" class="acct-pay__btn acct-pay__btn--danger" (click)="closeSlip()">
+              Close
+            </button>
+          </div>
+        } @else {
+          <p class="acct-pay__banner">
+            <span class="acct-pay__banner-text">{{ paymentBanner() }}</span>
+          </p>
+
+          <div class="acct-pay__table-wrap">
+            <table class="acct-pay__table">
+              <thead>
+                <tr>
+                  <th>S/No</th>
+                  <th>Full Name</th>
+                  <th>Employee Id</th>
+                  <th>Basic Salary</th>
+                  <th>Allowance</th>
+                  <th>Bonus</th>
+                  <th>Deduction</th>
+                  <th>Total</th>
+                  <th>Selection</th>
+                  <th>Payment Type</th>
+                  @if (slipMode() === 'payments') {
+                    <th>Comments</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows(); track row.employeeId + '-' + row.id; let i = $index) {
+                  <tr>
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ row.fullName }}</td>
+                    <td>{{ row.employeeIdNo }}</td>
+                    <td>{{ formatAmount(row.basicSalary) }}</td>
+                    <td>{{ formatAmount(row.allowance) }}</td>
+                    <td>
+                      <input
+                        type="text"
+                        inputmode="decimal"
+                        class="acct-pay__cell-input"
+                        [disabled]="isConfirmed()"
+                        [ngModel]="row.bonusDisplay"
+                        (ngModelChange)="onBonusInput(i, $event)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        inputmode="decimal"
+                        class="acct-pay__cell-input"
+                        [disabled]="isConfirmed()"
+                        [ngModel]="row.deductionDisplay"
+                        (ngModelChange)="onDeductionInput(i, $event)"
+                      />
+                    </td>
+                    <td>{{ formatAmount(rowNet(row)) }}</td>
+                    <td>
+                      <select
+                        class="acct-pay__select"
+                        [disabled]="isConfirmed()"
+                        [ngModel]="row.status"
+                        (ngModelChange)="onStatusChange(i, $event)"
+                      >
+                        @if (row.status === 0) {
+                          <option [value]="0">To be paid Now</option>
+                          <option [value]="1">To be paid later</option>
+                          <option [value]="2">Should not be paid</option>
+                        } @else if (row.status === 1) {
+                          <option [value]="1">To be paid later</option>
+                          <option [value]="0">To be paid Now</option>
+                          <option [value]="2">Should not be paid</option>
+                        } @else {
+                          <option [value]="2">Should not be paid</option>
+                          <option [value]="0">To be paid Now</option>
+                          <option [value]="1">To be paid later</option>
+                        }
+                      </select>
+                    </td>
+                    <td>
+                      @if (row.status === 0) {
+                        <select
+                          class="acct-pay__select"
+                          [disabled]="isConfirmed()"
+                          [ngModel]="row.paymentType"
+                          (ngModelChange)="onPaymentTypeChange(i, $event)"
+                        >
+                          @if (row.paymentType === 0) {
+                            <option [value]="0">Cash</option>
+                            <option [value]="1">Teller</option>
+                            <option [value]="2">Transfer</option>
+                          } @else if (row.paymentType === 1) {
+                            <option [value]="1">Teller</option>
+                            <option [value]="0">Cash</option>
+                            <option [value]="2">Transfer</option>
+                          } @else {
+                            <option [value]="2">Transfer</option>
+                            <option [value]="0">Cash</option>
+                            <option [value]="1">Teller</option>
+                          }
+                        </select>
+                      }
+                    </td>
+                    @if (slipMode() === 'payments') {
+                      <td>
+                        @if (isConfirmed() && row.status !== 0) {
+                          <button
+                            type="button"
+                            class="acct-pay__btn acct-pay__btn--danger acct-pay__btn--xs"
+                            (click)="openUpdatePayment(row)"
+                          >
+                            Update Payment
+                          </button>
+                        } @else if (isConfirmed()) {
+                          <button
+                            type="button"
+                            class="acct-pay__btn acct-pay__btn--warn acct-pay__btn--xs"
+                            disabled
+                          >
+                            Comments
+                          </button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="acct-pay__btn acct-pay__btn--warn acct-pay__btn--xs"
+                            (click)="openComments(row)"
+                          >
+                            Comments
+                          </button>
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+
+                <tr class="acct-pay__total-row">
+                  <td colspan="6" class="acct-pay__total-label">Overall Total:</td>
+                  <td colspan="4" class="acct-pay__total-value">{{ overallTotalDisplay() }}</td>
+                </tr>
+
+                <tr>
+                  <td [attr.colspan]="slipMode() === 'payments' ? 11 : 10">
+                    <div class="acct-pay__summary">
+                      <p class="acct-pay__summary-line">
+                        The number of employee(s)
+                        {{
+                          isConfirmed()
+                            ? 'that has been paid during the month is:'
+                            : 'to be now paid:'
+                        }}
+                        <span class="acct-pay__em">{{ summary().paidNowCount }}</span>
+                        while the total payment is:
+                        <span class="acct-pay__em">{{ formatAmount(summary().paidNowAmount) }}</span>
+                      </p>
+
+                      <table class="acct-pay__types">
+                        <tr>
+                          <td rowspan="3" class="acct-pay__types-label">Payment-Types</td>
+                          <td>
+                            Cash:
+                            <span class="acct-pay__em">{{ summary().cashCount }}</span> employee(s),
+                            total amount:
+                            <span class="acct-pay__em">{{ formatAmount(summary().cashAmount) }}</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            Teller:
+                            <span class="acct-pay__em">{{ summary().tellerCount }}</span> employee(s),
+                            total amount:
+                            <span class="acct-pay__em">{{
+                              formatAmount(summary().tellerAmount)
+                            }}</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            Transfer:
+                            <span class="acct-pay__em">{{ summary().transferCount }}</span>
+                            employee(s), total amount:
+                            <span class="acct-pay__em">{{
+                              formatAmount(summary().transferAmount)
+                            }}</span>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p class="acct-pay__summary-line">
+                        The number of employee(s) that Should not be paid at all is:
+                        <span class="acct-pay__em">{{ summary().skipCount }}</span> employee(s), total
+                        amount:
+                        <span class="acct-pay__em">{{ formatAmount(summary().skipAmount) }}</span>
+                        <br />
+                        while the number of employee that should be paid later is:
+                        <span class="acct-pay__em">{{ summary().laterCount }}</span> employee(s), total
+                        amount:
+                        <span class="acct-pay__em">{{ formatAmount(summary().laterAmount) }}</span>
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td [attr.colspan]="slipMode() === 'payments' ? 11 : 10">
+                    <div class="acct-pay__footer-actions">
+                      @if (!isConfirmed()) {
+                        <button
+                          type="button"
+                          class="acct-pay__btn acct-pay__btn--warn"
+                          [disabled]="generating()"
+                          (click)="generatePaymentSlip()"
+                        >
+                          {{ generating() ? 'Please Wait...' : 'Generate Payment Slip' }}
+                        </button>
+                        @if (slipMode() === 'payments' && monthId()) {
+                          <button
+                            type="button"
+                            class="acct-pay__btn acct-pay__btn--danger"
+                            (click)="deletePreview()"
+                          >
+                            Delete preview
+                          </button>
+                        }
+                      } @else {
+                        <span class="acct-pay__confirmed">The payment has been confirmed.</span>
+                      }
+                      <button
+                        type="button"
+                        class="acct-pay__btn acct-pay__btn--danger acct-pay__btn--right"
+                        (click)="closeSlip()"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (viewMode() === 'print') {
+    <div class="acct-pay__overlay" role="dialog" aria-modal="true">
+      <div class="acct-pay__modal acct-pay__modal--print">
+        <div class="acct-pay__print-toolbar">
+          <button type="button" class="acct-pay__btn acct-pay__btn--primary" (click)="printPage()">
+            Print
+          </button>
+          @if (levelId()) {
+            <button type="button" class="acct-pay__btn acct-pay__btn--danger" (click)="confirmPayment()">
+              confirm Payment
+            </button>
+          }
+          <button
+            type="button"
+            class="acct-pay__btn acct-pay__btn--warn acct-pay__btn--right"
+            (click)="closeSlip()"
+          >
+            Cancel
+          </button>
+        </div>
+
+        <div id="pageContent1" class="acct-pay-print">
+          @for (page of printPages(); track $index; let pageIndex = $index) {
+            <div class="acct-pay-print__page">
+              @for (card of page; track $index) {
+                <div class="acct-pay-print__card">
+                  <table class="acct-pay-print__grid">
+                    <tr>
+                      <td class="acct-pay-print__col acct-pay-print__col--left">
+                        <table class="acct-pay-print__inner">
+                          <tr>
+                            <th>Full Name:</th>
+                            <td>{{ card.fullName }}</td>
+                          </tr>
+                          <tr>
+                            <th>Basic Salary:</th>
+                            <td>{{ card.basicSalary }}</td>
+                          </tr>
+                          <tr>
+                            <th>Bonus:</th>
+                            <td>{{ card.bonus }}</td>
+                          </tr>
+                          <tr>
+                            <th>Gross Pay:</th>
+                            <td class="gross">{{ card.grossPay }}</td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td class="acct-pay-print__col acct-pay-print__col--right">
+                        <table class="acct-pay-print__inner">
+                          <tr>
+                            <th>Id No.:</th>
+                            <td>{{ card.employeeIdNo }}</td>
+                          </tr>
+                          <tr>
+                            <th>Allowance:</th>
+                            <td>{{ card.allowance }}</td>
+                          </tr>
+                          <tr>
+                            <th>Deduction:</th>
+                            <td>{{ card.deduction }}</td>
+                          </tr>
+                          <tr>
+                            <th>Net Pay:</th>
+                            <td class="net">{{ card.netPay }}</td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showCommentModal()) {
+    <div class="acct-pay__overlay acct-pay__overlay--nested" role="dialog" aria-modal="true">
+      <div class="acct-pay__modal acct-pay__modal--small" (click)="$event.stopPropagation()">
+        <p class="acct-pay__modal-lead">
+          Employees name: <span class="acct-pay__em">{{ commentEmployeeName() }}</span>
+        </p>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="commentInput">Enter comment</label>
+          <textarea
+            id="commentInput"
+            rows="4"
+            maxlength="170"
+            class="acct-pay__input"
+            [ngModel]="commentText()"
+            (ngModelChange)="commentText.set($event)"
+          ></textarea>
+        </div>
+        <div class="acct-pay__edit-actions">
+          <button
+            type="button"
+            class="acct-pay__btn acct-pay__btn--warn"
+            [disabled]="saving()"
+            (click)="saveComment()"
+          >
+            Save Comment
+          </button>
+          <button type="button" class="acct-pay__btn acct-pay__btn--danger" (click)="closeCommentModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showUpdateModal()) {
+    <div class="acct-pay__overlay acct-pay__overlay--nested" role="dialog" aria-modal="true">
+      <div class="acct-pay__modal acct-pay__modal--small" (click)="$event.stopPropagation()">
+        <p class="acct-pay__modal-lead acct-pay__modal-lead--right">
+          Employees name:<span class="acct-pay__em">{{ updateFullName() }}</span>
+        </p>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="BasicSalary">Basic Salary</label>
+          <input
+            id="BasicSalary"
+            type="text"
+            class="acct-pay__input"
+            readonly
+            [value]="formatAmount(updateBasic())"
+          />
+        </div>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="Allowance">Allowance</label>
+          <input
+            id="Allowance"
+            type="text"
+            class="acct-pay__input"
+            readonly
+            [value]="formatAmount(updateAllowance())"
+          />
+        </div>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="Bonus">Enter Bonus</label>
+          <input
+            id="Bonus"
+            type="text"
+            class="acct-pay__input"
+            [ngModel]="updateBonusDisplay()"
+            (ngModelChange)="updateBonusDisplay.set(applyCurrency($event))"
+          />
+        </div>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="Deduction">Enter Deduction</label>
+          <input
+            id="Deduction"
+            type="text"
+            class="acct-pay__input"
+            [ngModel]="updateDeductionDisplay()"
+            (ngModelChange)="updateDeductionDisplay.set(applyCurrency($event))"
+          />
+        </div>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="EmployeeMonthlyPaymentStatus"
+            >Monthly Payment Status</label
+          >
+          <select id="EmployeeMonthlyPaymentStatus" class="acct-pay__input" disabled>
+            <option value="0">To be paid Now</option>
+          </select>
+        </div>
+        <div class="acct-pay__edit-group">
+          <label class="acct-pay__edit-label" for="PaymentType">Payment Type</label>
+          <select
+            id="PaymentType"
+            class="acct-pay__input"
+            [ngModel]="updatePaymentType()"
+            (ngModelChange)="updatePaymentType.set(+$event)"
+          >
+            <option [value]="0">Cash</option>
+            <option [value]="1">Teller</option>
+            <option [value]="2">Transfer</option>
+          </select>
+        </div>
+        <div class="acct-pay__edit-actions">
+          <button
+            type="button"
+            class="acct-pay__btn acct-pay__btn--warn"
+            [disabled]="saving()"
+            (click)="submitUpdatePayment()"
+          >
+            Save Changes
+          </button>
+          <button type="button" class="acct-pay__btn acct-pay__btn--danger" (click)="closeUpdateModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

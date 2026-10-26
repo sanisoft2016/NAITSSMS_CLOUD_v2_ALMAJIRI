@@ -1,0 +1,21 @@
+<mat-toolbar>
+  @if (showToggle()) {
+    <button matIconButton (click)="toggleSidenav.emit()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+
+  @if (showBranding()) {
+    <app-branding />
+  }
+
+
+  <span class="flex-fill"></span>
+  <span style="padding-right: 1.5em;">
+      <button matIconButton type="button" (click)="goToLogin()">
+          <mat-icon>home</mat-icon>
+      </button>
+  </span>
+
+  <app-user />
+</mat-toolbar>

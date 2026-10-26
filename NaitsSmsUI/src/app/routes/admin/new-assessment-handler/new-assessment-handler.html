@@ -1,0 +1,187 @@
+<section class="new-assessment-page">
+  @if (isLoading()) {
+    <div class="ajax-loader" aria-live="polite" aria-busy="true">
+      <div class="ajax-loader__spinner"></div>
+    </div>
+  }
+
+  <div class="page-header">
+    <h1 class="page-title">New Assessment Handling Complex</h1>
+    <button type="button" class="btn btn-primary header-action" (click)="openDefaultedTeachers()">
+      Assessment Completion Defaulted Teachers
+    </button>
+  </div>
+
+  <div class="filter-panel">
+    <div class="filter-row filter-row--category">
+      <div class="form-group form-group--category">
+        <label class="control-label" for="assessmentCategory">Assessment Category</label>
+        <select
+          id="assessmentCategory"
+          class="form-control"
+          name="assessmentCategory"
+          [(ngModel)]="assessmentCategory"
+          (ngModelChange)="onAssessmentCategoryChange()">
+          <option value="0">Various Subjects</option>
+          <option value="1">Psychomotor/Affective</option>
+        </select>
+      </div>
+
+      <div class="form-group form-group--action">
+        <label class="control-label" for="actionType">Action Type</label>
+        <select
+          id="actionType"
+          class="form-control"
+          name="actionType"
+          [(ngModel)]="actionType"
+          (ngModelChange)="onActionTypeChange()">
+          <option value="0">Create</option>
+          <option value="1">Delete</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="psychoAffectDefaultValueDiv" class="filter-row" [class.no-display]="!showPsychoAffectField">
+      <div class="form-group form-group--full">
+        <label class="control-label" for="psychoAffectDefaultValue">Psychomotor/Affective default value</label>
+        <input
+          id="psychoAffectDefaultValue"
+          class="form-control"
+          type="text"
+          name="psychoAffectDefaultValue"
+          [(ngModel)]="psychoAffectDefaultValue" />
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="form-group form-group--collection">
+        <label class="control-label" for="collectionSize">Collection Size</label>
+        <select
+          id="collectionSize"
+          class="form-control"
+          name="collectionSize"
+          [(ngModel)]="collectionType"
+          (ngModelChange)="onCollectionSizeChange()">
+          <option value="2">Per Arm Students</option>
+          <option value="0">All Students</option>
+          <option value="1">Per Class Students</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-row filter-row--filters">
+      <div class="form-group form-group--quarter">
+        <label class="control-label" for="Session">Session</label>
+        <select
+          id="Session"
+          class="form-control"
+          name="Session"
+          [(ngModel)]="sessionId"
+          [compareWith]="compareOptionValues"
+          disabled>
+          @for (option of sessions(); track option.value) {
+            <option [ngValue]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div id="termDiv" class="form-group form-group--quarter">
+        <label class="control-label" for="Term">Term</label>
+        <select
+          id="Term"
+          class="form-control"
+          name="Term"
+          [(ngModel)]="termStatus"
+          [compareWith]="compareOptionValues"
+          disabled>
+          @for (option of terms(); track option.value) {
+            <option [ngValue]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div id="ClassContainer" class="form-group form-group--quarter" [class.no-display]="!showClassField">
+        <label class="control-label" for="ClassName">Class</label>
+        <select
+          id="ClassName"
+          class="form-control"
+          name="ClassName"
+          [(ngModel)]="classValue"
+          (ngModelChange)="onClassChange()">
+          <option value="-1">Select</option>
+          @for (option of classOptions(); track option.value) {
+            <option [value]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div id="ArmContainer" class="form-group form-group--quarter" [class.no-display]="!showArmField">
+        <label class="control-label" for="ArmName">Arm</label>
+        <select
+          id="ArmName"
+          class="form-control"
+          name="ArmName"
+          [(ngModel)]="armValue"
+          (ngModelChange)="onArmChange()">
+          <option value="-1">Select</option>
+          @for (option of armOptions(); track option.value) {
+            <option [value]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert-banner alert-banner--error">{{ errorMessage() }}</div>
+  }
+
+  <div id="pageContainer" class="page-container">
+    @if (statusMessage()) {
+      <p class="page-container__message" [class.page-container__message--success]="statusSuccess()">
+        {{ statusMessage() }}
+      </p>
+    }
+  </div>
+
+  @if (showDefaultedModal()) {
+    <div class="legacy-modal-backdrop"></div>
+    <div class="legacy-modal legacy-modal--lg" role="dialog" aria-modal="true" aria-labelledby="defaultedTeachersTitle">
+      <div class="legacy-modal__dialog">
+        <div id="defaultedTeachersPageContent" class="legacy-modal__content">
+          @if (defaultedTeachers().length > 0) {
+            <p id="defaultedTeachersTitle" class="legacy-modal__lead legacy-modal__lead--danger">
+              The following teacher(s) have not yet round-up their termly assessement.
+            </p>
+            <table class="legacy-modal__table legacy-modal__table--striped">
+              <thead>
+                <tr>
+                  <th>S/No</th>
+                  <th>Form-master Name</th>
+                  <th>User Name</th>
+                  <th>Class arm</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (teacher of defaultedTeachers(); track teacher.userName + teacher.classLabelAndArm; let index = $index) {
+                  <tr>
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ teacher.formMasterName }}</td>
+                    <td>{{ teacher.userName }}</td>
+                    <td>{{ teacher.classLabelAndArm }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <p id="defaultedTeachersTitle" class="legacy-modal__lead legacy-modal__lead--plain">{{ defaultedMessage() }}</p>
+          }
+        </div>
+        <div class="legacy-modal__footer">
+          <button type="button" class="btn btn-warning" (click)="closeDefaultedTeachers()">Close</button>
+          <button type="button" class="btn btn-danger" (click)="printDefaultedTeachers()">Print</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

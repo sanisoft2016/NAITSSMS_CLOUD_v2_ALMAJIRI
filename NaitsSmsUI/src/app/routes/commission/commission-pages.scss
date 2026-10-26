@@ -1,0 +1,393 @@
+// Shared look for the Commission pages: matches the Programme overview (commission-dashboard).
+
+:host {
+  display: block;
+}
+
+.cx {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  padding: 18px 8px 36px;
+}
+
+.cx [hidden] {
+  display: none !important;
+}
+
+.cx-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  padding: 24px 28px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #0f3b57 0%, #14618a 100%);
+  color: #fff;
+  box-shadow: 0 16px 30px rgba(15, 59, 87, 0.18);
+}
+
+.cx-header__eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.82;
+}
+
+.cx-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-family: Cambria, Georgia, serif;
+}
+
+.cx-header__sub {
+  margin: 8px 0 0;
+  opacity: 0.9;
+}
+
+.cx-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.cx-header__actions .mat-mdc-button-base {
+  background: #fff;
+  color: #0f3b57;
+  font-weight: 700;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.back-link mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.cx-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.kpi {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid #e0e5ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(20, 49, 63, 0.05);
+}
+
+.kpi--alert {
+  border-color: #f3d0d6;
+  background: #fff7f8;
+}
+
+.kpi__label {
+  color: #667085;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kpi__value {
+  color: #14313f;
+  font-size: 30px;
+  font-family: Cambria, Georgia, serif;
+}
+
+.kpi__foot {
+  color: #667085;
+  font-size: 13px;
+}
+
+.delta {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.delta--up {
+  color: #138a62;
+}
+
+.delta--down {
+  color: #c23c4d;
+}
+
+.cx-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 14px;
+}
+
+.cx-stack {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.panel {
+  min-width: 0;
+  padding: 20px 22px;
+  border: 1px solid #e0e5ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(20, 49, 63, 0.05);
+}
+
+.panel--alert {
+  border-color: #f0c9d0;
+  background:
+    radial-gradient(circle at top right, rgba(194, 60, 77, 0.07), transparent 34%),
+    #fff;
+}
+
+.panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel__head h3 {
+  margin: 0;
+  color: #14313f;
+  font-family: Cambria, Georgia, serif;
+}
+
+.panel__head p {
+  margin: 4px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.panel__empty {
+  margin: 0;
+  color: #667085;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+}
+
+.facts div {
+  display: grid;
+  gap: 2px;
+}
+
+.facts dt {
+  color: #8b93a7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.facts dd {
+  margin: 0;
+  color: #14313f;
+  font-weight: 600;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.cx-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cx-table th,
+.cx-table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #eef1f6;
+  color: #33415c;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.cx-table th {
+  background: #f7f9fc;
+  color: #667085;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cx-table td strong {
+  display: block;
+  color: #14313f;
+}
+
+.cx-table .muted {
+  display: block;
+  color: #8b93a7;
+  font-size: 12px;
+  white-space: normal;
+}
+
+.cx-table .num {
+  text-align: right;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  background: #f7fbfd;
+}
+
+.tone-good {
+  color: #138a62;
+  font-weight: 700;
+}
+
+.tone-warn {
+  color: #b57414;
+  font-weight: 700;
+}
+
+.tone-bad {
+  color: #c23c4d;
+  font-weight: 700;
+}
+
+.flag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.flag--good {
+  background: #e4f4ec;
+  color: #12724f;
+}
+
+.flag--warn {
+  background: #fdf0dc;
+  color: #96600f;
+}
+
+.flag--bad {
+  background: #fbe4e7;
+  color: #a92c3d;
+}
+
+.flag--info {
+  background: #e3eef7;
+  color: #14618a;
+}
+
+// Horizontal bar rows: label, bar, value.
+.bars {
+  display: grid;
+  gap: 10px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.4fr) minmax(0, 3fr) 64px;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.bar-row__label {
+  overflow: hidden;
+  color: #33415c;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-row__track {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: #eef2f6;
+}
+
+.bar-row__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: #14618a;
+}
+
+.bar-row__fill--good {
+  background: #138a62;
+}
+
+.bar-row__fill--warn {
+  background: #d39222;
+}
+
+.bar-row__fill--bad {
+  background: #c23c4d;
+}
+
+.bar-row__value {
+  color: #14313f;
+  font-weight: 700;
+  text-align: right;
+}
+
+.cx-loading,
+.cx-error {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border: 1px dashed #d5dde8;
+  border-radius: 16px;
+  background: #fff;
+  color: #667085;
+}
+
+.cx-error {
+  color: #a92c3d;
+}
+
+@media (max-width: 720px) {
+  .cx-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cx-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bar-row {
+    grid-template-columns: minmax(100px, 1fr) minmax(0, 2fr) 52px;
+  }
+}

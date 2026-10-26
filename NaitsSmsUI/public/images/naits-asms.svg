@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NAITS-ASMS">
+  <defs>
+    <linearGradient id="naitsGrad" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#115e59"/>
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="32" fill="url(#naitsGrad)"/>
+  <text
+    x="32"
+    y="38"
+    text-anchor="middle"
+    font-family="Segoe UI, Arial, sans-serif"
+    font-size="22"
+    font-weight="700"
+    letter-spacing="0.5"
+    fill="#ffffff"
+  >NA</text>
+</svg>

@@ -1,0 +1,82 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Class Registry</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div class="header-section">
+      <div class="info-section">
+        <strong>Number of Class(es): </strong>
+        <span class="text-danger">{{ totalNoOfClasses }}</span>
+      </div>
+      <div class="button-section">
+        <button mat-raised-button color="primary" (click)="addNewClass()">
+          <mat-icon>add</mat-icon>
+          Add New Class
+        </button>
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="reArrangeClasses()"
+          *ngIf="classes.length > 0"
+        >
+          <mat-icon>swap_vert</mat-icon>
+          Re-arrange Classes
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container" *ngIf="classes.length > 0; else noData">
+      <table class="data-table mat-elevation-z2">
+        <thead>
+          <tr>
+            <th>Class Name</th>
+            <th>Class Label</th>
+            <th>Commands</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let element of classes">
+            <td>{{ getClassNameInString(element.className) }}</td>
+            <td>{{ element.classLabel }}</td>
+            <td>
+              <div class="action-buttons">
+                <button
+                  mat-mini-fab
+                  color="warn"
+                  (click)="deleteClass(element)"
+                  matTooltip="Delete"
+                  class="action-button"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+                <button
+                  mat-mini-fab
+                  color="primary"
+                  (click)="editClass(element)"
+                  matTooltip="Edit"
+                  class="action-button"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-raised-button
+                  color="accent"
+                  (click)="viewArmsAndMore(element)"
+                  class="view-arms-button"
+                >
+                  View Arms and More
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noData>
+      <div class="no-data-message">
+        <p class="text-center text-danger lead">Welcome! Begin your Class entering</p>
+      </div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

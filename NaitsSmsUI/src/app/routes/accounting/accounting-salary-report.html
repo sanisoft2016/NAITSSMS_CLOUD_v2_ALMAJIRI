@@ -1,0 +1,170 @@
+<section class="acct-sal">
+  <header class="acct-sal__header">
+    <h1 class="acct-sal__heading">Salary Payment Report Environment</h1>
+  </header>
+
+  @if (loading()) {
+    <div class="acct-sal__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <form class="acct-sal__filters" (submit)="$event.preventDefault()">
+      <div class="acct-sal__filter">
+        <label class="acct-sal__label" for="Year">Select Year</label>
+        <select
+          id="Year"
+          name="Year"
+          class="acct-sal__select"
+          [ngModel]="year()"
+          (ngModelChange)="onYearChange($event)"
+        >
+          @for (opt of years(); track opt.value) {
+            <option [value]="opt.value">{{ opt.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="acct-sal__filter">
+        <label class="acct-sal__label" for="startMonth">Start Month</label>
+        <select
+          id="startMonth"
+          name="startMonth"
+          class="acct-sal__select"
+          [ngModel]="startMonth()"
+          (ngModelChange)="onMonthChange('start', $event)"
+        >
+          @for (opt of months(); track opt.value) {
+            <option [value]="opt.value">{{ opt.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="acct-sal__filter">
+        <label class="acct-sal__label" for="endMonth">End Month</label>
+        <select
+          id="endMonth"
+          name="endMonth"
+          class="acct-sal__select"
+          [ngModel]="endMonth()"
+          (ngModelChange)="onMonthChange('end', $event)"
+        >
+          @for (opt of months(); track opt.value) {
+            <option [value]="opt.value">{{ opt.text }}</option>
+          }
+        </select>
+      </div>
+    </form>
+
+    @if (error()) {
+      <div class="acct-sal__alert acct-sal__alert--error" role="alert">{{ error() }}</div>
+    }
+
+    <div class="acct-sal__content" id="pageContent">
+      @if (refreshing()) {
+        <div class="acct-sal__loading acct-sal__loading--inline">
+          <mat-spinner diameter="28"></mat-spinner>
+        </div>
+      }
+
+      @if (rows().length > 0) {
+        <div class="acct-sal__table-wrap">
+          <table class="acct-sal__table">
+            <thead>
+              <tr>
+                <th colspan="8" class="acct-sal__table-title">Overall Payment Report</th>
+              </tr>
+              <tr>
+                <th>Months</th>
+                <th>No Of Employees</th>
+                <th>Total Basic Salary</th>
+                <th>Total Allowance</th>
+                <th>Total Bonus</th>
+                <th>Total Gross Pay</th>
+                <th>Total Deduction</th>
+                <th>Total Net Pay</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of rows(); track item.id) {
+                <tr>
+                  <td>{{ item.month }}</td>
+                  <td>{{ item.noOfEmpl }}</td>
+                  <td>{{ formatAmount(item.basicSalary) }}</td>
+                  <td>{{ formatAmount(item.allowance) }}</td>
+                  <td>{{ formatAmount(item.bonus) }}</td>
+                  <td>
+                    {{ formatAmount(item.basicSalary + item.allowance + item.bonus) }}
+                  </td>
+                  <td>{{ formatAmount(item.deduction) }}</td>
+                  <td>
+                    {{
+                      formatAmount(
+                        item.basicSalary + item.allowance + item.bonus - item.deduction
+                      )
+                    }}
+                  </td>
+                </tr>
+              }
+              <tr class="acct-sal__footer-row">
+                <th colspan="2" class="acct-sal__total-label">Overall Tolal:</th>
+                <td>{{ formatNairaAmount(overall().basic) }}</td>
+                <td>{{ formatNairaAmount(overall().allowance) }}</td>
+                <td>{{ formatNairaAmount(overall().bonus) }}</td>
+                <td class="acct-sal__gross">{{ formatNairaAmount(overall().gross) }}</td>
+                <td>{{ formatNairaAmount(overall().deduction) }}</td>
+                <td>
+                  <span class="acct-sal__net">{{ formatNairaAmount(overall().net) }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="acct-sal__table-wrap acct-sal__table-wrap--second">
+          <table class="acct-sal__table">
+            <thead>
+              <tr>
+                <th colspan="8" class="acct-sal__table-title">Payment Method Report</th>
+              </tr>
+              <tr>
+                <th>Months</th>
+                <th>No. of Employees</th>
+                <th>Total No of Cash</th>
+                <th>Total Cash Amount</th>
+                <th>Total No of Teller</th>
+                <th>Total Teller Amount</th>
+                <th>Total No of Transfer</th>
+                <th>Total Transfer Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of rows(); track item.id + '-method') {
+                <tr>
+                  <td>{{ item.month }}</td>
+                  <td>{{ item.noOfEmpl }}</td>
+                  <td>{{ item.subordinateSalaryReport.cashNo }}</td>
+                  <td>{{ formatAmount(item.subordinateSalaryReport.cashAmount) }}</td>
+                  <td>{{ item.subordinateSalaryReport.tellerNo }}</td>
+                  <td>{{ formatAmount(item.subordinateSalaryReport.tellerAmount) }}</td>
+                  <td>{{ item.subordinateSalaryReport.transferNo }}</td>
+                  <td>{{ formatAmount(item.subordinateSalaryReport.transferAmount) }}</td>
+                </tr>
+              }
+              <tr class="acct-sal__footer-row">
+                <th colspan="2" class="acct-sal__total-label">Overall Tolal:</th>
+                <td>{{ overall().cashNo }}</td>
+                <td class="acct-sal__cash">{{ formatNairaAmount(overall().cashAmount) }}</td>
+                <td>{{ overall().tellerNo }}</td>
+                <td class="acct-sal__teller">{{ formatNairaAmount(overall().tellerAmount) }}</td>
+                <td>{{ overall().transferNo }}</td>
+                <td class="acct-sal__transfer">
+                  {{ formatNairaAmount(overall().transferAmount) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</section>

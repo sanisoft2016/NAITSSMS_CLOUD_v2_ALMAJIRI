@@ -1,0 +1,35 @@
+.search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid #d5dde8;
+  border-radius: 14px;
+  background: #f7f9fc;
+}
+
+.search__icon {
+  color: #667085;
+}
+
+.search input {
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  color: #14313f;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.search button {
+  min-height: 44px;
+}
+
+.search__hint {
+  margin: 10px 2px 0;
+  color: #667085;
+  font-size: 13px;
+}

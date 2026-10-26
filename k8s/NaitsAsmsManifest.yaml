@@ -1,0 +1,695 @@
+# =============================================================================
+# NAITS ASMS – Combined K3s Deployment Manifest
+# Target: K3s on Hostinger KVM 2 (2 vCPU / 8 GB), co-hosted with CustReward
+# Includes: PostgreSQL 17 (StatefulSet) + naitsasms-api (Deployment)
+#            + Aspire Dashboard (standalone OTLP UI)
+# =============================================================================
+# Apply with (secrets first — see k8s/secrets/README.md):
+#   kubectl apply -f k8s/secrets/NaitsAsms.secrets.local.yaml
+#   kubectl apply -f k8s/NaitsAsmsManifest.yaml
+#
+# All durable files live under ONE host root:
+#   /sani/tmp/naittsasms/
+#     ├── postgres/                 # PostgreSQL data (PGDATA parent)
+#     ├── wwwroot/                  # API static uploads (/app/wwwroot)
+#     │     ├── Passport/           # Student passport photos
+#     │     ├── Signatures/         # All signature images (heads, teachers, etc.)
+#     │     ├── profile-avatars/    # User profile photos
+#     │     └── school-logos/       # School logo images
+#     └── database-backups/         # CronJob pg_dump (.dump); unique-size retention
+#
+# Prerequisites on the VPS node:
+#   mkdir -p /sani/tmp/naittsasms/postgres/data \
+#            /sani/tmp/naittsasms/wwwroot/Passport \
+#            /sani/tmp/naittsasms/wwwroot/Signatures \
+#            /sani/tmp/naittsasms/wwwroot/profile-avatars \
+#            /sani/tmp/naittsasms/wwwroot/school-logos \
+#            /sani/tmp/naittsasms/database-backups
+#   chown -R 999:999 /sani/tmp/naittsasms/postgres /sani/tmp/naittsasms/database-backups
+#   chown -R 1000:1000 /sani/tmp/naittsasms/wwwroot
+#
+# Database name, user and password live only in the gitignored secrets overlay
+# (POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD and ConnectionStrings__*).
+#
+# In-cluster API connection (connection string key "NaitsASMSDb"):
+#   Host=postgres-service-naitsasms;Port=5432;Username=<db-user>;Password=<db-password>;Database=<db-name>
+#
+# External DBA / tools: no public port. Open an SSH tunnel (keep it running),
+# then connect to localhost:15432:
+#   ssh -L 15432:127.0.0.1:15432 root@<VPS-IP> kubectl port-forward --address 127.0.0.1 svc/postgres-service-naitsasms 15432:5432
+#   Host=localhost;Port=15432;Username=<db-user>;Password=<db-password>;Database=<db-name>
+#
+# Aspire Dashboard UI: no public port (it has no login). Open an SSH tunnel, then browse
+# http://localhost:28888:
+#   ssh -L 28888:127.0.0.1:28888 root@<VPS-IP> kubectl port-forward --address 127.0.0.1 svc/aspire-dashboard-naitsasms 28888:18888
+#   API OTEL (in-cluster): http://aspire-dashboard-naitsasms:18889 (gRPC)
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# SECTION 1 – PostgreSQL ConfigMap
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config-naitsasms
+  namespace: default
+  labels:
+    app: postgres-naitsasms
+    tier: database
+data:
+  PGDATA: /var/lib/postgresql/data
+
+---
+# REMOVED FROM GIT (GitGuardian): Secret/postgres-secret-naitsasms
+# (POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD). On an empty PGDATA the official
+# postgres image creates POSTGRES_DB owned by POSTGRES_USER, so no init script is needed.
+# Apply from gitignored overlay: k8s/secrets/NaitsAsms.secrets.local.yaml
+---
+# ---------------------------------------------------------------------------
+# SECTION 3a – PostgreSQL ClusterIP Service (in-cluster, used by the API)
+# API connects via: Host=postgres-service-naitsasms;Port=5432
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service-naitsasms
+  namespace: default
+  labels:
+    app: postgres-naitsasms
+    tier: database
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-naitsasms
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 4a – PostgreSQL data under /sani/tmp/naittsasms/postgres
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: naitsasms-postgres-volume
+  namespace: default
+  labels:
+    app: postgres-naitsasms
+    tier: database
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual-naitsasms-postgres
+  hostPath:
+    path: /sani/tmp/naittsasms/postgres
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: naitsasms-postgres-volume-claim
+  namespace: default
+  labels:
+    app: postgres-naitsasms
+    tier: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual-naitsasms-postgres
+  volumeName: naitsasms-postgres-volume
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 4b – PostgreSQL StatefulSet
+# Resources sized for Hostinger KVM 2 (2 vCPU / 8 GB) co-hosted with CustReward:
+# keep modest requests (always reserved); raise limits so a busy stack can use spare RAM/CPU
+# when the other app is idle. Limits are not auto-scaled — they only raise the burst ceiling.
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-naitsasms
+  namespace: default
+  labels:
+    app: postgres-naitsasms
+    tier: database
+spec:
+  serviceName: postgres-service-naitsasms
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-naitsasms
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: postgres-naitsasms
+        tier: database
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        - name: init-perms
+          image: alpine:3.20
+          securityContext:
+            runAsUser: 0
+          command: ["/bin/sh", "-c"]
+          args:
+            - >
+              find /var/lib/postgresql -maxdepth 1 -name "*.sql" -delete 2>/dev/null;
+              mkdir -p /var/lib/postgresql/data &&
+              chown 999:999 /var/lib/postgresql &&
+              chown -R 999:999 /var/lib/postgresql/data &&
+              chmod 700 /var/lib/postgresql &&
+              chmod 700 /var/lib/postgresql/data
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+      containers:
+        # postgres:18 declares VOLUME /var/lib/postgresql, which matches the mount below.
+        # Images <= 17 declare VOLUME /var/lib/postgresql/data; containerd then mounts a
+        # per-container volume over PGDATA and the data is lost when the pod is replaced.
+        - name: postgres
+          image: postgres:18
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: postgres-config-naitsasms
+            - secretRef:
+                name: postgres-secret-naitsasms
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data
+          ports:
+            - containerPort: 5432
+              name: postgres
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "1000m"
+              memory: "2Gi"
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", 'pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: naitsasms-postgres-volume-claim
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 5 – API ConfigMap
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: naitsasms-api-env
+  namespace: default
+  labels:
+    app: naitsasms-api
+    tier: api
+data:
+  ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+  ASPNETCORE_URLS: "http://+:8080"
+  ASPNETCORE_ENVIRONMENT: "Production"
+  HTTP_PORTS: "8080"
+  MAP_ASPIRE_HEALTH_ENDPOINTS: "true"
+  DOTNET_RUNNING_IN_CONTAINER: "true"
+  OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+  OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+  OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+  OTEL_SERVICE_NAME: "naitsasms-api"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://aspire-dashboard-naitsasms:18889"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "grpc"
+  TwoFactor__Issuer: "NAITS-ASMS"
+  # Enables POST api/SuperAdmin/demo/seed-almajiri (SAOfficer only, idempotent). Turn this on for
+  # the Commission demo window so the register can be topped up to the current day without shell
+  # access, and turn it off afterwards.
+  # Demo__AllowAlmajiriSeed: "true"
+  # Stable host fingerprint for Linux/containers (WMI is Windows-only).
+  # Keep identical across API replicas; used for Sms Api Key / licensing binding.
+  NAITS_UNIQUE_SYSTEM_ID: "ourschoolonline-vps-01"
+
+---
+# REMOVED FROM GIT (GitGuardian): Secret/naitsasms-api-secrets
+# Apply from gitignored overlay: k8s/secrets/NaitsAsms.secrets.local.yaml
+---
+# ---------------------------------------------------------------------------
+# SECTION 7 – Uploads / wwwroot PersistentVolume & Claim
+# Host path: /sani/tmp/naittsasms/wwwroot  →  container: /app/wwwroot
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: naitsasms-wwwroot-volume
+  namespace: default
+  labels:
+    app: naitsasms-api
+    tier: api
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual-naitsasms-wwwroot
+  hostPath:
+    path: /sani/tmp/naittsasms/wwwroot
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: naitsasms-wwwroot-volume-claim
+  namespace: default
+  labels:
+    app: naitsasms-api
+    tier: api
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual-naitsasms-wwwroot
+  volumeName: naitsasms-wwwroot-volume
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 8 – API Deployment
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: naitsasms-api
+  namespace: default
+  labels:
+    app: naitsasms-api
+    tier: api
+spec:
+  replicas: 1
+  minReadySeconds: 30
+  selector:
+    matchLabels:
+      app: naitsasms-api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: naitsasms-api
+        tier: api
+    spec:
+      terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: dockerhub-sanibesiru
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z postgres-service-naitsasms 5432; do
+                echo "Waiting for PostgreSQL..."; sleep 3;
+              done
+              echo "PostgreSQL is ready."
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "16Mi"
+            limits:
+              cpu: "50m"
+              memory: "32Mi"
+        - name: ensure-upload-dirs
+          image: busybox:1.36
+          securityContext:
+            runAsUser: 0
+            runAsNonRoot: false
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p \
+                /wwwroot/Passport \
+                /wwwroot/Signatures \
+                /wwwroot/profile-avatars \
+                /wwwroot/school-logos
+              chown -R 1000:1000 /wwwroot
+              chmod -R u+rwX,g+rwX /wwwroot
+              echo "Upload dirs ready under /wwwroot:"
+              ls -la /wwwroot /wwwroot/Passport /wwwroot/Signatures /wwwroot/profile-avatars /wwwroot/school-logos
+          volumeMounts:
+            - name: wwwroot-volume
+              mountPath: /wwwroot
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "16Mi"
+            limits:
+              cpu: "50m"
+              memory: "32Mi"
+      containers:
+        - name: naitsasms-api
+          image: sanibesiru/naitsasms-api:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: naitsasms-api-env
+            - secretRef:
+                name: naitsasms-api-secrets
+          resources:
+            requests:
+              cpu: "150m"
+              memory: "256Mi"
+            limits:
+              cpu: "1500m"
+              memory: "2Gi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 20
+            failureThreshold: 3
+          volumeMounts:
+            - name: wwwroot-volume
+              mountPath: /app/wwwroot
+      volumes:
+        - name: wwwroot-volume
+          persistentVolumeClaim:
+            claimName: naitsasms-wwwroot-volume-claim
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 9 – API Service (NodePort)
+# HTTP on host port 30092 (CustReward uses 30081; 30082 was already allocated).
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: naitsasms-api
+  namespace: default
+  labels:
+    app: naitsasms-api
+    tier: api
+spec:
+  type: NodePort
+  selector:
+    app: naitsasms-api
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      nodePort: 30092
+      protocol: TCP
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 9b – Aspire Dashboard (standalone)
+# Browser UI: SSH tunnel only (see header); no public NodePort.
+# In-cluster OTLP/gRPC for the API: aspire-dashboard-naitsasms:18889
+# Telemetry is in-memory only (lost on pod restart) — diagnostic use.
+# ---------------------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspire-dashboard-naitsasms
+  namespace: default
+  labels:
+    app: aspire-dashboard-naitsasms
+    tier: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aspire-dashboard-naitsasms
+  template:
+    metadata:
+      labels:
+        app: aspire-dashboard-naitsasms
+        tier: observability
+    spec:
+      containers:
+        - name: aspire-dashboard
+          image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 18888
+              protocol: TCP
+            - name: otlp-grpc
+              containerPort: 18889
+              protocol: TCP
+            - name: otlp-http
+              containerPort: 18890
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://0.0.0.0:18888"
+            - name: DOTNET_DASHBOARD_OTLP_ENDPOINT_URL
+              value: "http://0.0.0.0:18889"
+            - name: DOTNET_DASHBOARD_OTLP_HTTP_ENDPOINT_URL
+              value: "http://0.0.0.0:18890"
+            - name: ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS
+              value: "true"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 18888
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 18888
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 9c – Aspire Dashboard ClusterIP (UI + OTLP for in-cluster apps)
+# ---------------------------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspire-dashboard-naitsasms
+  namespace: default
+  labels:
+    app: aspire-dashboard-naitsasms
+    tier: observability
+spec:
+  type: ClusterIP
+  selector:
+    app: aspire-dashboard-naitsasms
+  ports:
+    - name: http
+      port: 18888
+      targetPort: 18888
+      protocol: TCP
+    - name: otlp-grpc
+      port: 18889
+      targetPort: 18889
+      protocol: TCP
+    - name: otlp-http
+      port: 18890
+      targetPort: 18890
+      protocol: TCP
+
+---
+# ---------------------------------------------------------------------------
+# SECTION 10 – Database Backup CronJob
+# Unique-size retention (same idea as the former in-app backup service):
+#   - custom-format dump: <db-name>-yyyyMMdd-HHmmss.dump  (pg_dump -F c)
+#   - after success, delete the immediately preceding <db-name>-*.dump
+#     when it has the same byte size as the new file (unique-size retention)
+#   - write .last-backup-status.txt
+# Daily 02:00 UTC → /sani/tmp/naittsasms/database-backups/
+#
+# Prerequisites:
+#   mkdir -p /sani/tmp/naittsasms/database-backups && chown 999:999 /sani/tmp/naittsasms/database-backups
+#
+# Manual one-off:
+#   kubectl create job --from=cronjob/postgres-backup-naitsasms postgres-backup-naitsasms-manual -n default
+# ---------------------------------------------------------------------------
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: postgres-backup-naitsasms
+  namespace: default
+  labels:
+    app: db-backup-naitsasms
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+          initContainers:
+            - name: wait-for-postgres
+              image: busybox:1.36
+              command:
+                - sh
+                - -c
+                - |
+                  until nc -z postgres-service-naitsasms 5432; do
+                    echo "Waiting for PostgreSQL..."; sleep 3;
+                  done
+                  echo "PostgreSQL is ready."
+              resources:
+                requests:
+                  cpu: "20m"
+                  memory: "16Mi"
+                limits:
+                  cpu: "50m"
+                  memory: "32Mi"
+          containers:
+            - name: pg-dump
+              image: postgres:18
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret-naitsasms
+                      key: POSTGRES_PASSWORD
+                - name: POSTGRES_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret-naitsasms
+                      key: POSTGRES_USER
+                - name: POSTGRES_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres-secret-naitsasms
+                      key: POSTGRES_DB
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+                  BACKUP_DIR=/backup
+                  DB="$POSTGRES_DB"
+                  STAMP=$(date +%Y%m%d-%H%M%S)
+                  OUT="${BACKUP_DIR}/${DB}-${STAMP}.dump"
+                  STATUS="${BACKUP_DIR}/.last-backup-status.txt"
+
+                  write_status() {
+                    printf 'Time: %s\nStatus: %s\nDetail: %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" "$2" > "$STATUS"
+                  }
+
+                  write_status "started" "Running pg_dump -F c to ${OUT}"
+                  if ! pg_dump -w -h postgres-service-naitsasms -U "$POSTGRES_USER" -d "$DB" -F c -f "$OUT"; then
+                    rm -f "$OUT"
+                    write_status "failed" "pg_dump exited with an error"
+                    exit 1
+                  fi
+
+                  if [ ! -s "$OUT" ]; then
+                    rm -f "$OUT"
+                    write_status "failed" "pg_dump finished but output file is missing or empty"
+                    exit 1
+                  fi
+
+                  NEW_SIZE=$(stat -c%s "$OUT")
+
+                  # Delete preceding dump when byte size matches the new file.
+                  PREV=""
+                  for f in $(ls -1t "${BACKUP_DIR}/${DB}-"*.dump 2>/dev/null || true); do
+                    [ "$f" = "$OUT" ] && continue
+                    PREV="$f"
+                    break
+                  done
+
+                  if [ -n "$PREV" ] && [ -f "$PREV" ]; then
+                    PREV_SIZE=$(stat -c%s "$PREV")
+                    if [ "$PREV_SIZE" = "$NEW_SIZE" ]; then
+                      rm -f "$PREV"
+                      echo "Deleted previous backup ${PREV} because it matches the new backup size (${NEW_SIZE} bytes)."
+                    fi
+                  fi
+
+                  write_status "success" "Created ${OUT} (${NEW_SIZE} bytes)."
+                  echo "Backup written: ${OUT} (${NEW_SIZE} bytes)"
+              volumeMounts:
+                - name: database-backups
+                  mountPath: /backup
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "128Mi"
+                limits:
+                  cpu: "300m"
+                  memory: "512Mi"
+          volumes:
+            - name: database-backups
+              hostPath:
+                path: /sani/tmp/naittsasms/database-backups
+                type: DirectoryOrCreate

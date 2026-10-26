@@ -1,0 +1,143 @@
+<section class="acct-income">
+  <p class="lead text-center acct-income__title">Income Statement Report</p>
+
+  @if (loading()) {
+    <div class="acct-income__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <form class="acct-income__filters" (submit)="$event.preventDefault()">
+      <div class="form-group col-md-4">
+        <label class="control-label col-md-6 text-right" for="acctYear">Select Year</label>
+        <div class="col-md-6">
+          <select
+            id="acctYear"
+            class="form-control"
+            [ngModel]="year()"
+            (ngModelChange)="onYearChange($event)"
+            name="year"
+          >
+            @for (item of years(); track item.value) {
+              <option [value]="item.value">{{ item.text }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        <label class="control-label col-md-6 text-right" for="acctStartMonth">Start Month</label>
+        <div class="col-md-6">
+          <select
+            id="acctStartMonth"
+            class="form-control"
+            [ngModel]="startMonth()"
+            (ngModelChange)="onMonthChange('start', $event)"
+            name="startMonth"
+          >
+            @for (item of months(); track item.value) {
+              <option [value]="item.value">{{ item.text }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        <label class="control-label col-md-6 text-right" for="acctEndMonth">End Month</label>
+        <div class="col-md-6">
+          <select
+            id="acctEndMonth"
+            class="form-control"
+            [ngModel]="endMonth()"
+            (ngModelChange)="onMonthChange('end', $event)"
+            name="endMonth"
+          >
+            @for (item of months(); track item.value) {
+              <option [value]="item.value">{{ item.text }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </form>
+
+    @if (error()) {
+      <p class="lead text-center text-danger">{{ error() }}</p>
+    }
+
+    <div class="acct-income__content" id="pageContent">
+      @if (refreshing()) {
+        <div class="acct-income__loading acct-income__loading--inline">
+          <mat-spinner diameter="28"></mat-spinner>
+        </div>
+      }
+
+      @if (view(); as stmt) {
+        <div class="acct-income__table-wrap">
+          <table class="table table-bordered lead">
+            <tr>
+              <th colspan="3" class="text-left highlight-head">
+                <span>Total Income Statement within the selected period</span>
+              </th>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <table class="inner-table">
+                  <tr class="text-right">
+                    <th class="text-right">
+                      School Fixed Fee Payment:
+                      <span class="amount-blue">{{ stmt.fixedFeePayment }}</span>
+                    </th>
+                  </tr>
+                  <tr class="text-right">
+                    <th class="text-right">
+                      School Optional Fee Payment:
+                      <span class="amount-blue">{{ stmt.optionalFeePayment }}</span>
+                    </th>
+                  </tr>
+                  <tr class="text-right">
+                    <th class="text-right">
+                      Other Income: <span class="amount-blue">{{ stmt.otherIncome }}</span>
+                    </th>
+                  </tr>
+                </table>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <th class="text-right" colspan="2">Total Income:</th>
+              <td><span class="amount-blue">{{ stmt.totalIncome }}</span></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <table class="inner-table">
+                  <tr class="text-right">
+                    <th class="text-right">
+                      Total Salary payment:
+                      <span class="amount-red">{{ stmt.salaryPayment }}</span>
+                    </th>
+                  </tr>
+                  <tr class="text-right">
+                    <th class="text-right">
+                      Total Other Expenses:
+                      <span class="amount-red">{{ stmt.otherExpenses }}</span>
+                    </th>
+                  </tr>
+                </table>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <th class="text-right" colspan="2">Overall Total Expenditure:</th>
+              <td class="amount-red">{{ stmt.totalExpenditure }}</td>
+            </tr>
+            <tr>
+              <th class="text-right" colspan="2">Net Profit:</th>
+              <td [innerHTML]="stmt.netProfitHtml"></td>
+            </tr>
+          </table>
+        </div>
+      } @else if (!error()) {
+        <p class="lead welcome-empty">Welcome! There is nothing to show yet.</p>
+      }
+    </div>
+  }
+</section>

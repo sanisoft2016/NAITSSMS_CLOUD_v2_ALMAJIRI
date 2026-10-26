@@ -1,0 +1,238 @@
+﻿
+<div class="page-intro">
+	<p class="text-center text-danger lead">
+		Students Management: You can enter student's Id and click search or Select "Class" and the "Arm".
+	</p>
+
+	<p class="right-actions">
+		<ng-container *ngIf="filteredStudents.length > 0">
+			<strong>Number of Student(s): </strong>
+			<span class="student-count">{{ filteredStudents.length }}</span>
+		</ng-container>
+
+		<a
+			id="studentsWithoutPassport"
+			class="btn btn-warning"
+			role="button"
+			[class.disabled]="isLoadingWithoutPassport"
+			(click)="getStudentsWithoutPassport()"
+		>
+			{{ isLoadingWithoutPassport ? 'Please Wait ...' : 'Students without Passport' }}
+			<i class="fa fa-user"></i>
+		</a>
+
+		<a class="btn btn-danger" role="button" (click)="printPreview()">
+			Print Preview <i class="fa fa-print"></i>
+		</a>
+
+		<button type="button" class="btn btn-success" (click)="addStudent()">
+			Add Student <i class="fa fa-plus"></i>
+		</button>
+	</p>
+
+	<div class="clear-both"></div>
+
+	<div class="well">
+		<form class="form-horizontal">
+			<div class="form-group search-row">
+				<div class="search-label-wrap text-right">
+					<label class="control-label">Student Id:</label>
+				</div>
+
+				<div class="search-input-wrap">
+					<input
+						class="form-control"
+						placeholder="Id No. here"
+						name="parameter"
+						[(ngModel)]="searchParameter"
+						type="text"
+					/>
+				</div>
+
+				<div class="search-button-wrap">
+					<button type="button" (click)="searchStudent()" class="btn btn-primary form-control">Search</button>
+				</div>
+
+				<label class="control-label class-label" for="CurrentClass">Class</label>
+				<div class="class-select-wrap">
+					<select id="CurrentClass" name="CurrentClass" class="form-control" [(ngModel)]="currentClass" (ngModelChange)="onClassChange($event)">
+						<option value="">Select Class</option>
+						<option *ngFor="let item of classes" [value]="item.id">{{ item.classLabel }}</option>
+					</select>
+				</div>
+
+				<label class="control-label arm-label" for="ArmName">Arm</label>
+				<div class="arm-select-wrap">
+					<select id="ArmName" name="ArmName" class="form-control" [(ngModel)]="currentArm" (ngModelChange)="onArmChange($event)">
+						<option value="">Select Arm</option>
+						<option *ngFor="let item of arms" [value]="item.id">{{ getEnumStringValue(item.armName) }}</option>
+					</select>
+					<span class="field-validation-valid text-danger"></span>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div id="pageContent">
+		<p class="lead text-center text-danger" *ngIf="isLoading">Loading students...</p>
+		<p class="lead text-center text-danger" *ngIf="!isLoading && loadError">{{ loadError }}</p>
+		<p class="lead text-center text-danger" *ngIf="!isLoading && !loadError && emptyStateMessage">
+			{{ emptyStateMessage }}
+			<button type="button" class="btn btn-success btn-add-empty" (click)="addStudent()">
+				Add Student <i class="fa fa-plus"></i>
+			</button>
+		</p>
+
+		<div class="table-scroll-wrap" *ngIf="!isLoading && !loadError && filteredStudents.length > 0">
+			<p class="lead text-center text-danger">Student List</p>
+
+			<table class="table table-bordered table-responsive" id="studentList">
+				<tr>
+					<th>S/No</th>
+					<th style="text-align: left;">Full Name</th>
+					<th>Class Category</th>
+					<th>Admission No.</th>
+					<th>User Name</th>
+					<th>Status</th>
+					<th></th>
+				</tr>
+
+				<tr *ngFor="let item of filteredStudents; let i = index">
+					<td>{{ i + 1 }}</td>
+					<td>{{ getStudentFullName(item) }}</td>
+					<td style="text-align: center;">{{ getStudentClassCategory(item) }}</td>
+					<td style="text-align: center;">{{ item.idNo || '-' }}</td>
+					<td style="text-align: center;">{{ getStudentUserName(item) }}</td>
+					<td>
+						<span *ngIf="item.status === StudentStatus.Fresher" class="status-fresher">{{ getStatusLabel(item.status) }}</span>
+						<span *ngIf="item.status === StudentStatus.Previous" class="status-previous">{{ getStatusLabel(item.status) }}</span>
+						<ng-container *ngIf="item.status !== StudentStatus.Fresher && item.status !== StudentStatus.Previous">
+							{{ getStatusLabel(item.status) }}
+						</ng-container>
+					</td>
+					<td>
+						<input
+							type="button"
+							[class]="'btn btn-xs ' + (((i + 1) % 2 === 0) ? 'btn-primary' : 'btn-success')"
+							title="View Details"
+							(click)="viewDetails(item.id || item.userId || '')"
+							value="View Details"
+						/>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="modal" id="DetailsPopup" *ngIf="showDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="legacy-dialog-shell" [class.is-print]="isPrintPreview">
+			<button type="button" class="close dialog-close" (click)="closeDetailsModal()" aria-hidden="true">&times;</button>
+
+			<div class="legacy-student-dialog preview-dialog-shell" *ngIf="isPrintPreview">
+				<div class="col-md-12 preview-toolbar">
+					<input type="button" class="btn btn-primary btn-xs pull-left" value="Print Page" (click)="printPage()" />
+					<button class="btn btn-warning btn-xs pull-right" type="button" (click)="closeDetailsModal()">Cancel</button>
+					<div class="clear-both"></div>
+				</div>
+
+				<div class="preview-border-box">
+					<div class="preview-inner">
+						<table class="table table-bordered table-striped" id="printResult">
+							<tr>
+								<th colspan="5" class="text-center text-danger">{{ printTitle }}</th>
+							</tr>
+							<tr>
+								<th class="nowrap-small">S/No</th>
+								<th class="nowrap-medium text-danger">Admission No</th>
+								<th class="nowrap-name">Full Name</th>
+								<th class="nowrap-medium">Class Category</th>
+								<th class="remark-head">Remark</th>
+							</tr>
+							<tr *ngFor="let item of printData">
+								<td class="text-left" style="white-space: nowrap;">{{ item.sNo }}</td>
+								<td class="text-left" style="white-space: nowrap;">{{ item.admisnNo }}</td>
+								<td class="text-left" style="white-space: nowrap;">{{ item.studentName }}</td>
+								<td class="text-left" style="white-space: nowrap;">{{ item.classStatus }}</td>
+								<td class="text-left">{{ item.space }}</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="legacy-student-dialog" *ngIf="!isPrintPreview">
+				<h4 class="text-center">Student Details</h4>
+
+				<p class="legacy-top-actions" *ngIf="selectedStudent">
+					<button class="legacy-btn legacy-btn-success legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="editRecord()">Edit</button>
+					<button class="legacy-btn legacy-btn-danger legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="deleteRecord()">Delete</button>
+					<button class="legacy-btn legacy-btn-warning legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="loadPasswordPage()">Change Password</button>
+					<button *ngIf="isAccountDisabled()" class="legacy-btn legacy-btn-danger legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="enableStudentAccount()">Enable Account</button>
+					<button *ngIf="!isAccountDisabled()" class="legacy-btn legacy-btn-primary legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="disableStudentAccount()">Disable Account</button>
+				</p>
+
+				<div class="change-password-panel" *ngIf="showChangePasswordPanel">
+					<span class="change-password-label">New Password</span>
+					<input class="password-input" type="password" placeholder="Enter new password" [(ngModel)]="newPassword" (keyup.enter)="submitChangePassword()" />
+					<button class="legacy-btn legacy-btn-primary legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="submitChangePassword()">Save Password</button>
+					<button class="legacy-btn legacy-btn-default legacy-btn-xs" type="button" (click)="loadPasswordPage()">Cancel</button>
+				</div>
+
+				<p class="loading-text" *ngIf="isDetailsLoading">Loading student details...</p>
+				<p class="error-text" *ngIf="!isDetailsLoading && detailsLoadError">{{ detailsLoadError }}</p>
+
+				<div id="studentDetails" *ngIf="!isDetailsLoading && selectedStudent">
+					<div class="row legacy-body-border">
+						<table class="legacy-table-layout">
+							<tr>
+								<td class="legacy-cell">
+									<dl class="dl-horizontal">
+										<dt>Admission No.</dt><dd>{{ selectedStudent.idNo || '-' }}</dd>
+										<dt>First Name</dt><dd>{{ firstName }}</dd>
+										<dt>Middle Name</dt><dd>{{ middleName }}</dd>
+										<dt>Surname</dt><dd>{{ surName }}</dd>
+										<dt>Date Of Birth</dt><dd>{{ formatDate(selectedStudent.dateOfBirth) }}</dd>
+										<dt>Place Of Birth</dt><dd>{{ selectedStudent.placeOfBirth || '-' }}</dd>
+										<dt>Blood Group</dt><dd>{{ selectedStudent.bloodGroup || '-' }}</dd>
+										<dt>Date Of Admission</dt><dd>{{ formatDate(selectedStudent.dateOfAdmsn) }}</dd>
+										<dt>Transferred From</dt><dd>{{ selectedStudent.transferedFromWhere || '-' }}</dd>
+										<dt>Guardian's Name</dt><dd>{{ selectedStudent.guardiansName || '-' }}</dd>
+										<dt>Relationship</dt><dd>{{ selectedStudent.relationship || '-' }}</dd>
+										<dt>Guardian Address</dt><dd>{{ selectedStudent.guardianAddress || '-' }}</dd>
+										<dt>Occupation</dt><dd>{{ selectedStudent.occupation || '-' }}</dd>
+										<dt>Mobile Number</dt><dd>{{ selectedStudent.mobileNumber || '-' }}</dd>
+										<dt>Home Number</dt><dd>{{ selectedStudent.homeNumber || '-' }}</dd>
+										<dt>Start Class</dt><dd>{{ selectedStudent.startClass || '-' }}</dd>
+									</dl>
+								</td>
+
+								<td class="legacy-cell">
+									<div class="image-holder" id="image-holder">
+										<img *ngIf="studentPassportUrl" [src]="studentPassportUrl" class="thumb-image" alt="Student passport" (error)="onPassportPreviewError()" />
+										<div *ngIf="!studentPassportUrl" class="thumb-placeholder">No Image</div>
+									</div>
+
+									<dl class="dl-horizontal">
+										<dt>Current Class</dt><dd>{{ detailsClassDisplay }}</dd>
+										<dt>Class Category</dt><dd>{{ getStudentClassCategory(selectedStudent) }}</dd>
+										<dt>Religion</dt><dd>{{ religionLabel }}</dd>
+										<dt>User Phone Number</dt><dd>{{ selectedStudent.user?.phoneNumber || '-' }}</dd>
+										<dt>User Email</dt><dd>{{ selectedStudent.user?.email || '-' }}</dd>
+										<dt>Country</dt><dd>{{ selectedStudent.country || '-' }}</dd>
+									</dl>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button class="legacy-btn legacy-btn-warning" type="button" (click)="closeDetailsModal()">Close</button>
+					<button class="legacy-btn legacy-btn-danger" type="button" [disabled]="isDetailsLoading || !selectedStudent" (click)="printStudentDetails()">Print</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

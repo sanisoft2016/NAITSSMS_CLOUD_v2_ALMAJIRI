@@ -1,0 +1,129 @@
+.remark-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 45%);
+  z-index: 1040;
+}
+
+.remark-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+.remark-modal__body {
+  width: min(700px, 100%);
+  margin-top: 1em;
+  padding: 1rem;
+  border: 3px double #333;
+  background: #fff;
+}
+
+.student-meta {
+  margin-bottom: 1rem;
+}
+
+.highlight {
+  color: #a94442;
+}
+
+.pad-left {
+  padding-left: 2em;
+}
+
+.comments-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.comment-block textarea {
+  width: 100%;
+  resize: none;
+}
+
+.attendance-block {
+  padding-top: 2.4em;
+}
+
+.assessment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #ddd;
+  padding: 0.4rem 0.5rem;
+  background: #fff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.score-input {
+  height: 25px;
+  width: 100px;
+}
+
+.remark-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  color: #fff;
+  background: #337ab7;
+  border-color: #2e6da4;
+}
+
+.btn-danger {
+  color: #fff;
+  background: #d9534f;
+  border-color: #d43f3a;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lead {
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.text-danger {
+  color: #a94442;
+}
+
+@media (max-width: 767px) {
+  .comments-row,
+  .assessment-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,83 @@
+<section class="acct-opt-item">
+  <header class="acct-opt-item__header">
+    <h1 class="acct-opt-item__title">Register Optional Fees</h1>
+  </header>
+
+  @if (error()) {
+    <div class="acct-opt-item__alert acct-opt-item__alert--error" role="alert">{{ error() }}</div>
+  }
+  @if (warn()) {
+    <div class="acct-opt-item__alert acct-opt-item__alert--warn" role="status">{{ warn() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="acct-opt-item__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <form class="acct-opt-item__card" (submit)="$event.preventDefault(); save()">
+      <div class="acct-opt-item__group">
+        <label class="acct-opt-item__label" for="ItemCategoryId">OPtional Fee Category</label>
+        <select
+          id="ItemCategoryId"
+          name="ItemCategoryId"
+          class="acct-opt-item__control"
+          [ngModel]="itemCategoryId()"
+          (ngModelChange)="itemCategoryId.set($event)"
+        >
+          @for (cat of categories(); track cat.id) {
+            <option [value]="cat.id">{{ cat.categoryName }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="acct-opt-item__group">
+        <label class="acct-opt-item__label" for="ItemName">Item Name</label>
+        <div class="acct-opt-item__field">
+          <input
+            id="ItemName"
+            name="ItemName"
+            type="text"
+            class="acct-opt-item__control"
+            maxlength="30"
+            [ngModel]="itemName()"
+            (ngModelChange)="itemName.set($event); itemNameError.set('')"
+            [attr.aria-invalid]="!!itemNameError()"
+          />
+          @if (itemNameError()) {
+            <span class="acct-opt-item__field-error">{{ itemNameError() }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="acct-opt-item__group">
+        <label class="acct-opt-item__label" for="Cost">Cost</label>
+        <input
+          id="Cost"
+          name="Cost"
+          type="number"
+          step="any"
+          min="0"
+          class="acct-opt-item__control"
+          [ngModel]="cost()"
+          (ngModelChange)="cost.set($event === '' || $event == null ? null : +$event)"
+        />
+      </div>
+
+      <div class="acct-opt-item__actions">
+        <button
+          type="submit"
+          class="acct-opt-item__btn acct-opt-item__btn--primary"
+          [disabled]="saving()"
+        >
+          @if (saving()) {
+            <mat-spinner diameter="18"></mat-spinner>
+            Saving…
+          } @else {
+            Create
+          }
+        </button>
+      </div>
+    </form>
+  }
+</section>

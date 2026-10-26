@@ -1,0 +1,451 @@
+/* ─── Other Registrations — quick-link tile grid ─────────────────────────── */
+
+.other-registrations-page {
+  display: grid;
+  gap: 2rem;
+  padding: 0.5rem 0;
+}
+
+/* Page header */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+
+  h1 {
+    margin: 0;
+    font-size: 1.65rem;
+    font-weight: 700;
+  }
+}
+
+.page-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+
+  mat-icon {
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: #0f766e;
+  }
+
+  &.is-loading mat-icon {
+    animation: spin 1s linear infinite;
+    color: #d97706;
+  }
+}
+
+/* Error bar */
+.alert-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.9rem;
+
+  mat-icon {
+    color: #dc2626;
+    font-size: 1.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+
+/* Group section */
+.ql-section {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ql-group-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #334155;
+  padding-left: 0.25rem;
+  border-left: 3px solid #0284c7;
+  padding-left: 0.6rem;
+}
+
+/* Quick-link tile row matching Bootstrap col-xs-6 col-sm-6 col-md-4 */
+.ql-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem 1.25rem;
+}
+
+/* Individual tile */
+.ql-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.3rem;
+}
+
+/* Colored icon button — matches Bootstrap .btn .btn-{color} */
+.ql-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: filter 120ms ease, transform 120ms ease;
+  color: #fff;
+
+  mat-icon {
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* accent colours matching Bootstrap contextual classes */
+  &--success { background-color: #28a745; }
+  &--info    { background-color: #17a2b8; }
+  &--warning { background-color: #ffc107; color: #212529; }
+  &--danger  { background-color: #dc3545; }
+}
+
+/* Title styled as a clickable link */
+.ql-title-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    transition: color 120ms ease;
+  }
+
+  &:hover:not(:disabled) h3 {
+    color: #0284c7;
+    text-decoration: underline;
+  }
+}
+
+.ql-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.ql-note {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 991px) {
+  .ql-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .ql-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Stale classes kept below so nothing breaks if referenced elsewhere ──── */
+
+.state-pill.state-ready {
+  background: rgba(22, 163, 74, 0.12);
+  color: #166534;
+}
+
+.state-pill.state-limited {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0c4a6e;
+}
+
+.state-pill.state-pending {
+  background: rgba(148, 163, 184, 0.2);
+  color: #334155;
+}
+
+.state-pill.state-destructive {
+  background: rgba(220, 38, 38, 0.12);
+  color: #991b1b;
+}
+
+.action-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.action-copy {
+  display: grid;
+  gap: 0.55rem;
+  flex: 1 1 auto;
+}
+
+.action-description,
+.action-note {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.action-note {
+  font-size: 0.92rem;
+  color: #64748b;
+}
+
+.action-button {
+  width: 100%;
+  min-height: 2.9rem;
+  margin-top: auto;
+  border-radius: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+.action-button.accent-success {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+.action-button.accent-info {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+}
+
+.action-button.accent-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.action-button.accent-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.ca-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.55);
+  z-index: 1200;
+}
+
+.ca-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(92vw, 520px);
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 55px rgba(2, 6, 23, 0.32);
+  z-index: 1201;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 1rem 0.9rem;
+}
+
+.ca-modal__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.8rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+  }
+}
+
+.ca-modal__close {
+  border: none;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.ca-modal__body {
+  display: grid;
+  gap: 0.55rem;
+
+  label {
+    font-size: 0.88rem;
+    color: #334155;
+    font-weight: 600;
+  }
+
+  select,
+  input:not(.mat-mdc-input-element) {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.45rem;
+    padding: 0.52rem 0.62rem;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #fff;
+  }
+}
+
+.ca-modal__footer {
+  display: flex;
+  justify-content: end;
+  gap: 0.55rem;
+}
+
+.ca-modal__btn {
+  border: none;
+  border-radius: 0.45rem;
+  padding: 0.48rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ca-modal__btn--plain {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.ca-modal__btn--primary {
+  background: #2563eb;
+  color: #fff;
+}
+
+.resumption-picker {
+  width: 100%;
+  display: block;
+}
+
+:host ::ng-deep .resumption-picker .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+:host ::ng-deep .resumption-picker .mdc-notched-outline__leading,
+:host ::ng-deep .resumption-picker .mdc-notched-outline__notch,
+:host ::ng-deep .resumption-picker .mdc-notched-outline__trailing {
+  border-color: #cbd5e1 !important;
+}
+
+:host ::ng-deep .resumption-picker.mat-focused .mdc-notched-outline__leading,
+:host ::ng-deep .resumption-picker.mat-focused .mdc-notched-outline__notch,
+:host ::ng-deep .resumption-picker.mat-focused .mdc-notched-outline__trailing {
+  border-color: #2563eb !important;
+  border-width: 2px !important;
+}
+
+:host ::ng-deep .resumption-picker .mat-mdc-icon-button {
+  color: #475569;
+}
+
+::ng-deep .resumption-calendar-panel {
+  border-radius: 0.85rem;
+  overflow: hidden;
+}
+
+::ng-deep .resumption-calendar-panel .mat-datepicker-content {
+  box-shadow: 0 20px 48px rgba(15, 23, 42, 0.28);
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-header {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-controls,
+::ng-deep .resumption-calendar-panel .mat-calendar-controls .mat-mdc-button,
+::ng-deep .resumption-calendar-panel .mat-calendar-previous-button,
+::ng-deep .resumption-calendar-panel .mat-calendar-next-button {
+  color: #ffffff;
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-body-selected {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: #2563eb;
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-body-cell-content,
+::ng-deep .resumption-calendar-panel .mat-calendar-body-label {
+  color: #0f172a !important;
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-body-disabled > .mat-calendar-body-cell-content {
+  color: #94a3b8 !important;
+}
+
+::ng-deep .resumption-calendar-panel .mat-calendar-body-selected.mat-calendar-body-cell-content,
+::ng-deep .resumption-calendar-panel .mat-calendar-body-selected > .mat-calendar-body-cell-content {
+  color: #ffffff !important;
+}
+
+.action-button:disabled {
+  opacity: 0.72;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 960px) {
+  .hero-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .other-registrations-page {
+    gap: 1rem;
+  }
+
+  .hero-card,
+  .action-card {
+    padding: 1rem;
+  }
+}

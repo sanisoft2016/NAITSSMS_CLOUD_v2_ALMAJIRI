@@ -1,0 +1,76 @@
+.student-profile-page {
+  padding: 1.5rem;
+}
+
+.page-title {
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.profile-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid #333;
+}
+
+.dl-horizontal {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) 1fr;
+  gap: 0.45rem 0.85rem;
+  margin: 0;
+}
+
+.dl-horizontal dt {
+  font-weight: 600;
+  text-align: right;
+}
+
+.dl-horizontal dd {
+  margin: 0;
+}
+
+.passport-frame {
+  width: 16em;
+  height: 16em;
+  margin: 0 auto 1rem;
+  border-style: double;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.thumb-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.arm {
+  padding-left: 1.2em;
+}
+
+.empty-message,
+.loader {
+  padding-top: 3em;
+  text-align: center;
+  color: #c62828;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 800px) {
+  .profile-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .dl-horizontal {
+    grid-template-columns: 1fr;
+  }
+
+  .dl-horizontal dt {
+    text-align: left;
+  }
+}

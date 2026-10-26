@@ -1,0 +1,364 @@
+<section class="acct-ophome">
+  <div class="acct-ophome__top">
+    <h3 class="acct-ophome__title">Student Optional Payment Home</h3>
+    <div class="acct-ophome__result-type">
+      <label class="acct-ophome__inline-label" for="ResultType">Size</label>
+      <select
+        id="ResultType"
+        class="acct-ophome__control acct-ophome__control--result"
+        [ngModel]="resultType()"
+        (ngModelChange)="onResultTypeChange($event)"
+      >
+        <option [ngValue]="1">Make student payment</option>
+        <option [ngValue]="0">List of students payment defaulters</option>
+      </select>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="acct-ophome__alert acct-ophome__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="acct-ophome__loading"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <div class="acct-ophome__menu" id="menuCategory">
+      @if (isMakePayment()) {
+        <div class="acct-ophome__row acct-ophome__row--collection">
+          <label class="acct-ophome__inline-label" for="ResultCollectionType"
+            >Payment Collection Type:</label
+          >
+          <select
+            id="ResultCollectionType"
+            class="acct-ophome__control acct-ophome__control--wide"
+            [ngModel]="collectionType()"
+            (ngModelChange)="onCollectionTypeChange($event)"
+          >
+            <option [ngValue]="2">Per Arm Payment</option>
+            <option [ngValue]="0">All Payment</option>
+            <option [ngValue]="1">Per Class Payment</option>
+          </select>
+        </div>
+
+        <div class="acct-ophome__row acct-ophome__row--filters">
+          <div class="acct-ophome__field">
+            <label class="acct-ophome__inline-label" for="Session">Session</label>
+            <select
+              id="Session"
+              class="acct-ophome__control"
+              [ngModel]="sessionId()"
+              (ngModelChange)="onSessionChange($event)"
+            >
+              @for (opt of sessions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.text }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="acct-ophome__field" id="termDiv">
+            <label class="acct-ophome__inline-label" for="Term">Term</label>
+            @if (termsLoading()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <select
+                id="Term"
+                class="acct-ophome__control"
+                [ngModel]="termStatus()"
+                (ngModelChange)="onTermChange($event)"
+              >
+                @for (opt of terms(); track opt.value) {
+                  <option [value]="opt.value">{{ opt.text }}</option>
+                }
+              </select>
+            }
+          </div>
+
+          @if (showClassFilter()) {
+            <div class="acct-ophome__field" id="ClassContainer">
+              <label class="acct-ophome__inline-label" for="ClassName">Class</label>
+              <select
+                id="ClassName"
+                class="acct-ophome__control"
+                [ngModel]="classValue()"
+                (ngModelChange)="onClassChange($event)"
+              >
+                @for (opt of classes(); track opt.value) {
+                  <option [value]="opt.value">{{ opt.text }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          @if (showArmFilter()) {
+            <div class="acct-ophome__field" id="ArmContainer">
+              <label class="acct-ophome__inline-label" for="ArmName">Arm</label>
+              <select
+                id="ArmName"
+                class="acct-ophome__control"
+                [ngModel]="armValue()"
+                (ngModelChange)="onArmChange($event)"
+              >
+                @for (opt of arms(); track opt.value) {
+                  <option [value]="opt.value">{{ opt.text }}</option>
+                }
+              </select>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="acct-ophome__row acct-ophome__row--def-size">
+          <label class="acct-ophome__inline-label" for="ResultStatus">Size</label>
+          <select
+            id="ResultStatus"
+            class="acct-ophome__control"
+            [ngModel]="defaulterSize()"
+            (ngModelChange)="onDefaulterSizeChange($event)"
+          >
+            <option [ngValue]="1">Termly</option>
+            <option [ngValue]="0">Yearly</option>
+          </select>
+        </div>
+
+        <div class="acct-ophome__row acct-ophome__row--filters">
+          <div class="acct-ophome__field">
+            <label class="acct-ophome__inline-label" for="SessionDef">Session</label>
+            <select
+              id="SessionDef"
+              class="acct-ophome__control"
+              [ngModel]="sessionId()"
+              (ngModelChange)="onSessionChange($event)"
+            >
+              @for (opt of sessions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.text }}</option>
+              }
+            </select>
+          </div>
+
+          @if (showDefaulterTerm()) {
+            <div class="acct-ophome__field" id="termDivDef">
+              <label class="acct-ophome__inline-label" for="TermDef">Term</label>
+              @if (termsLoading()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <select
+                  id="TermDef"
+                  class="acct-ophome__control"
+                  [ngModel]="termStatus()"
+                  (ngModelChange)="onTermChange($event)"
+                >
+                  @for (opt of terms(); track opt.value) {
+                    <option [value]="opt.value">{{ opt.text }}</option>
+                  }
+                </select>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="acct-ophome__content" id="pageContent">
+      @if (contentLoading()) {
+        <div class="acct-ophome__loading acct-ophome__loading--inline">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+      } @else if (isDefaulters() && defaultersReport(); as data) {
+        @if (defaulterClassGroups().length === 0) {
+          <p class="acct-ophome__empty lead">No recod available</p>
+        } @else {
+          <p class="acct-ophome__summary lead">
+            List of payment defaulters - Total Outstanding:
+            <span class="acct-ophome__blue">{{ formatNaira(data.totalOutstanding) }}</span>, Total
+            Discount:
+            <span class="acct-ophome__blue">{{ formatNaira(data.totalDiscount) }}</span>
+          </p>
+
+          <div class="acct-ophome__table-wrap">
+            <table class="acct-ophome__outer table table-bordered">
+              @for (cls of defaulterClassGroups(); track cls.classId) {
+                <tr class="acct-ophome__class-row">
+                  <th>{{ cls.classLabel }}</th>
+                </tr>
+                @for (arm of cls.arms; track arm.classArmId) {
+                  <tr class="acct-ophome__arm-row">
+                    <th>{{ arm.label }}</th>
+                  </tr>
+                  <tr>
+                    <td class="acct-ophome__arm-cell">
+                      @for (stu of arm.students; track stu.studentId) {
+                        <div class="acct-ophome__student">
+                          <table class="acct-ophome__student-table table table-bordered">
+                            <tr>
+                              <th class="acct-ophome__student-head">
+                                Full Name:
+                                <span class="acct-ophome__green">{{ stu.fullName }}</span>, Id No.:
+                                <span class="acct-ophome__green">{{ stu.idNo }}</span>, Total Charges:
+                                <span class="acct-ophome__green">{{
+                                  formatNaira(stu.totalCharges)
+                                }}</span>
+                                <br />
+                                Total Payment:
+                                <span class="acct-ophome__green">{{
+                                  formatNaira(stu.totalPayment)
+                                }}</span
+                                >, Total Discount:
+                                <span class="acct-ophome__green">{{
+                                  formatNaira(stu.totalDiscount)
+                                }}</span
+                                >, Total Outstanding:
+                                <span class="acct-ophome__red">{{
+                                  formatNaira(stu.totalOutstanding)
+                                }}</span>
+                              </th>
+                            </tr>
+                            @for (term of stu.terms; track term.key) {
+                              <tr>
+                                <th class="acct-ophome__term-head">
+                                  Term/Session:
+                                  <span class="acct-ophome__blue"
+                                    >{{ term.termLabel }}, {{ term.session }}</span
+                                  >
+                                </th>
+                              </tr>
+                              @for (item of term.items; track item.charge.id) {
+                                <tr>
+                                  <td>
+                                    <table class="acct-ophome__item-table table table-bordered">
+                                      <tr>
+                                        <th colspan="5" class="acct-ophome__item-head">
+                                          <span class="acct-ophome__red"
+                                            >{{ item.counter }} =&gt;
+                                          </span>
+                                          Item's name:
+                                          <span class="acct-ophome__blue">{{
+                                            item.charge.itemName
+                                          }}</span
+                                          >, Charges:
+                                          <span class="acct-ophome__blue">{{
+                                            formatNaira(item.charge.cost)
+                                          }}</span
+                                          >, Total Payment:
+                                          <span class="acct-ophome__blue">{{
+                                            formatNaira(item.paid)
+                                          }}</span
+                                          >, Discount:
+                                          <span class="acct-ophome__blue">{{
+                                            formatNaira(item.discount)
+                                          }}</span
+                                          >, Outstanding:
+                                          <span class="acct-ophome__red">{{
+                                            formatNaira(item.outstanding)
+                                          }}</span>
+                                        </th>
+                                      </tr>
+                                      @if (item.charge.payments.length) {
+                                        <tr class="acct-ophome__pay-cols">
+                                          <th>Payment Date</th>
+                                          <th>Payment Type</th>
+                                          <th>Payment Amount</th>
+                                          <th>Discount</th>
+                                          <th>Reason for the discount</th>
+                                        </tr>
+                                        @for (pay of item.charge.payments; track $index) {
+                                          <tr>
+                                            <th>{{ formatPaymentDate(pay.paymentDate) }}</th>
+                                            <th>{{ pay.paymentTypeLabel }}</th>
+                                            <th>{{ formatNaira(pay.amount) }}</th>
+                                            <th>{{ formatNaira(item.paymentDiscount) }}</th>
+                                            <th>{{ item.reason }}</th>
+                                          </tr>
+                                        }
+                                      }
+                                    </table>
+                                  </td>
+                                </tr>
+                              }
+                            }
+                          </table>
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              }
+            </table>
+          </div>
+        }
+      } @else if (isMakePayment() && processing(); as pay) {
+        @if (processingClassGroups().length === 0) {
+          <p class="acct-ophome__empty lead acct-ophome__empty--danger">
+            {{
+              pay.message ||
+                'No optional charge has been assigned to any student in the selected class-arm in the selected session and term.'
+            }}
+          </p>
+        } @else {
+          <p class="acct-ophome__summary lead">Session/Term: {{ pay.sessionAndTerm }}</p>
+          <div class="acct-ophome__table-wrap">
+            <table class="acct-ophome__outer table table-bordered">
+              @for (cls of processingClassGroups(); track cls.classId) {
+                <tr>
+                  <th>Class: {{ cls.classLabel }}</th>
+                </tr>
+                @for (arm of cls.arms; track arm.classArmId) {
+                  <tr>
+                    <th>Class/Arm: {{ arm.label }}</th>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table class="acct-ophome__process-table table table-bordered table-striped">
+                        @for (stu of arm.students; track stu.studentId) {
+                          <tr>
+                            <th colspan="9" class="acct-ophome__process-student">
+                              {{ stu.fullName }} ({{ stu.idNo }})
+                            </th>
+                          </tr>
+                          @for (cat of stu.categories; track cat.categoryId) {
+                            <tr>
+                              <th colspan="9">
+                                <span class="acct-ophome__category">{{ cat.categoryName }}</span>,
+                                Items total charge:
+                                <span class="acct-ophome__red">{{ formatNaira(cat.totalCost) }}</span>
+                              </th>
+                            </tr>
+                            <tr class="acct-ophome__pay-cols">
+                              <th>Item Name</th>
+                              <th>Outstanding</th>
+                              <th>Discount</th>
+                              <th>Payment</th>
+                              <th>Payment Type</th>
+                              <th>Receipt Type</th>
+                              <th>Payment Id</th>
+                              <th>Option</th>
+                              <th>Payment Date</th>
+                            </tr>
+                            @for (item of cat.items; track item.id) {
+                              <tr>
+                                <td>{{ item.itemName }}</td>
+                                <td>{{ formatNaira(item.outstanding) }}</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                              </tr>
+                            }
+                          }
+                        }
+                      </table>
+                    </td>
+                  </tr>
+                }
+              }
+            </table>
+          </div>
+          <p class="acct-ophome__hint">
+            Payment entry and Submit Selections will be enabled in the next pass for this screen.
+          </p>
+        }
+      }
+    </div>
+  }
+</section>

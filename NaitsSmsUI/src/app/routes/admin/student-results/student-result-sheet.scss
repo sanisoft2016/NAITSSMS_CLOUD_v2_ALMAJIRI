@@ -1,0 +1,126 @@
+
+
+/* Legacy PerArmAndThirdTermCumulativeResultProcessing.cshtml styles */
+
+.legacy-report-sheet .page {
+  margin: 0;
+  border: initial;
+  border-radius: initial;
+  width: 100%;
+  min-height: initial;
+  box-shadow: initial;
+  background-color: #ffffff;
+}
+
+.legacy-report-sheet {
+  display: block;
+  width: 100%;
+  max-width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto 12mm;
+  padding: 0;
+  box-sizing: border-box;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
+  font-size: var(--report-font-size, 14px);
+  page-break-after: always;
+  break-after: page;
+}
+
+.legacy-report-sheet .text-left {
+  text-align: left;
+}
+
+.legacy-report-sheet .text-right {
+  text-align: right;
+}
+
+.legacy-report-sheet .text-center {
+  text-align: center;
+}
+
+.legacy-report-sheet .text-primary {
+  color: #0d6efd;
+}
+
+.legacy-report-sheet .table {
+  border-collapse: collapse !important;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.legacy-report-sheet .table-bordered th,
+.legacy-report-sheet .table-bordered td {
+  border: 1px solid #ddd !important;
+}
+
+.legacy-report-sheet .table td,
+.legacy-report-sheet .table th {
+  background-color: #fff !important;
+}
+
+.legacy-report-sheet .table > thead > tr > th,
+.legacy-report-sheet .table > tbody > tr > th,
+.legacy-report-sheet .table > tfoot > tr > th,
+.legacy-report-sheet .table > thead > tr > td,
+.legacy-report-sheet .table > tbody > tr > td,
+.legacy-report-sheet .table > tfoot > tr > td {
+  vertical-align: middle;
+}
+
+.legacy-report-sheet .borderLess {
+  border-width: 0 !important;
+}
+
+.legacy-report-sheet .tableFontSize {
+  font-size: var(--report-font-size, 14px);
+}
+
+.legacy-report-sheet th.rotate {
+  height: 100px;
+  width: 1em;
+  white-space: nowrap;
+  padding: 0;
+}
+
+.legacy-report-sheet .wrap {
+  white-space: nowrap;
+  width: 6%;
+}
+
+/* Legacy rotate: translate(2px, 51px) rotate(-90deg) */
+.legacy-report-sheet th.rotate > div {
+  transform: translate(2px, 51px) rotate(-90deg);
+  width: 5px;
+}
+
+.legacy-report-sheet th.rotate > div > span {
+  padding-left: 6px;
+}
+
+.legacy-report-sheet .img-responsive {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+}
+
+.legacy-report-sheet .col-md-12 {
+  width: 100%;
+}
+
+@media print {
+  .legacy-report-sheet {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .legacy-report-sheet:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}

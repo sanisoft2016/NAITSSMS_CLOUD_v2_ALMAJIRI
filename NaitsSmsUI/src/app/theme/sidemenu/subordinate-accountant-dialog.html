@@ -1,0 +1,77 @@
+<div class="sub-acc-dialog">
+  @if (!editing) {
+    <h2 mat-dialog-title class="dialog-title">Super Admin Accountant Info</h2>
+    <mat-dialog-content>
+      <table class="details-table">
+        <tr>
+          <th>School Name</th>
+          <td>{{ schoolName }}</td>
+        </tr>
+        <tr>
+          <th>Employee Name</th>
+          <td>{{ employeeName }}</td>
+        </tr>
+        <tr>
+          <th>User Name</th>
+          <td>{{ userName }}</td>
+        </tr>
+        <tr>
+          <th>Employee Status</th>
+          <td>{{ employeeStatus }}</td>
+        </tr>
+      </table>
+
+      @if (message) {
+        <p class="dialog-message">{{ message }}</p>
+      }
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-stroked-button type="button" color="primary" [disabled]="busy" (click)="startEdit()">
+        Edit
+      </button>
+      <button mat-stroked-button type="button" [disabled]="busy" (click)="toggleAccess()">
+        {{ isActive ? 'Disable Account' : 'Enable Account' }}
+      </button>
+      <button mat-stroked-button type="button" color="warn" [disabled]="busy" (click)="deleteAccountant()">
+        Delete
+      </button>
+      <button mat-button type="button" [disabled]="busy" (click)="close()">Cancel</button>
+    </mat-dialog-actions>
+  } @else {
+    <h2 mat-dialog-title class="dialog-title">Edit Subordinate Accountant</h2>
+    <mat-dialog-content>
+      <form class="edit-form" [formGroup]="editForm">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Middle Name</mat-label>
+          <input matInput formControlName="middleName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Sur Name</mat-label>
+          <input matInput formControlName="surName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" />
+        </mat-form-field>
+      </form>
+
+      @if (message) {
+        <p class="dialog-message">{{ message }}</p>
+      }
+    </mat-dialog-content>
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-flat-button color="primary" type="button" [disabled]="busy" (click)="saveChanges()">
+        Save Changes
+      </button>
+      <button mat-button type="button" [disabled]="busy" (click)="cancelEdit()">Cancel</button>
+    </mat-dialog-actions>
+  }
+</div>

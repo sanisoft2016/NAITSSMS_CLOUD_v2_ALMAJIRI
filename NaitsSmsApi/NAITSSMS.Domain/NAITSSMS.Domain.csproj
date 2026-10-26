@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <DefaultItemExcludes>$(DefaultItemExcludes);_copilot_build\**\*;_copilot_build_validate\**\*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+    <Content Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+    <EmbeddedResource Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+    <None Remove="_copilot_build\**\*;_copilot_build_validate\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.9" />
+  </ItemGroup>
+
+</Project>

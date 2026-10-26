@@ -1,0 +1,164 @@
+<mat-card appearance="outlined">
+  <mat-card-header class="header">
+    <mat-card-title>"{{ classLabel }} {{ armName }}" Students</mat-card-title>
+    <span class="spacer"></span>
+    <div class="header-actions">
+      <span class="student-count">
+        <strong>Number of Student(s): </strong>
+        <span class="count-value">{{ totalNoOfStudents }}</span>
+      </span>
+      <button mat-stroked-button color="primary" type="button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Go Back
+      </button>
+      <button mat-raised-button color="success" type="button" (click)="addStudent()">
+        <mat-icon>person_add</mat-icon>
+        Add Student
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (isLoading) {
+      <p class="no-data">Loading students...</p>
+    } @else if (loadError) {
+      <p class="no-data error-msg">{{ loadError }}</p>
+    } @else if (noStudents) {
+      <p class="no-data">Fresh Class! Start Adding Student</p>
+    } @else {
+      <div class="table-container">
+        <table class="data-table mat-elevation-z2">
+          <thead>
+            <tr>
+              <th>S/No</th>
+              <th>Full Name</th>
+              <th>Gender</th>
+              <th>Current Class</th>
+              <th>Admission No.</th>
+              <th>Time Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let student of students; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ student.fullName }}</td>
+              <td>{{ getGenderLabel(student.gender) }}</td>
+              <td>{{ getClassDisplay(student) }}</td>
+              <td>{{ student.idNo }}</td>
+              <td>
+                <span [class]="getStatusClass(student.status)">
+                  {{ getStatusLabel(student.status) }}
+                </span>
+              </td>
+              <td>
+                <button
+                  mat-raised-button
+                  [color]="i % 2 === 0 ? 'primary' : 'accent'"
+                  matTooltip="View Details"
+                  (click)="viewDetails(student)"
+                >
+                  View Details
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>
+
+<ng-template #studentDetailsDialog>
+  <div class="legacy-student-dialog">
+    <h4 class="text-center">Student Details</h4>
+
+    <p class="legacy-top-actions">
+      <button class="legacy-btn legacy-btn-success legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="editRecord()">Edit</button>
+      <button class="legacy-btn legacy-btn-danger legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="deleteRecord()">Delete</button>
+      <button class="legacy-btn legacy-btn-warning legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="loadPasswordPage()">Change Password</button>
+      @if (isAccountDisabled) {
+        <button class="legacy-btn legacy-btn-danger legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="enableStudentAccount()">Enable Account</button>
+      } @else {
+        <button class="legacy-btn legacy-btn-primary legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="disableStudentAccount()">Disable Account</button>
+      }
+    </p>
+
+    @if (showChangePasswordPanel) {
+      <div class="change-password-panel">
+        <span class="change-password-label">New Password</span>
+        <input
+          class="password-input"
+          type="password"
+          placeholder="Enter new password"
+          [(ngModel)]="newPassword"
+          (keyup.enter)="submitChangePassword()"
+        />
+        <button class="legacy-btn legacy-btn-primary legacy-btn-xs" type="button" [disabled]="isActionBusy" (click)="submitChangePassword()">Save Password</button>
+        <button class="legacy-btn legacy-btn-default legacy-btn-xs" type="button" (click)="toggleChangePasswordPanel()">Cancel</button>
+      </div>
+    }
+
+    <mat-dialog-content>
+      @if (isDetailsLoading) {
+        <p class="loading-text">Loading student details...</p>
+      } @else if (detailsLoadError) {
+        <p class="error-text">{{ detailsLoadError }}</p>
+      } @else if (selectedStudent) {
+        <div id="studentDetails" class="row">
+          <div class="row legacy-body-border">
+            <table class="legacy-table-layout">
+              <tr>
+                <td class="legacy-cell">
+                  <dl class="dl-horizontal">
+                    <dt>Admission No.</dt><dd>{{ selectedStudent.idNo || '-' }}</dd>
+                    <dt>First Name</dt><dd>{{ firstName }}</dd>
+                    <dt>Middle Name</dt><dd>{{ middleName }}</dd>
+                    <dt>Surname</dt><dd>{{ surName }}</dd>
+                    <dt>Date Of Birth</dt><dd>{{ formatDate(selectedStudent.dateOfBirth) }}</dd>
+                    <dt>Place Of Birth</dt><dd>{{ selectedStudent.placeOfBirth || '-' }}</dd>
+                    <dt>Blood Group</dt><dd>{{ selectedStudent.bloodGroup || '-' }}</dd>
+                    <dt>Date Of Admission</dt><dd>{{ formatDate(selectedStudent.dateOfAdmsn) }}</dd>
+                    <dt>Transfered From</dt><dd>{{ selectedStudent.transferedFromWhere || '-' }}</dd>
+                    <dt>Guardian's Name</dt><dd>{{ selectedStudent.guardiansName || '-' }}</dd>
+                    <dt>Relationship</dt><dd>{{ selectedStudent.relationship || '-' }}</dd>
+                    <dt>Guardian Address</dt><dd>{{ selectedStudent.guardianAddress || '-' }}</dd>
+                    <dt>Occupation</dt><dd>{{ selectedStudent.occupation || '-' }}</dd>
+                    <dt>Mobile Number</dt><dd>{{ selectedStudent.mobileNumber || '-' }}</dd>
+                    <dt>Home Number</dt><dd>{{ selectedStudent.homeNumber || '-' }}</dd>
+                    <dt>Start Class</dt><dd>{{ selectedStudent.startClass || '-' }}</dd>
+                  </dl>
+                </td>
+                <td class="legacy-cell">
+                  <div class="image-holder" id="image-holder">
+                    @if (studentPassportUrl) {
+                      <img [src]="studentPassportUrl" class="thumb-image" alt="Student passport" />
+                    } @else {
+                      <div class="thumb-placeholder">No Image</div>
+                    }
+                  </div>
+
+                  <dl class="dl-horizontal">
+                    <dt>Current Class</dt><dd>{{ detailsClassDisplay }}</dd>
+                    <dt>Class Category</dt><dd>{{ selectedStudent.classCategory || '-' }}</dd>
+                    <dt>Religion</dt><dd>{{ religionLabel }}</dd>
+                    <dt>User Phone Number</dt><dd>{{ selectedStudent.user?.phoneNumber || '-' }}</dd>
+                    <dt>User Email</dt><dd>{{ selectedStudent.user?.email || '-' }}</dd>
+                    <dt>Country</dt><dd>{{ selectedStudent.country || '-' }}</dd>
+                  </dl>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      } @else {
+        <p class="error-text">Student details not available.</p>
+      }
+    </mat-dialog-content>
+
+    <div class="modal-footer">
+      <button class="legacy-btn legacy-btn-warning" type="button" (click)="closeDetailsDialog()">Close</button>
+      <button class="legacy-btn legacy-btn-danger" type="button" [disabled]="isDetailsLoading || !selectedStudent" (click)="printStudentDetails()">Print</button>
+    </div>
+  </div>
+</ng-template>

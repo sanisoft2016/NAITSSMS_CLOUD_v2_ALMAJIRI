@@ -1,0 +1,427 @@
+AcademicSessions|Id|character varying|40|NO
+AcademicSessions|Session|character varying|9|NO
+AcademicSessions|Status|smallint||NO
+AcademicSessions|SchoolInfoId|character varying|40|NO
+AffectiveAndPsychomotorAssessments|Id|character varying|40|NO
+AffectiveAndPsychomotorAssessments|ItemId|smallint||NO
+AffectiveAndPsychomotorAssessments|Score|smallint||NO
+AffectiveAndPsychomotorAssessments|YearlyAndTermlyStatusId|character varying|40|NO
+AffectiveAndPsychomotorAssessments|StudentId|character varying|40|NO
+AffectiveAndPsychomotorAssessments|ClassArmId|character varying|40|NO
+AffectiveAndPsychomotorAssessments|FormMasterId|character varying|40|NO
+AffectiveAndPsychomotors|Id|smallint||NO
+AffectiveAndPsychomotors|ItemsName|character varying|25|NO
+Agents|UserId|character varying|40|NO
+Agents|TimeStatus|smallint||NO
+Agents|FullAddress|character varying|100|NO
+Agents|SchoolRegId|character varying|7|NO
+AspNetRoleClaims|Id|integer||NO
+AspNetRoleClaims|RoleId|character varying|40|NO
+AspNetRoleClaims|ClaimType|text||YES
+AspNetRoleClaims|ClaimValue|text||YES
+AspNetRoles|Id|character varying|40|NO
+AspNetRoles|Name|character varying|20|YES
+AspNetRoles|NormalizedName|character varying|20|YES
+AspNetRoles|ConcurrencyStamp|text||YES
+AspNetUserClaims|Id|integer||NO
+AspNetUserClaims|UserId|character varying|40|NO
+AspNetUserClaims|ClaimType|text||YES
+AspNetUserClaims|ClaimValue|text||YES
+AspNetUserLogins|LoginProvider|text||NO
+AspNetUserLogins|ProviderKey|text||NO
+AspNetUserLogins|ProviderDisplayName|text||YES
+AspNetUserLogins|UserId|character varying|40|NO
+AspNetUserRoles|UserId|character varying|40|NO
+AspNetUserRoles|RoleId|character varying|40|NO
+AspNetUserTokens|UserId|character varying|40|NO
+AspNetUserTokens|LoginProvider|text||NO
+AspNetUserTokens|Name|text||NO
+AspNetUserTokens|Value|text||YES
+AspNetUsers|Id|character varying|40|NO
+AspNetUsers|UserName|character varying|50|YES
+AspNetUsers|Email|character varying|50|YES
+AspNetUsers|PhoneNumber|character varying|13|YES
+AspNetUsers|PasswordHash|character varying|150|YES
+AspNetUsers|SecurityStamp|character varying|40|YES
+AspNetUsers|FirstName|character varying|20|NO
+AspNetUsers|MiddleName|character varying|20|NO
+AspNetUsers|SurName|character varying|20|NO
+AspNetUsers|CreatedDate|timestamp with time zone||NO
+AspNetUsers|Gender|smallint||NO
+AspNetUsers|AccessStatus|smallint||NO
+AspNetUsers|UserStatus|smallint||NO
+AspNetUsers|NormalizedUserName|character varying|50|YES
+AspNetUsers|NormalizedEmail|character varying|50|YES
+AspNetUsers|EmailConfirmed|boolean||NO
+AspNetUsers|ConcurrencyStamp|text||YES
+AspNetUsers|PhoneNumberConfirmed|boolean||NO
+AspNetUsers|TwoFactorEnabled|boolean||NO
+AspNetUsers|LockoutEnd|timestamp with time zone||YES
+AspNetUsers|LockoutEnabled|boolean||NO
+AspNetUsers|AccessFailedCount|integer||NO
+CbtQuestionsAndAnswers|Id|character varying|40|NO
+CbtQuestionsAndAnswers|AssessmentType|smallint||NO
+CbtQuestionsAndAnswers|Question|character varying|600|NO
+CbtQuestionsAndAnswers|AnswerOptions|character varying|2010|NO
+CbtQuestionsAndAnswers|Answer|smallint||NO
+CbtQuestionsAndAnswers|TermId|smallint||NO
+CbtQuestionsAndAnswers|ClassId|character varying|40|NO
+CbtQuestionsAndAnswers|SubjectId|character varying|40|NO
+CbtSetQuestions|Id|character varying|40|NO
+CbtSetQuestions|QuestionAndAnswerId|character varying|40|NO
+ClassArms|Id|character varying|40|NO
+ClassArms|SNo|smallint||NO
+ClassArms|ClassId|character varying|40|NO
+ClassArms|ArmName|smallint||NO
+ClassArms|FormMaster|character varying|40|NO
+ClassTeachers|Id|character varying|40|NO
+ClassTeachers|FullAddress|character varying|100|NO
+ClassTeachers|LastLogin|timestamp with time zone||YES
+ClassTeachers|DateOfBirth|timestamp with time zone||YES
+ClassTeachers|UserId|character varying|50|NO
+ClassTeachers|SignatureImageString|character varying|50|NO
+ClassTeachers|TimeStatus|smallint||NO
+ClassTeachers|EmployeeStatus|smallint||NO
+ClassTeachers|SchoolId|character varying|40|NO
+ClassTeachers|EmployeeIncomeStructureStatus|smallint||NO
+ClassTeachers|EmployeeIdNo|character varying|20|NO
+ClassTeachers|Decipline|character varying|30|NO
+ClassTeachers|EmployeeQualificationStatus|smallint||NO
+Classes|Id|character varying|40|NO
+Classes|SNo|smallint||NO
+Classes|ClassName|smallint||NO
+Classes|ClassLabel|character varying|40|NO
+Classes|SchoolInfoId|character varying|40|NO
+ContinuousAssessmentTypes|Id|character varying|40|NO
+ContinuousAssessmentTypes|SchoolId|character varying|40|NO
+ContinuousAssessmentTypes|AssessmentType|smallint||NO
+EmployeeIncomeStructures|Id|character varying|40|NO
+EmployeeIncomeStructures|BasicSalary|double precision||NO
+EmployeeIncomeStructures|Allowance|double precision||NO
+EmployeesMonthlyPayments|Id|character varying|40|NO
+EmployeesMonthlyPayments|EmployeeMonthlyPaymentLevelId|character varying|40|NO
+EmployeesMonthlyPayments|EmployeeId|character varying|40|NO
+EmployeesMonthlyPayments|BasicSalary|double precision||NO
+EmployeesMonthlyPayments|Allowance|double precision||NO
+EmployeesMonthlyPayments|Bonus|double precision||NO
+EmployeesMonthlyPayments|Deduction|double precision||NO
+EmployeesMonthlyPayments|EmployeeMonthlyPaymentStatus|smallint||NO
+EmployeesMonthlyPayments|PaymentType|smallint||NO
+EmployeesMonthlyPayments|Comments|character varying|170|NO
+EmployeesMonthlyPayments|CreatedDate|timestamp with time zone||NO
+EmployeesMonthlyPayments|CreatedBy|character varying|70|NO
+EmployeesMonthlyPayments|UpdatedDate|timestamp with time zone||NO
+EmployeesMonthlyPayments|UpdatedBy|character varying|70|NO
+ExpenditureWeeks|Id|text||NO
+ExpenditureWeeks|TimeStatus|smallint||NO
+ExpenditureWeeks|WeekOfMonth|smallint||NO
+ExpenditureWeeks|SchoolId|character varying|40|NO
+Expenses|Id|character varying|40|NO
+Expenses|WeekId|character varying|40|NO
+Expenses|ItemCategoryId|character varying|40|NO
+Expenses|CapturedDate|timestamp with time zone||NO
+Expenses|Details|character varying|150|NO
+Expenses|Cost|double precision||NO
+Expenses|CreatedDate|timestamp with time zone||NO
+Expenses|CreatedBy|character varying|70|NO
+Expenses|UpdatedDate|timestamp with time zone||NO
+Expenses|UpdatedBy|character varying|70|NO
+ExpensesCategories|Id|character varying|40|NO
+ExpensesCategories|SchoolId|character varying|40|NO
+ExpensesCategories|CategoryName|character varying|50|NO
+FeePaymentDiscounts|Id|character varying|40|NO
+FeePaymentDiscounts|StudentAcademicProgressId|character varying|40|NO
+FeePaymentDiscounts|DiscountAmount|double precision||NO
+FeePaymentDiscounts|ReasonsForDiscount|character varying|100|NO
+FeePaymentDiscounts|CreatedDate|timestamp with time zone||NO
+FeePaymentDiscounts|CreatedBy|character varying|70|NO
+FeePaymentDiscounts|UpdatedDate|timestamp with time zone||NO
+FeePaymentDiscounts|UpdatedBy|character varying|70|NO
+IncomeCategorys|Id|character varying|40|NO
+IncomeCategorys|SchoolId|character varying|40|NO
+IncomeCategorys|CategoryName|character varying|50|NO
+IncomeWeeks|Id|character varying|40|NO
+IncomeWeeks|TimeStatus|smallint||NO
+IncomeWeeks|WeekOfMonth|smallint||NO
+IncomeWeeks|SchoolId|character varying|40|NO
+Incomes|Id|character varying|40|NO
+Incomes|WeekId|character varying|40|NO
+Incomes|ItemCategoryId|character varying|40|NO
+Incomes|CapturedDate|timestamp with time zone||NO
+Incomes|Details|character varying|150|NO
+Incomes|Cost|double precision||NO
+Incomes|CreatedDate|timestamp with time zone||NO
+Incomes|CreatedBy|character varying|70|NO
+Incomes|UpdatedDate|timestamp with time zone||NO
+Incomes|UpdatedBy|character varying|70|NO
+Licensings|Id|character varying|40|NO
+Licensings|SchoolSmsId|character varying|40|NO
+Licensings|SubscriptionId|integer||NO
+Licensings|PaymentDate|timestamp with time zone||NO
+Licensings|ExpiryDate|timestamp with time zone||NO
+Licensings|AgentUserId|character varying|40|NO
+Licensings|LicenseCategory|smallint||NO
+Licensings|Charges|real||NO
+Licensings|TimeStatus|smallint||NO
+Licensings|RenewalConsumptionStatus|smallint||NO
+LocalGovernments|Id|smallint||NO
+LocalGovernments|StateId|smallint||NO
+LocalGovernments|Name|character varying|50|NO
+Months|Id|character varying|40|NO
+Months|YearId|character varying|40|NO
+Months|Month|smallint||NO
+OPtionalFeesCategories|Id|character varying|40|NO
+OPtionalFeesCategories|SchoolId|character varying|40|NO
+OPtionalFeesCategories|CategoryName|character varying|50|NO
+OptionalFeesItems|Id|character varying|40|NO
+OptionalFeesItems|ItemCategoryId|character varying|40|NO
+OptionalFeesItems|ItemName|character varying|30|NO
+OptionalFeesItems|Cost|double precision||NO
+OptionalFeesItems|YearlyAndTermlyStatusId|character varying|40|NO
+OptionalFeesItems|CreatedDate|timestamp with time zone||NO
+OptionalFeesItems|CreatedBy|character varying|70|NO
+OptionalFeesItems|UpdatedDate|timestamp with time zone||NO
+OptionalFeesItems|UpdatedBy|character varying|70|NO
+PrincipalDetails|Id|character varying|40|NO
+PrincipalDetails|HeadsName|character varying|40|NO
+PrincipalDetails|PhoneNumber|character varying|15|NO
+PrincipalDetails|SignatureImageString|character varying|40|NO
+PrincipalDetails|Status|smallint||NO
+PrincipalDetails|SchoolInfoId|character varying|40|NO
+PrincipalDetails|SchoolHeadCategoryId|smallint||NO
+PrincipalDetails|Gender|smallint||NO
+ProgramInfos|Id|smallint||NO
+ProgramInfos|Machines|character varying|150|NO
+ProgramInfos|Matches|character varying|70|NO
+Regions|Id|smallint||NO
+Regions|Name|character varying|50|NO
+SchoolHeadCategories|Id|smallint||NO
+SchoolHeadCategories|HeadStatus|smallint||NO
+SchoolInfos|SchoolRegistrationOfficerId|character varying|40|NO
+SchoolInfos|SsNo|smallint||NO
+SchoolInfos|SchoolName|character varying|70|NO
+SchoolInfos|SchoolAddress|character varying|150|NO
+SchoolInfos|Telephone|character varying|50|NO
+SchoolInfos|PoAddress|character varying|100|NO
+SchoolInfos|EmailAddress|character varying|50|NO
+SchoolInfos|Website|character varying|70|NO
+SchoolInfos|SchoolLogoString|character varying|40|NO
+SchoolInfos|Motto|character varying|70|NO
+SchoolInfos|SchoolAdminAccountantStatus|smallint||NO
+SchoolInfos|AccountingStartTermId|character varying|40|YES
+SchoolInfos|ElectiveAccessStatus|smallint||NO
+SchoolInfos|SystemImplementationType|character varying|162|NO
+SchoolInfos|MyStatus|smallint||NO
+SchoolInfos|SmsApiKey|character varying|150|NO
+SchoolInfos|SmsApiToken|character varying|70|NO
+SchoolInfos|TotalStudents|character varying|170|NO
+SchoolInfos|FeatureImplementationType|character varying|162|NO
+SchoolInfos|NetworkImplementationType|character varying|162|NO
+SchoolLevelCategoriesLabels|SchoolInfoId|character varying|40|NO
+SchoolLevelCategoriesLabels|GeneralSujectLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|ReligionSubjectLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|PlayClassLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|PreNurseryLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|NurseryLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|PrimaryLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|JssLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|SsLabel|character varying|30|NO
+SchoolLevelCategoriesLabels|CustomLevelLabel|character varying|30|NO
+SchoolRegistrationOfficer|UserId|character varying|40|NO
+SchoolRegistrationOfficer|FullAddress|character varying|100|NO
+SchoolRegistrationOfficer|LastLogin|timestamp with time zone||YES
+SchoolRegistrationOfficer|DateOfBirth|timestamp with time zone||YES
+SchoolRegistrationOfficer|SignatureImageString|character varying|40|NO
+SchoolRegistrationOfficer|TimeStatus|smallint||NO
+SchoolRegistrationOfficer|AccessStatus|smallint||NO
+SchoolRegistrationOfficer|AgentUserId|character varying|40|NO
+SetEmployeeSalaries|Id|character varying|40|NO
+SetEmployeeSalaries|EmployeeId|character varying|40|NO
+SetEmployeeSalaries|TimeStatus|smallint||NO
+SetEmployeeSalaries|Salary|numeric||NO
+SetEmployeeSalaries|CreatedDate|timestamp with time zone||NO
+SetEmployeeSalaries|CreatedBy|character varying|70|NO
+SetEmployeeSalaries|UpdatedDate|timestamp with time zone||NO
+SetEmployeeSalaries|UpdatedBy|character varying|70|NO
+SetFreshierRegistrationFees|Id|character varying|40|NO
+SetFreshierRegistrationFees|SchoolId|character varying|40|NO
+SetFreshierRegistrationFees|YearlyAndTermlyStatusId|character varying|40|NO
+SetFreshierRegistrationFees|FreshPlayClass|double precision||NO
+SetFreshierRegistrationFees|FreshPreNursery|double precision||NO
+SetFreshierRegistrationFees|FreshNursery|double precision||NO
+SetFreshierRegistrationFees|FreshPrimary|double precision||NO
+SetFreshierRegistrationFees|FreshJss|double precision||NO
+SetFreshierRegistrationFees|FreshScience|double precision||NO
+SetFreshierRegistrationFees|FreshArt|double precision||NO
+SetFreshierRegistrationFees|FreshCommercial|double precision||NO
+SetFreshierRegistrationFees|RetnPlayClass|double precision||NO
+SetFreshierRegistrationFees|RetnPreNursery|double precision||NO
+SetFreshierRegistrationFees|RetnNursery|double precision||NO
+SetFreshierRegistrationFees|RetnPrimary|double precision||NO
+SetFreshierRegistrationFees|RetnJss|double precision||NO
+SetFreshierRegistrationFees|RetnScience|double precision||NO
+SetFreshierRegistrationFees|RetnArt|double precision||NO
+SetFreshierRegistrationFees|RetnCommercial|double precision||NO
+SetFreshierRegistrationFees|CreatedDate|timestamp with time zone||NO
+SetFreshierRegistrationFees|CreatedBy|character varying|70|NO
+SetFreshierRegistrationFees|UpdatedDate|timestamp with time zone||NO
+SetFreshierRegistrationFees|UpdatedBy|character varying|70|NO
+SmsLogs|Id|text||NO
+SmsLogs|RecipientNumber|text||NO
+SmsLogs|MessageText|text||NO
+SmsLogs|SchoolInfoId|character varying|40|YES
+SmsLogs|CreatedDate|timestamp with time zone||NO
+SmsLogs|SentDate|timestamp with time zone||YES
+SmsLogs|Status|integer||NO
+SmsLogs|ErrorMessage|text||YES
+SmsPaymentBalances|SchoolSmsId|character varying|40|NO
+SmsPaymentBalances|PricePerSms|real||NO
+SmsPaymentBalances|Amount|real||NO
+SmsPurchases|Id|character varying|40|NO
+SmsPurchases|SchoolSmsId|character varying|40|NO
+SmsPurchases|PaymentDate|timestamp with time zone||NO
+SmsPurchases|AgentUserId|character varying|40|NO
+SmsPurchases|BalB4Purchase|real||NO
+SmsPurchases|AmountPurchase|real||NO
+SmsPurchases|TimeStatus|smallint||NO
+SmsUseds|Id|character varying|40|NO
+SmsUseds|SchoolSmsId|character varying|40|NO
+SmsUseds|UsedDate|timestamp with time zone||NO
+SmsUseds|PricePerSms|real||NO
+SmsUseds|NoOfPages|smallint||NO
+SmsUseds|NoOfRecipient|smallint||NO
+SmsUseds|BalB4SendindSms|real||NO
+States|Id|smallint||NO
+States|Name|character varying|50|NO
+States|RegionId|smallint||NO
+StudentAcademicProgressHistories|Id|character varying|40|NO
+StudentAcademicProgressHistories|StudentId|character varying|40|NO
+StudentAcademicProgressHistories|YearlyAndTermlyStatusId|character varying|40|NO
+StudentAcademicProgressHistories|ClassId|character varying|40|NO
+StudentAcademicProgressHistories|ClassCategory|smallint||NO
+StudentAccessments|Id|character varying|40|NO
+StudentAccessments|LastUpdateDate|timestamp with time zone||NO
+StudentAccessments|SubjectId|character varying|40|NO
+StudentAccessments|StudentId|character varying|40|NO
+StudentAccessments|EmployeeId|character varying|40|NO
+StudentAccessments|ClassArmId|character varying|40|NO
+StudentAccessments|YearlyAndTermlyStatusId|character varying|40|NO
+StudentAccessments|Ca1|real||NO
+StudentAccessments|Ca2|real||NO
+StudentAccessments|Ca3|real||NO
+StudentAccessments|Exams|real||NO
+StudentOPtionalFeesAssignments|Id|character varying|40|NO
+StudentOPtionalFeesAssignments|StudentId|character varying|40|NO
+StudentOPtionalFeesAssignments|OptionalFeesItemId|character varying|40|NO
+StudentOptionalFeePayments|Id|character varying|40|NO
+StudentOptionalFeePayments|StudentTermlyOptionalChargesId|character varying|40|NO
+StudentOptionalFeePayments|PaymentDate|timestamp with time zone||NO
+StudentOptionalFeePayments|PaymentType|smallint||NO
+StudentOptionalFeePayments|PaymentId|character varying|10|NO
+StudentOptionalFeePayments|Amount|double precision||NO
+StudentOptionalFeePayments|CreatedDate|timestamp with time zone||NO
+StudentOptionalFeePayments|CreatedBy|character varying|70|NO
+StudentOptionalFeePayments|UpdatedDate|timestamp with time zone||NO
+StudentOptionalFeePayments|UpdatedBy|character varying|70|NO
+StudentTermlyFeePayments|Id|character varying|40|NO
+StudentTermlyFeePayments|StudentAcademicProgressHistoryId|character varying|40|NO
+StudentTermlyFeePayments|PaymentType|smallint||NO
+StudentTermlyFeePayments|PaymentId|character varying|10|NO
+StudentTermlyFeePayments|PaymentDate|timestamp with time zone||NO
+StudentTermlyFeePayments|Amount|double precision||NO
+StudentTermlyFeePayments|CreatedDate|timestamp with time zone||NO
+StudentTermlyFeePayments|CreatedBy|character varying|70|NO
+StudentTermlyFeePayments|UpdatedDate|timestamp with time zone||NO
+StudentTermlyFeePayments|UpdatedBy|character varying|70|NO
+StudentTermlyOptionalCharges|Id|character varying|40|NO
+StudentTermlyOptionalCharges|StudentId|character varying|40|NO
+StudentTermlyOptionalCharges|ClassArmId|character varying|40|NO
+StudentTermlyOptionalCharges|OptionalFeesItemId|character varying|40|NO
+StudentTermlyOptionalCharges|AsignedDate|timestamp with time zone||NO
+StudentTermlyOptionalPaymentDiscounts|Id|character varying|40|NO
+StudentTermlyOptionalPaymentDiscounts|StudentTermlyOptionalChargesId|character varying|40|NO
+StudentTermlyOptionalPaymentDiscounts|DiscountAmount|double precision||NO
+StudentTermlyOptionalPaymentDiscounts|ReasonsForDiscount|character varying|100|NO
+StudentTermlyOptionalPaymentDiscounts|CreatedDate|timestamp with time zone||NO
+StudentTermlyOptionalPaymentDiscounts|CreatedBy|character varying|70|NO
+StudentTermlyOptionalPaymentDiscounts|UpdatedDate|timestamp with time zone||NO
+StudentTermlyOptionalPaymentDiscounts|UpdatedBy|character varying|70|NO
+StudentsAttendanceReports|Id|character varying|40|NO
+StudentsAttendanceReports|Attendance|smallint||NO
+StudentsAttendanceReports|TeacherComments|character varying|150|NO
+StudentsAttendanceReports|SchoolHeadComments|character varying|150|NO
+StudentsAttendanceReports|YearlyAndTermlyStatusId|character varying|40|NO
+StudentsAttendanceReports|StudentId|character varying|40|NO
+StudentsAttendanceReports|ClassArmId|character varying|40|NO
+StudentsDetails|UserId|character varying|40|NO
+StudentsDetails|SNo|smallint||NO
+StudentsDetails|IdNo|character varying|15|NO
+StudentsDetails|DateOfBirth|timestamp with time zone||NO
+StudentsDetails|PlaceOfBirth|character varying|50|NO
+StudentsDetails|Religion|smallint||NO
+StudentsDetails|BloodGroup|character varying|10|NO
+StudentsDetails|DateOfAdmsn|timestamp with time zone||NO
+StudentsDetails|DateOfDischarge|timestamp with time zone||YES
+StudentsDetails|TransferedFromWhere|character varying|150|NO
+StudentsDetails|StartClass|character varying|40|NO
+StudentsDetails|CurrentClass|smallint||NO
+StudentsDetails|Passport|character varying|40|NO
+StudentsDetails|ClassArmId|character varying|40|NO
+StudentsDetails|GuardiansName|character varying|50|NO
+StudentsDetails|Relationship|character varying|50|NO
+StudentsDetails|GuardianAddress|character varying|200|NO
+StudentsDetails|Occupation|character varying|50|NO
+StudentsDetails|MobileNumber|character varying|50|NO
+StudentsDetails|HomeNumber|character varying|50|NO
+StudentsDetails|EmailAddress|character varying|100|NO
+StudentsDetails|MailingAddress|character varying|150|NO
+StudentsDetails|Country|character varying|50|NO
+StudentsDetails|TimeStatus|smallint||NO
+StudentsDetails|SchoolInfoId|character varying|40|NO
+StudentsDetails|ClassCategory|smallint||NO
+StudentsDetails|Status|smallint||NO
+StudentsDetails|StudentInitialRegStatus|smallint||NO
+StudentsDetails|AdmisnTermId|character varying|40|NO
+SubjectCategories|Id|character varying|40|NO
+SubjectCategories|SubjectStatus|smallint||NO
+SubjectCategories|SubjectStatusLabel|character varying|50|NO
+SubjectCategories|SchoolId|character varying|40|NO
+SubjectStudentAssignments|Id|character varying|40|NO
+SubjectStudentAssignments|StudentId|character varying|40|NO
+SubjectStudentAssignments|SubjectId|character varying|40|NO
+Subjects|Id|character varying|40|NO
+Subjects|SubjectName|character varying|50|NO
+Subjects|TimeStatus|smallint||NO
+Subjects|SubjectCategoryId|character varying|40|NO
+Subjects|SchoolTyInfoSchoolRegistrationOfficerId|character varying|40|YES
+TeacherClassArmAssignments|Id|character varying|40|NO
+TeacherClassArmAssignments|EmployeeId|character varying|40|NO
+TeacherClassArmAssignments|ArmId|character varying|40|NO
+TeacherClassArmAssignments|ArmTermlyAssessmentStatus|smallint||NO
+TeacherSubjectArmAssignments|Id|character varying|40|NO
+TeacherSubjectArmAssignments|SubjectId|character varying|40|NO
+TeacherSubjectArmAssignments|EmployeeId|character varying|40|NO
+TeacherSubjectArmAssignments|ArmId|character varying|40|NO
+Terms|Id|smallint||NO
+Terms|TermStatus|smallint||NO
+TxEmployeeMonthlyPaymentLevel|Id|character varying|40|NO
+TxEmployeeMonthlyPaymentLevel|MonthId|character varying|40|NO
+TxEmployeeMonthlyPaymentLevel|EmployeeMonthlyPaymentLevel|smallint||NO
+YearlyAndTermlyAssessmentStatus|Id|character varying|40|NO
+YearlyAndTermlyAssessmentStatus|CreatedDate|timestamp with time zone||NO
+YearlyAndTermlyAssessmentStatus|TermlyAccessmentStatus|smallint||NO
+YearlyAndTermlyAssessmentStatus|TermStatus|smallint||NO
+YearlyAndTermlyAssessmentStatus|CasCategory|smallint||NO
+YearlyAndTermlyAssessmentStatus|PerCasValue|smallint||YES
+YearlyAndTermlyAssessmentStatus|MinPassMark|smallint||YES
+YearlyAndTermlyAssessmentStatus|NextTermBeginsDate|timestamp with time zone||YES
+YearlyAndTermlyAssessmentStatus|AssessmtEndDate|timestamp with time zone||YES
+YearlyAndTermlyAssessmentStatus|TotalAttendance|smallint||YES
+YearlyAndTermlyAssessmentStatus|SessionId|character varying|40|NO
+YearlyAndTermlyAssessmentStatus|HeadmasterId|character varying|40|YES
+YearlyAndTermlyAssessmentStatus|PrincipalId|character varying|40|YES
+Years|Id|character varying|40|NO
+Years|SchoolId|character varying|40|NO
+Years|Year|smallint||NO
+__EFMigrationsHistory|MigrationId|character varying|150|NO
+__EFMigrationsHistory|ProductVersion|character varying|32|NO

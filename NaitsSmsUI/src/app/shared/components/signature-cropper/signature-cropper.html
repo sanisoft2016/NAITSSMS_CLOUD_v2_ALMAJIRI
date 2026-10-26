@@ -1,0 +1,73 @@
+<div class="sig-cropper">
+  <div class="sig-actions">
+    <button
+      type="button"
+      class="sig-btn sig-btn--default"
+      (click)="fileInput.click()"
+      [disabled]="disabled"
+    >
+      Choose image
+    </button>
+
+    <button
+      type="button"
+      class="sig-btn sig-btn--camera"
+      (click)="cameraInput.click()"
+      [disabled]="disabled"
+    >
+      Open camera
+    </button>
+    <input
+      #cameraInput
+      type="file"
+      accept="image/*"
+      capture="environment"
+      (change)="onFileSelected($event)"
+      class="file-hidden"
+    />
+
+    <!-- No `capture` on the gallery picker: mobile browsers then present the native
+         chooser (Photo Library / Browse Files) instead of jumping straight to the camera. -->
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      (change)="onFileSelected($event)"
+      class="file-hidden"
+    />
+
+    <span class="sig-hint">{{ hintText }}</span>
+  </div>
+
+  @if (error) {
+    <div class="sig-error">{{ error }}</div>
+  }
+
+  <div class="sig-preview">
+    <div
+      #imageHolder
+      id="image-holder"
+      style="min-width: 16em; min-height: 8em; position: relative; overflow: hidden;"
+    ></div>
+  </div>
+
+  <div class="sig-buttons">
+    <button
+      type="button"
+      class="sig-btn sig-btn--primary"
+      (click)="cropAndUse()"
+      [disabled]="!canCrop"
+    >
+      Crop &amp; Use
+    </button>
+
+    <button
+      type="button"
+      class="sig-btn sig-btn--default"
+      (click)="clear()"
+      [disabled]="!hasSignature"
+    >
+      Clear
+    </button>
+  </div>
+</div>

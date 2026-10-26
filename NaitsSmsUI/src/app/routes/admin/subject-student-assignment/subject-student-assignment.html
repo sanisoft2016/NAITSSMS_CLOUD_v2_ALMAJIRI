@@ -1,0 +1,99 @@
+<div class="assignment-shell">
+  <div class="header-card">
+    <div>
+      <h2>Subject-Student Assignment Home</h2>
+    </div>
+
+    <button type="button" class="secondary-button" (click)="backToIndex()">Back to subject home</button>
+  </div>
+
+  <div class="filter-card">
+    <div class="filter-grid">
+      <label class="field-block">
+        <span>Subject</span>
+        <select [(ngModel)]="selectedSubjectId" (ngModelChange)="onSubjectChange($event)">
+          <option value="">-- Select Subject --</option>
+          <option *ngFor="let item of subjectOptions" [value]="item.value">{{ item.text }}</option>
+        </select>
+      </label>
+
+      <label class="field-block">
+        <span>Class</span>
+        <select [(ngModel)]="selectedClassId" (ngModelChange)="onClassChange($event)">
+          <option value="">-- Select Class --</option>
+          <option *ngFor="let item of classOptions" [value]="item.value">{{ item.text }}</option>
+        </select>
+      </label>
+
+      <label class="field-block">
+        <span>Arm</span>
+        <select [(ngModel)]="selectedArmId" (ngModelChange)="onArmChange($event)">
+          <option value="">-- Select Arm --</option>
+          <option *ngFor="let item of armOptions" [value]="item.value">{{ item.text }}</option>
+        </select>
+      </label>
+
+      <label class="field-block category-field">
+        <span>Student category</span>
+        <select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange($event)">
+          <option *ngFor="let item of categoryOptions" [value]="item.value">{{ item.label }}</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="helper-copy" *ngIf="teacherAssignmentMessage">{{ teacherAssignmentMessage }}</p>
+  </div>
+
+  <div class="result-card">
+    <div class="result-head">
+      <div>
+        <h3>Students In Selected Arm</h3>
+      </div>
+
+      <label class="select-all" *ngIf="students.length > 0">
+        <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll(($any($event.target)).checked)" />
+        <span>Select all</span>
+      </label>
+    </div>
+
+    <table class="legacy-table" *ngIf="students.length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Admission No.</th>
+          <th>Student Name</th>
+          <th>Category</th>
+          <th class="check-col">Assign</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students; let index = index">
+          <td>{{ index + 1 }}</td>
+          <td>{{ student.idNo || '-' }}</td>
+          <td>{{ student.fullName || student.firstName || '-' }}</td>
+          <td>{{ getCategoryLabel(student.classCategory, student.currentClass) }}</td>
+          <td class="check-col">
+            <input
+              type="checkbox"
+              [checked]="isStudentChecked(student.id)"
+              (change)="toggleStudentSelection(student.id, ($any($event.target)).checked)"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <h3>No student list loaded</h3>
+        <p>Select the subject context above to render the arm student board.</p>
+      </div>
+    </ng-template>
+
+    <div class="action-row" *ngIf="students.length > 0">
+      <button type="button" class="primary-button" [disabled]="isSubmitting()" (click)="submitAssignments()">
+        {{ isSubmitting() ? 'Submitting...' : 'Submit changes' }}
+      </button>
+    </div>
+  </div>
+</div>

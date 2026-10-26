@@ -1,0 +1,429 @@
+<section class="acct-oprcx">
+  <div class="acct-oprcx__top">
+    <h3 class="acct-oprcx__title">Student Optional Payment Report Complex</h3>
+    <div class="acct-oprcx__result-type">
+      <label class="acct-oprcx__inline-label" for="ResultType">Size</label>
+      <select
+        id="ResultType"
+        class="acct-oprcx__control acct-oprcx__control--result"
+        [ngModel]="resultType()"
+        (ngModelChange)="onResultTypeChange($event)"
+      >
+        <option [ngValue]="0">List of students payment report</option>
+        <option [ngValue]="4">Individual student payment history</option>
+        <option [ngValue]="5">Periodic optional payment report</option>
+      </select>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="acct-oprcx__alert acct-oprcx__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="acct-oprcx__loading"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <div class="acct-oprcx__menu" id="menuCategory">
+      @if (resultType() === 0) {
+        <div class="acct-oprcx__row acct-oprcx__row--center">
+          <label class="acct-oprcx__inline-label" for="ResultStatus">Size</label>
+          <select
+            id="ResultStatus"
+            class="acct-oprcx__control"
+            [ngModel]="sizeMode()"
+            (ngModelChange)="onSizeChange($event)"
+          >
+            <option [ngValue]="1">Termly</option>
+            <option [ngValue]="0">Yearly</option>
+          </select>
+        </div>
+
+        <div class="acct-oprcx__row acct-oprcx__row--filters">
+          <div class="acct-oprcx__field">
+            <label class="acct-oprcx__inline-label" for="Session">Session</label>
+            <select
+              id="Session"
+              class="acct-oprcx__control"
+              [ngModel]="sessionId()"
+              (ngModelChange)="onSessionChange($event)"
+            >
+              @for (opt of sessions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.text }}</option>
+              }
+            </select>
+          </div>
+
+          @if (showTermFilter()) {
+            <div class="acct-oprcx__field" id="termDiv">
+              <label class="acct-oprcx__inline-label" for="Term">Term</label>
+              @if (termsLoading()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <select
+                  id="Term"
+                  class="acct-oprcx__control"
+                  [ngModel]="termStatus()"
+                  (ngModelChange)="onTermChange($event)"
+                >
+                  @for (opt of terms(); track opt.value) {
+                    <option [value]="opt.value">{{ opt.text }}</option>
+                  }
+                </select>
+              }
+            </div>
+          }
+        </div>
+      } @else if (resultType() === 4) {
+        <div class="acct-oprcx__well">
+          <label class="acct-oprcx__inline-label" for="parameter">Search Student:</label>
+          <input
+            id="parameter"
+            class="acct-oprcx__control acct-oprcx__control--search"
+            placeholder="Search by Admission number or first name or surname or middle name"
+            [ngModel]="searchParameter()"
+            (ngModelChange)="searchParameter.set($event)"
+            (keydown.enter)="$event.preventDefault(); runStudentSearch()"
+          />
+          <button type="button" class="acct-oprcx__btn acct-oprcx__btn--primary" (click)="runStudentSearch()">
+            Search
+          </button>
+        </div>
+      } @else {
+        <p class="acct-oprcx__range-hint lead">Please select your desired range</p>
+        <div class="acct-oprcx__row acct-oprcx__row--range">
+          <div class="acct-oprcx__field">
+            <label class="acct-oprcx__inline-label" for="startDate">Start Date</label>
+            <input
+              id="startDate"
+              type="date"
+              class="acct-oprcx__control"
+              [ngModel]="startDate()"
+              (ngModelChange)="startDate.set($event)"
+            />
+          </div>
+          <div class="acct-oprcx__field">
+            <label class="acct-oprcx__inline-label" for="endDate">End Date</label>
+            <input
+              id="endDate"
+              type="date"
+              class="acct-oprcx__control"
+              [ngModel]="endDate()"
+              (ngModelChange)="endDate.set($event)"
+            />
+          </div>
+          <div class="acct-oprcx__field">
+            <label class="acct-oprcx__inline-label" for="Category">Category</label>
+            <select
+              id="Category"
+              class="acct-oprcx__control"
+              [ngModel]="categoryMode()"
+              (ngModelChange)="onCategoryModeChange($event)"
+            >
+              <option [ngValue]="0">All Category</option>
+              <option [ngValue]="1">Selected Category</option>
+            </select>
+          </div>
+          @if (showCategoryPicker()) {
+            <div class="acct-oprcx__field">
+              <label class="acct-oprcx__inline-label" for="CategoryId">Select</label>
+              <select
+                id="CategoryId"
+                class="acct-oprcx__control"
+                [ngModel]="categoryId()"
+                (ngModelChange)="categoryId.set($event)"
+              >
+                <option value="-1">Select</option>
+                @for (cat of categories(); track cat.id) {
+                  <option [value]="cat.id">{{ cat.categoryName }}</option>
+                }
+              </select>
+            </div>
+          }
+          <div class="acct-oprcx__field acct-oprcx__field--action">
+            <button type="button" class="acct-oprcx__btn acct-oprcx__btn--primary" (click)="loadRangeReport()">
+              Get Result
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="acct-oprcx__content" id="pageContent">
+      @if (contentLoading() || searching()) {
+        <div class="acct-oprcx__loading acct-oprcx__loading--inline">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+      } @else if (resultType() === 0 && listReport(); as data) {
+        @if (listClassGroups().length === 0) {
+          <p class="acct-oprcx__empty lead">No recod available</p>
+        } @else {
+          <div class="acct-oprcx__panel">
+            <p class="acct-oprcx__summary lead">
+              Student Optional Payment Report - Total Payment:
+              <span class="acct-oprcx__blue">{{ formatNaira(data.totalPayment) }}</span>, Total Discount:
+              <span class="acct-oprcx__blue">{{ formatNaira(data.totalDiscount) }}</span>
+            </p>
+            <div class="acct-oprcx__table-wrap">
+              <table class="acct-oprcx__outer table table-bordered">
+                @for (cls of listClassGroups(); track cls.classId) {
+                  <tr><th>{{ cls.classLabel }}</th></tr>
+                  @for (arm of cls.arms; track arm.classArmId) {
+                    <tr><th>{{ arm.label }}</th></tr>
+                    <tr>
+                      <td>
+                        @for (stu of arm.students; track stu.studentId) {
+                          <div class="acct-oprcx__student">
+                            <table class="acct-oprcx__inner table table-bordered">
+                              <tr>
+                                <th class="acct-oprcx__student-head">
+                                  Full Name: <span class="acct-oprcx__green">{{ stu.fullName }}</span>, Id No.:
+                                  <span class="acct-oprcx__green">{{ stu.idNo }}</span>, Total Charges:
+                                  <span class="acct-oprcx__green">{{ formatNaira(stu.totalCharges) }}</span><br />
+                                  Total Payment:
+                                  <span class="acct-oprcx__green">{{ formatNaira(stu.totalPayment) }}</span>, Total
+                                  Discount:
+                                  <span class="acct-oprcx__green">{{ formatNaira(stu.totalDiscount) }}</span>, Total
+                                  Outstanding:
+                                  <span class="acct-oprcx__red">{{ formatNaira(stu.totalOutstanding) }}</span>
+                                </th>
+                              </tr>
+                              @for (term of stu.terms; track term.key) {
+                                <tr>
+                                  <th>
+                                    Term/Session:
+                                    <span class="acct-oprcx__blue"
+                                      >{{ term.termLabel }}, {{ term.session }}</span
+                                    >
+                                  </th>
+                                </tr>
+                                @for (item of term.items; track item.charge.id) {
+                                  <tr>
+                                    <td>
+                                      <table class="acct-oprcx__item table table-bordered">
+                                        <tr>
+                                          <th colspan="5">
+                                            <span class="acct-oprcx__red">{{ item.counter }} =&gt; </span>
+                                            Item's name:
+                                            <span class="acct-oprcx__blue">{{ item.charge.itemName }}</span>, Charges:
+                                            <span class="acct-oprcx__blue">{{
+                                              formatNaira(item.charge.cost)
+                                            }}</span
+                                            >, Total Payment:
+                                            <span class="acct-oprcx__blue">{{ formatNaira(item.paid) }}</span>,
+                                            Discount:
+                                            <span class="acct-oprcx__blue">{{ formatNaira(item.discount) }}</span>,
+                                            Outstanding:
+                                            <span class="acct-oprcx__red">{{
+                                              formatNaira(item.outstanding)
+                                            }}</span>
+                                          </th>
+                                        </tr>
+                                        @if (item.paymentRows.length) {
+                                          <tr class="acct-oprcx__cols">
+                                            <th>Payment Date</th>
+                                            <th>Payment Type</th>
+                                            <th>Payment Amount</th>
+                                            <th>Discount</th>
+                                            <th>Reason for the discount</th>
+                                          </tr>
+                                          @for (pay of item.paymentRows; track $index) {
+                                            <tr>
+                                              <th>{{ formatPaymentDate(pay.paymentDate) }}</th>
+                                              <th>{{ pay.paymentTypeLabel }}</th>
+                                              <th>{{ formatNaira(pay.amount) }}</th>
+                                              <th>{{ formatNaira(pay.discount) }}</th>
+                                              <th>{{ pay.reason }}</th>
+                                            </tr>
+                                          }
+                                        }
+                                      </table>
+                                    </td>
+                                  </tr>
+                                }
+                              }
+                            </table>
+                          </div>
+                        }
+                      </td>
+                    </tr>
+                  }
+                }
+              </table>
+            </div>
+          </div>
+        }
+      } @else if (resultType() === 4) {
+        @if (hasSearched() && searchStudents().length === 0 && !historyReport()) {
+          <p class="acct-oprcx__empty lead">
+            Sorry! No student's name matched the letter you have typed.
+          </p>
+        } @else if (searchStudents().length) {
+          <div class="acct-oprcx__table-wrap">
+            <table class="table table-bordered table-striped acct-oprcx__search-table">
+              <thead>
+                <tr>
+                  <th>SNo</th>
+                  <th>Admision No.</th>
+                  <th>Full Name</th>
+                  <th>Class Arm</th>
+                  <th>Class Category</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of searchStudents(); track item.studentLevelPaymentId; let sno = $index) {
+                  <tr>
+                    <td>{{ sno + 1 }}</td>
+                    <td>{{ item.admisionNo }}</td>
+                    <td>{{ item.fullName }}</td>
+                    <td>{{ item.classLabel }} {{ item.armName }}</td>
+                    <td>{{ item.classCategoryStatus }}</td>
+                    <td>
+                      <button
+                        type="button"
+                        class="acct-oprcx__btn acct-oprcx__btn--success"
+                        (click)="openStudentHistory(item)"
+                      >
+                        View Defaulted Payments
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (historyReport(); as hist) {
+          <div class="acct-oprcx__panel acct-oprcx__panel--history">
+            @if (!hist.charges.length) {
+              <p class="acct-oprcx__empty lead">No recod available</p>
+            } @else {
+              <p class="acct-oprcx__summary lead">
+                Full Name: <span class="acct-oprcx__green">{{ historyTotals().fullName }}</span>, Id No.:
+                <span class="acct-oprcx__green">{{ historyTotals().idNo }}</span>, Total Charges:
+                <span class="acct-oprcx__green">{{ formatNaira(historyTotals().charges) }}</span><br />
+                Total Payment:
+                <span class="acct-oprcx__green">{{ formatNaira(historyTotals().payment) }}</span>, Total Discount:
+                <span class="acct-oprcx__green">{{ formatNaira(historyTotals().discount) }}</span>, Total Outstanding:
+                <span class="acct-oprcx__red">{{ formatNaira(historyTotals().outstanding) }}</span>
+              </p>
+              @for (sess of historySessions(); track sess.sessionId) {
+                <table class="acct-oprcx__outer table table-bordered">
+                  <tr>
+                    <th>Session/Term: {{ sess.session }}</th>
+                  </tr>
+                  @for (term of sess.terms; track term.key) {
+                    <tr>
+                      <th>
+                        Session/Term:
+                        <span class="acct-oprcx__blue">{{ term.termLabel }}, {{ term.session }}</span>
+                      </th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <table class="acct-oprcx__item table table-bordered">
+                          @for (item of term.items; track item.charge.id) {
+                            <tr>
+                              <th colspan="5">
+                                <span class="acct-oprcx__red">{{ item.counter }} =&gt; </span>
+                                Item's name:
+                                <span class="acct-oprcx__blue">{{ item.charge.itemName }}</span>, Charges:
+                                <span class="acct-oprcx__blue">{{ formatNaira(item.charge.cost) }}</span>, Total
+                                Payment: <span class="acct-oprcx__blue">{{ formatNaira(item.paid) }}</span>,
+                                Discount: <span class="acct-oprcx__blue">{{ formatNaira(item.discount) }}</span>,
+                                Outstanding:
+                                <span class="acct-oprcx__red">{{ formatNaira(item.outstanding) }}</span>
+                              </th>
+                            </tr>
+                            @if (item.paymentRows.length) {
+                              <tr class="acct-oprcx__cols">
+                                <th>Amount</th>
+                                <th>Discount</th>
+                                <th>Payment Date</th>
+                                <th>Payment Type</th>
+                                <th>Reason for the discount</th>
+                              </tr>
+                              @for (pay of item.paymentRows; track $index) {
+                                <tr>
+                                  <th>{{ formatNaira(pay.amount) }}</th>
+                                  <th>{{ formatNaira(pay.discount) }}</th>
+                                  <th>{{ formatPaymentDate(pay.paymentDate) }}</th>
+                                  <th>{{ pay.paymentTypeLabel }}</th>
+                                  <th>{{ pay.reason }}</th>
+                                </tr>
+                              }
+                            }
+                          }
+                        </table>
+                      </td>
+                    </tr>
+                  }
+                </table>
+              }
+            }
+          </div>
+        }
+      } @else if (resultType() === 5 && rangeReport(); as range) {
+        @if (rangeYears().length === 0) {
+          <p class="acct-oprcx__empty lead acct-oprcx__empty--danger">No record within the range</p>
+        } @else {
+          <div class="acct-oprcx__panel">
+            <p class="acct-oprcx__summary lead">
+              Category's name: <span class="acct-oprcx__blue">{{ range.categoryLabel }}</span><br />
+              Number of Items: <span class="acct-oprcx__blue">{{ range.numberOfItems }}</span>
+            </p>
+            <p class="acct-oprcx__summary lead">
+              Total Charges: <span class="acct-oprcx__blue">{{ formatNaira(range.totalCharges) }}</span>, Total
+              Payment: <span class="acct-oprcx__blue">{{ formatNaira(range.totalPayment) }}</span>, Total Distount:
+              <span class="acct-oprcx__blue">{{ formatNaira(range.totalDiscount) }}</span>, Total Outstanding:
+              <span class="acct-oprcx__red">{{ formatNaira(range.totalOutstanding) }}</span>
+            </p>
+            @for (year of rangeYears(); track year.year) {
+              <table class="acct-oprcx__outer table table-bordered">
+                <tr>
+                  <th>Year: {{ year.year }}</th>
+                </tr>
+                @for (term of year.terms; track term.termKey) {
+                  <tr>
+                    <th>Term: {{ term.termLabel }}</th>
+                  </tr>
+                  @for (cls of term.classes; track cls.classId) {
+                    <tr>
+                      <th>Class: {{ cls.classLabel }}</th>
+                    </tr>
+                    @for (arm of cls.arms; track arm.classArmId) {
+                      <tr>
+                        <th colspan="6">Class/Arm: {{ arm.label }}</th>
+                      </tr>
+                      <tr class="acct-oprcx__cols">
+                        <th class="text-primary">S/No</th>
+                        <th>Student's name/Admission Number</th>
+                        <th>Charges</th>
+                        <th>Payment</th>
+                        <th>Discount</th>
+                        <th>Outstanding</th>
+                      </tr>
+                      @for (stu of arm.students; track stu.studentId; let sno = $index) {
+                        <tr>
+                          <td class="text-primary">{{ sno + 1 }}</td>
+                          <td>
+                            {{ stu.fullName }} <span class="acct-oprcx__red">=&gt;</span> {{ stu.idNo }}
+                          </td>
+                          <td>{{ formatNaira(stu.charges) }}</td>
+                          <td>{{ formatNaira(stu.payment) }}</td>
+                          <td>{{ formatNaira(stu.discount) }}</td>
+                          <td>{{ formatNaira(stu.outstanding) }}</td>
+                        </tr>
+                      }
+                    }
+                  }
+                }
+              </table>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
+</section>

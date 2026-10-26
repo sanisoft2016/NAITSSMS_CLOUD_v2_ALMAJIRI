@@ -1,0 +1,24 @@
+<section class="teacher-index-page">
+  <div class="teacher-index-row">
+    @for (link of quickLinks; track link.id) {
+      <div class="teacher-index-col">
+        <div class="quick-link text-center btn">
+          <a
+            class="icon-link btn"
+            [ngClass]="'btn-' + link.accent"
+            [routerLink]="link.route"
+            [attr.title]="link.description"
+          >
+            <i class="fa fa-5x" [ngClass]="'fa-' + link.icon" aria-hidden="true"></i>
+          </a>
+
+          <a class="teacher-index-title-link" [routerLink]="link.route">
+            <h4 [ngClass]="'text-' + link.accent">{{ link.title }}</h4>
+          </a>
+
+          <p>{{ link.description }}</p>
+        </div>
+      </div>
+    }
+  </div>
+</section>

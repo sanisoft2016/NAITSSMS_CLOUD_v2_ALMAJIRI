@@ -1,0 +1,276 @@
+/* Legacy Teacher/AssignedArmAsFormMaster.cshtml look and feel */
+
+@use '../../admin/daily-attendance/daily-attendance.shared.scss';
+
+.form-master-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem 0 1.5rem;
+}
+
+.page-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1em;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.page-message {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.page-message--center {
+  text-align: center;
+}
+
+.page-message--danger,
+.text-danger,
+.highlight {
+  color: #a94442;
+}
+
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.no-display {
+  display: none !important;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.legacy-table {
+  width: 100%;
+  min-width: 760px;
+  margin: 0;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.legacy-table th,
+.legacy-table td,
+.students-table th,
+.students-table td {
+  border: 1px solid #ddd;
+  padding: 0.65rem 0.75rem;
+  vertical-align: middle;
+  background: #fff;
+}
+
+.legacy-table th {
+  font-weight: 700;
+  background: #fafafa;
+}
+
+.col-name {
+  width: 12%;
+}
+
+.col-arm {
+  width: 15%;
+}
+
+.cell-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  font-size: 14px;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  user-select: none;
+}
+
+.btn-xs {
+  padding: 0.25rem 0.5rem;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #337ab7;
+  border-color: #2e6da4;
+}
+
+.btn-warning {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+.btn-success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.btn-info {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
+
+.btn-danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+.page-content {
+  width: 100%;
+  margin: 0.5rem auto 0;
+}
+
+.students-toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto minmax(160px, 220px);
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.students-heading {
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.students-status-label {
+  text-align: right;
+  padding-top: 0.25rem;
+  white-space: nowrap;
+}
+
+.students-status-control {
+  min-width: 160px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.form-control:disabled {
+  background-color: #eee;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.students-table {
+  width: 650px;
+  max-width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Teacher register: arm is fixed from the form-master assignment, so only date is editable. */
+.filter-grid--teacher {
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.7fr);
+  align-items: end;
+}
+
+.filter-grid--teacher .date-field {
+  width: 100%;
+  max-width: none;
+}
+
+.attendance-table.legacy-table {
+  min-width: 0;
+}
+
+.attendance-table.legacy-table th {
+  background: #f8f0df;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid #eadfcf;
+}
+
+.attendance-table.legacy-table td {
+  border-bottom: 1px solid #eadfcf;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
+@media (max-width: 767px) {
+  .students-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .cell-menu {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cell-menu .btn {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .filter-grid--teacher {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .page-header-row,
+  .table-wrap,
+  .filter-card,
+  .action-row,
+  .status-toggle,
+  .remark-input {
+    display: none !important;
+  }
+}

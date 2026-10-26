@@ -1,0 +1,183 @@
+<nav class="legacy-sidenav" aria-label="Side navigation" style="padding-top: 7px;">
+  @if (menuRole() === 'teacher') {
+    @for (item of teacherMenuItems; track item.route) {
+      <a
+        matRipple
+        class="legacy-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="item.exact ? { exact: true } : { exact: false }"
+      >
+        @if (item.iconSet === 'fa') {
+          <i [ngClass]="faIconClasses(item.icon)" aria-hidden="true"></i>
+        } @else {
+          <mat-icon class="legacy-icon">{{ item.icon }}</mat-icon>
+        }
+        <span class="legacy-text" [style.white-space]="item.nowrap ? 'nowrap' : null">{{ item.label }}</span>
+      </a>
+    }
+  } @else if (menuRole() === 'commission') {
+    @for (item of commissionMenuItems; track item.route) {
+      <a
+        matRipple
+        class="legacy-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="item.exact ? { exact: true } : { exact: false }"
+      >
+        <mat-icon class="legacy-icon">{{ item.icon }}</mat-icon>
+        <span class="legacy-text" [style.white-space]="item.nowrap ? 'nowrap' : null">{{ item.label }}</span>
+      </a>
+    }
+  } @else if (menuRole() === 'saofficer') {
+    @for (item of saOfficerMenuItems; track item.route) {
+      <a
+        matRipple
+        class="legacy-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="item.exact ? { exact: true } : { exact: false }"
+      >
+        @if (item.iconSet === 'fa') {
+          <i [ngClass]="faIconClasses(item.icon)" aria-hidden="true"></i>
+        } @else {
+          <mat-icon class="legacy-icon">{{ item.icon }}</mat-icon>
+        }
+        <span class="legacy-text" [style.white-space]="item.nowrap ? 'nowrap' : null">{{ item.label }}</span>
+      </a>
+    }
+  } @else if (menuRole() === 'student') {
+    @for (item of studentParentMenuItems; track item.route) {
+      <a
+        matRipple
+        class="legacy-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="item.exact ? { exact: true } : { exact: false }"
+      >
+        @if (item.iconSet === 'fa') {
+          <i [ngClass]="faIconClasses(item.icon)" aria-hidden="true"></i>
+        } @else {
+          <mat-icon class="legacy-icon">{{ item.icon }}</mat-icon>
+        }
+        <span class="legacy-text" [style.white-space]="item.nowrap ? 'nowrap' : null">{{ item.label }}</span>
+      </a>
+    }
+  } @else if (menuRole() === 'accounting') {
+    @if (showSubordinateAccountantLink()) {
+      @if (subordinateAccountantExists()) {
+        <button
+          type="button"
+          class="legacy-item accounting-subordinate-link"
+          [disabled]="subordinateAccountantBusy()"
+          (click)="onViewSubordinateAccountant()"
+        >
+          <mat-icon class="legacy-icon">person_add</mat-icon>
+          <span class="legacy-text" style="white-space: nowrap;">View Subordinate Accountant</span>
+        </button>
+      } @else {
+        <a
+          matRipple
+          class="legacy-item accounting-subordinate-link"
+          [routerLink]="['/accounting/create-subordinate-accountant']"
+          [queryParams]="createSubordinateAccountantQueryParams()"
+          routerLinkActive="active"
+        >
+          <mat-icon class="legacy-icon">person_add</mat-icon>
+          <span class="legacy-text" style="white-space: nowrap;">Create Subordinate Accountant</span>
+        </a>
+      }
+    }
+
+    <div class="accounting-option-wrap">
+      <label class="accounting-option-label" for="accountingOptionType">Management Area</label>
+      <select
+        id="accountingOptionType"
+        class="accounting-option-select form-control"
+        [ngModel]="accountingOptionId()"
+        (ngModelChange)="onAccountingOptionChange($event)"
+      >
+        @for (choice of accountingOptionChoices; track choice.value) {
+          <option [value]="choice.value">{{ choice.label }}</option>
+        }
+      </select>
+    </div>
+
+    @for (item of accountingMenuItems(); track item.route) {
+      <a
+        matRipple
+        class="legacy-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="item.exact ? { exact: true } : { exact: false }"
+      >
+        @if (item.iconSet === 'fa') {
+          <i [ngClass]="faIconClasses(item.icon)" aria-hidden="true"></i>
+        } @else {
+          <mat-icon class="legacy-icon">{{ item.icon }}</mat-icon>
+        }
+        <span class="legacy-text" [style.white-space]="item.nowrap ? 'nowrap' : null">{{ item.label }}</span>
+      </a>
+    }
+  } @else {
+    <a matRipple class="legacy-item" routerLink="/dashboard" routerLinkActive="active">
+      <mat-icon class="legacy-icon">dashboard</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">My Dashboard</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin" routerLinkActive="active">
+      <mat-icon class="legacy-icon">home</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">My Home Page</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/class-reg-index" routerLinkActive="active">
+      <mat-icon class="legacy-icon">groups</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Class / Arm</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/student-home-page" routerLinkActive="active">
+      <mat-icon class="legacy-icon">school</mat-icon>
+      <span class="legacy-text">Students</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/subjects" routerLinkActive="active">
+      <mat-icon class="legacy-icon">menu_book</mat-icon>
+      <span class="legacy-text">Subjects</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/teachers" routerLinkActive="active" style="padding-right: 0px;">
+      <mat-icon class="legacy-icon">badge</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Teachers / Other Employees</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/other-registrations" routerLinkActive="active">
+      <mat-icon class="legacy-icon">assignment</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Other Registrations</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/daily-attendance/facilitators" routerLinkActive="active">
+      <mat-icon class="legacy-icon">how_to_reg</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Daily Register - Facilitators</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/daily-attendance/summary" routerLinkActive="active">
+      <mat-icon class="legacy-icon">summarize</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Attendance Summary</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/student-results" routerLinkActive="active">
+      <mat-icon class="legacy-icon">assessment</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Students Results</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/broadsheet-report" routerLinkActive="active">
+      <mat-icon class="legacy-icon">table_chart</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">Broad Sheet Report</span>
+    </a>
+
+    <a matRipple class="legacy-item" routerLink="/admin/new-assessment-handler" routerLinkActive="active">
+      <mat-icon class="legacy-icon">edit_note</mat-icon>
+      <span class="legacy-text" style="white-space: nowrap;">New Assessment Handler</span>
+    </a>
+  }
+</nav>

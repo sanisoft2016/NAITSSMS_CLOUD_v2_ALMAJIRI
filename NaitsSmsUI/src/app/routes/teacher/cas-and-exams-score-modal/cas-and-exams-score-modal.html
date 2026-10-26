@@ -1,0 +1,179 @@
+<div class="score-modal-backdrop" (click)="closeModal()"></div>
+
+<section class="score-modal" role="dialog" aria-modal="true" aria-labelledby="score-modal-title">
+  <header class="score-modal__header">
+    <button type="button" class="score-modal__close" aria-label="Close" (click)="closeModal()">&times;</button>
+  </header>
+
+  <div class="score-modal__body">
+    @if (isLoading()) {
+      <p class="lead text-center text-danger">Loading CA and exam scores...</p>
+    } @else if (errorMessage()) {
+      <p class="lead text-center text-danger">{{ errorMessage() }}</p>
+    } @else if (orderedRows().length > 0) {
+      <div class="score-toolbar row">
+        <div class="toolbar-col">
+          <button type="button" class="btn btn-primary btn-xs" (click)="printScores()">Print</button>
+        </div>
+
+        <div class="toolbar-col toolbar-col--actions">
+          <button
+            type="button"
+            class="btn btn-warning btn-xs"
+            [disabled]="loadingUnentered() === 'ca'"
+            (click)="loadUnenteredCa()"
+          >
+            {{ loadingUnentered() === 'ca' ? 'Please Wait ...' : 'Un-entered CAs' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger btn-xs"
+            [disabled]="loadingUnentered() === 'ca-exams'"
+            (click)="loadUnenteredCaAndExams()"
+          >
+            {{ loadingUnentered() === 'ca-exams' ? 'Please Wait ...' : 'Un-entered CAs & Exams' }}
+          </button>
+        </div>
+
+        <div class="toolbar-col toolbar-col--order">
+          <label for="reOrdering">Order By</label>
+          <select
+            id="reOrdering"
+            class="form-control"
+            [ngModel]="orderBy()"
+            (ngModelChange)="onOrderByChange($event)"
+          >
+            <option value="0">First Name</option>
+            <option value="1">Sur Name</option>
+            <option value="2">Gender</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="teacherScorePrintArea" class="score-sheet">
+        <table class="table table-bordered score-table">
+          <tr>
+            <th colspan="4" class="text-center">
+              CLass: <span class="highlight">{{ classArm }}</span>
+            </th>
+            <th colspan="4" class="text-center">
+              Subject: <span class="highlight">{{ subjectName }}</span>
+            </th>
+          </tr>
+          <tr class="nowrap-row">
+            <th>SNo</th>
+            <th>IdNo</th>
+            <th>Full Name</th>
+            @if (casCategory() === 'ThreeCAs') {
+              <th>First CA</th>
+              <th>Second CA</th>
+              <th>Third CA</th>
+            } @else if (casCategory() === 'TwoCAs') {
+              <th>First CA</th>
+              <th>Second CA</th>
+            } @else {
+              <th>CA</th>
+            }
+            <th>Exams</th>
+            <th>Total</th>
+          </tr>
+
+          @for (row of orderedRows(); track row.assessmentId; let index = $index) {
+            <tr class="each-student-row" (focusout)="onRowFocusOut(row)">
+              <td>{{ index + 1 }}</td>
+              <td>{{ row.idNo }}</td>
+              <td class="nowrap-cell">{{ row.fullName }}</td>
+
+              @if (casCategory() === 'ThreeCAs') {
+                <td>
+                  <input
+                    class="score-input cAs"
+                    type="number"
+                    [id]="scoreInputId(row.assessmentId, 'ca1')"
+                    [ngModel]="row.ca1"
+                    (ngModelChange)="updateRowValue(row, 'ca1', $event)"
+                  />
+                </td>
+                <td>
+                  <input
+                    class="score-input cAs"
+                    type="number"
+                    [id]="scoreInputId(row.assessmentId, 'ca2')"
+                    [ngModel]="row.ca2"
+                    (ngModelChange)="updateRowValue(row, 'ca2', $event)"
+                  />
+                </td>
+                <td>
+                  <input
+                    class="score-input cAs"
+                    type="number"
+                    [id]="scoreInputId(row.assessmentId, 'ca3')"
+                    [ngModel]="row.ca3"
+                    (ngModelChange)="updateRowValue(row, 'ca3', $event)"
+                  />
+                </td>
+              } @else if (casCategory() === 'TwoCAs') {
+                <td>
+                  <input
+                    class="score-input cAs"
+                    type="number"
+                    [id]="scoreInputId(row.assessmentId, 'ca1')"
+                    [ngModel]="row.ca1"
+                    (ngModelChange)="updateRowValue(row, 'ca1', $event)"
+                  />
+                </td>
+                <td>
+                  <input
+                    class="score-input cAs"
+                    type="number"
+                    [id]="scoreInputId(row.assessmentId, 'ca2')"
+                    [ngModel]="row.ca2"
+                    (ngModelChange)="updateRowValue(row, 'ca2', $event)"
+                  />
+                </td>
+              } @else {
+                <td>
+                  <input
+                    class="score-input cAs"
+                    type="number"
+                    [id]="scoreInputId(row.assessmentId, 'ca1')"
+                    [ngModel]="row.ca1"
+                    (ngModelChange)="updateRowValue(row, 'ca1', $event)"
+                  />
+                </td>
+              }
+
+              <td>
+                <input
+                  class="score-input exams"
+                  type="number"
+                  [id]="scoreInputId(row.assessmentId, 'exams')"
+                  [ngModel]="row.exams"
+                  (ngModelChange)="updateRowValue(row, 'exams', $event)"
+                />
+              </td>
+              <td>{{ computeAssessmentTotal(row) }}</td>
+            </tr>
+          }
+
+          <tr>
+            <td [attr.colspan]="casCategory() === 'ThreeCAs' ? 8 : casCategory() === 'TwoCAs' ? 7 : 6" class="text-right">
+              <button type="button" class="btn btn-success" [disabled]="saving()" (click)="submitScores()">
+                {{ saving() ? 'Please Wait ...' : 'Save' }}
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    } @else {
+      <p class="lead text-center text-danger">
+        No Student in this Class or the background preparation is yet to be done or all the scores has been entered.
+      </p>
+    }
+  </div>
+
+  <footer class="score-modal__footer">
+    <button type="button" class="btn btn-warning" (click)="closeModal()">Close</button>
+  </footer>
+</section>

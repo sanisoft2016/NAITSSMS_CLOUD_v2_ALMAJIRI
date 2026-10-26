@@ -1,0 +1,107 @@
+<div class="all-subject-shell">
+  <div class="header-card">
+    <div>
+      <p class="page-breadcrumb">Registry / Subjects</p>
+      <h2>All Registered Subjects</h2>
+      <p>Search every subject across school levels, inspect where it is offered, and apply the same edit or delete actions from one page.</p>
+    </div>
+
+    <button type="button" class="secondary-button" (click)="backToIndex()">Back to subject home</button>
+  </div>
+
+  <div class="search-card">
+    <div class="search-toolbar">
+      <div class="search-grid">
+        <label class="field-block">
+          <span>Choose from registered subjects</span>
+          <select [(ngModel)]="selectedSubjectName" (ngModelChange)="onSelectedSubjectChange($event)">
+            <option value="">-- Select Subject --</option>
+            <option *ngFor="let item of subjectOptions" [value]="item.value">{{ item.text }}</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="divider-text">OR</div>
+
+      <div class="search-grid">
+        <label class="field-block wide-field">
+          <span>Search by subject name</span>
+          <input type="text" [(ngModel)]="searchParameter" placeholder="e.g. Mathematics" />
+        </label>
+
+        <button type="button" class="accent-button" (click)="searchSubjectLevels()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-card">
+    <div class="result-head">
+      <h3>Result</h3>
+      <p>{{ infoMessage }}</p>
+    </div>
+
+    <table class="legacy-table" *ngIf="subjects.length > 0; else emptyResult">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Subject Name</th>
+          <th>Level Label</th>
+          <th>Status</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subject of subjects; let index = index">
+          <td>{{ index + 1 }}</td>
+          <td>{{ subject.subjectName || '-' }}</td>
+          <td>{{ getSubjectCategoryLabel(subject) }}</td>
+          <td>
+            <span class="status-pill" [class.previous]="getTimeStatusLabel(subject) === 'Previous'">
+              {{ getTimeStatusLabel(subject) }}
+            </span>
+          </td>
+          <td class="actions-col">
+            <button type="button" class="table-link" (click)="openEditModal(subject)">Edit</button>
+            <button type="button" class="table-link danger" (click)="deleteSubject(subject)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyResult>
+      <div class="empty-state">
+        <h3>No subject result loaded</h3>
+        <p>Select a subject from the dropdown or search by name to render the legacy level list.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="isEditModalOpen">
+    <div class="legacy-modal">
+      <div class="modal-head">
+        <h3>Edit Subject</h3>
+        <button type="button" class="close-button" (click)="closeEditModal()">x</button>
+      </div>
+
+      <label class="field-block">
+        <span>Subject name</span>
+        <input type="text" [(ngModel)]="editForm.subjectName" maxlength="35" />
+      </label>
+
+      <label class="field-block">
+        <span>Time status</span>
+        <select [(ngModel)]="editForm.timeStatus">
+          <option [ngValue]="TimeStatusCode.Current">Current</option>
+          <option [ngValue]="TimeStatusCode.Previous">Previous</option>
+        </select>
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-button" (click)="closeEditModal()">Close</button>
+        <button type="button" class="primary-button" [disabled]="isSubmitting()" (click)="updateSubject()">
+          {{ isSubmitting() ? 'Updating...' : 'Update subject' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

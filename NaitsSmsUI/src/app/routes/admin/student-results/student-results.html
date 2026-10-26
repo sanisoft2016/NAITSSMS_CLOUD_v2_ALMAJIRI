@@ -1,0 +1,206 @@
+<section class="student-results-page">
+  @if (isLoading()) {
+    <div class="ajax-loader" aria-live="polite" aria-busy="true">
+      <div class="ajax-loader__spinner"></div>
+    </div>
+  }
+
+  <div class="page-header">
+    <h2 class="page-title">Student Result Checking Environment</h2>
+    <div class="result-type-field">
+      <label class="control-label" for="ResultType">Result Type</label>
+      <select
+        id="ResultType"
+        class="form-control"
+        name="ResultType"
+        [(ngModel)]="resultType"
+        (ngModelChange)="onResultTypeChange()">
+        <option value="0">Individual Student</option>
+        <option value="1">Collection of Students</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="menuCategory" class="menu-category">
+    @if (isIndividual) {
+      <div class="menu-row menu-row--top">
+        <div class="print-col" [class.hide-content]="!showPrintButton()">
+          <button type="button" class="btn btn-primary print-result" (click)="printReport()">Print</button>
+        </div>
+
+        <div class="inline-field inline-field--student-id">
+          <label for="StudentRegNo" class="control-label">Enter Student Id:</label>
+          <input
+            id="StudentRegNo"
+            name="StudentRegNo"
+            class="form-control"
+            type="text"
+            [(ngModel)]="studentId"
+            (change)="onStudentIdChange()" />
+        </div>
+      </div>
+
+      <div class="menu-row menu-row--filters">
+        <div class="inline-field">
+          <label class="control-label" for="ResultStatus">Result Category</label>
+          <select
+            id="ResultStatus"
+            class="form-control"
+            name="ResultStatus"
+            [(ngModel)]="resultCategory"
+            (ngModelChange)="onResultCategoryChange()">
+            <option value="1">Termly</option>
+            <option value="0">Yearly</option>
+          </select>
+        </div>
+
+        <div class="inline-field">
+          <label class="control-label" for="Session">Session</label>
+          <select
+            id="Session"
+            class="form-control session-select"
+            name="Session"
+            [ngModel]="sessionId"
+            [compareWith]="compareOptionValues"
+            (ngModelChange)="onSessionChange($event)">
+            @for (option of sessions(); track option.value) {
+              <option [ngValue]="option.value">{{ option.text }}</option>
+            }
+          </select>
+        </div>
+
+        @if (showTermField) {
+          <div id="termDiv" class="inline-field">
+            <label class="control-label" for="Term">Term</label>
+            <select
+              id="Term"
+              class="form-control"
+              name="Term"
+              [ngModel]="termStatus"
+              [compareWith]="compareOptionValues"
+              (ngModelChange)="onTermChange($event)">
+              @for (option of terms(); track option.value) {
+                <option [ngValue]="option.value">{{ option.text }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="menu-row menu-row--collection-top">
+        <div class="print-col" [class.hide-content]="!showPrintButton()">
+          <button type="button" class="btn btn-primary print-result" (click)="printReport()">Print</button>
+        </div>
+
+        @if (showThirdTermType) {
+          <div id="thirdTermResultTypeDiv" class="inline-field">
+            <label class="control-label" for="thirdTermResultType">Third Term Result Type:</label>
+            <select
+              id="thirdTermResultType"
+              class="form-control"
+              name="thirdTermResultType"
+              [(ngModel)]="thirdTermResultType"
+              (ngModelChange)="onThirdTermResultTypeChange()">
+              <option value="0">Cumulative Result</option>
+              <option value="1">Third Term Only</option>
+            </select>
+          </div>
+        }
+
+        <div class="inline-field">
+          <label class="control-label" for="ResultCollectionType">Result Collection Type:</label>
+          <select
+            id="ResultCollectionType"
+            class="form-control"
+            name="ResultCollectionType"
+            [(ngModel)]="collectionScope"
+            (ngModelChange)="onCollectionScopeChange()">
+            <option value="0">General Result</option>
+            <option value="1">Per Class Result</option>
+            <option value="2">Per Arm Result</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="menu-row menu-row--collection-filters">
+        <div class="inline-field">
+          <label class="control-label" for="SessionCollection">Session</label>
+          <select
+            id="SessionCollection"
+            class="form-control session-select"
+            name="Session"
+            [ngModel]="sessionId"
+            [compareWith]="compareOptionValues"
+            (ngModelChange)="onSessionChange($event)">
+            @for (option of sessions(); track option.value) {
+              <option [ngValue]="option.value">{{ option.text }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="inline-field">
+          <label class="control-label" for="TermCollection">Term</label>
+          <select
+            id="TermCollection"
+            class="form-control"
+            name="Term"
+            [ngModel]="termStatus"
+            [compareWith]="compareOptionValues"
+            (ngModelChange)="onTermChange($event)">
+            @for (option of terms(); track option.value) {
+              <option [ngValue]="option.value">{{ option.text }}</option>
+            }
+          </select>
+        </div>
+
+        @if (showClassField) {
+          <div id="ClassContainer" class="inline-field">
+            <label class="control-label" for="ClassName">Class</label>
+            <select
+              id="ClassName"
+              class="form-control"
+              name="ClassName"
+              [(ngModel)]="classValue"
+              (ngModelChange)="onClassChange()">
+              <option value="">Select</option>
+              @for (option of classOptions(); track option.value) {
+                <option [value]="option.value">{{ option.text }}</option>
+              }
+            </select>
+          </div>
+        }
+
+        @if (showArmField) {
+          <div id="ArmContainer" class="inline-field">
+            <label class="control-label" for="ArmName">Arm</label>
+            <select
+              id="ArmName"
+              class="form-control"
+              name="ArmName"
+              [(ngModel)]="armValue"
+              (ngModelChange)="onArmChange()">
+              <option value="">Select</option>
+              @for (option of armOptions(); track option.value) {
+                <option [value]="option.value">{{ option.text }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert-banner alert-banner--error">{{ errorMessage() }}</div>
+  }
+
+  @if (reportMessage()) {
+    <div class="alert-banner alert-banner--info">{{ reportMessage() }}</div>
+  }
+
+  <div id="pageContent" class="page-content">
+    @for (sheet of reportSheets(); track sheet.studentId + '|' + sheet.reportTitle) {
+      <app-student-result-sheet [sheet]="sheet" />
+    }
+  </div>
+</section>

@@ -1,0 +1,204 @@
+/* Salary report — legacy SalaryPaymentReport + SalaryReportForSelectedPeriod, polished. */
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acct-sal {
+  --sal-ink: #2a3f54;
+  --sal-muted: #73879c;
+  --sal-line: #d9dee4;
+  --sal-accent: #1a6aa8;
+  --sal-card: #ffffff;
+  --sal-shadow: 0 10px 28px rgb(42 63 84 / 8%);
+  --sal-highlight: #ffe566;
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1.25rem 0 2.5rem;
+  color: var(--sal-ink);
+}
+
+.acct-sal__header {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.acct-sal__heading {
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.acct-sal__loading {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 0;
+}
+
+.acct-sal__loading--inline {
+  padding: 1rem 0;
+}
+
+.acct-sal__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.1rem 1.25rem;
+  background: var(--sal-card);
+  border: 1px solid var(--sal-line);
+  border-radius: 12px;
+  box-shadow: var(--sal-shadow);
+}
+
+.acct-sal__filter {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1 1 16rem;
+  min-width: 14rem;
+}
+
+.acct-sal__label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  white-space: nowrap;
+  min-width: 6.5rem;
+  text-align: right;
+}
+
+.acct-sal__select {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid #c5ced8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--sal-ink);
+  background: #fff;
+}
+
+.acct-sal__select:focus {
+  outline: none;
+  border-color: var(--sal-accent);
+  box-shadow: 0 0 0 3px rgb(26 106 168 / 15%);
+}
+
+.acct-sal__alert {
+  margin: 1rem 0 0;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.acct-sal__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-sal__content {
+  width: 100%;
+  margin: 0;
+  padding-top: 1.5rem;
+}
+
+.acct-sal__table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--sal-card);
+  border: 1px solid var(--sal-line);
+  border-radius: 12px;
+  box-shadow: var(--sal-shadow);
+}
+
+.acct-sal__table-wrap--second {
+  margin-top: 2rem;
+}
+
+.acct-sal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  background: #fff;
+}
+
+.acct-sal__table th,
+.acct-sal__table td {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #222;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.acct-sal__table-title {
+  text-align: center !important;
+  color: #a94442;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: #f7f9fc;
+}
+
+.acct-sal__table thead tr:nth-child(2) th {
+  background: #eef3f8;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.acct-sal__table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+.acct-sal__footer-row th,
+.acct-sal__footer-row td {
+  background: #f4f7fb;
+  font-weight: 600;
+}
+
+.acct-sal__total-label {
+  text-align: right !important;
+}
+
+.acct-sal__gross {
+  color: #c9302c;
+}
+
+.acct-sal__net {
+  display: inline-block;
+  padding: 0.1rem 0.35rem;
+  background: var(--sal-highlight);
+  font-weight: 700;
+}
+
+.acct-sal__cash {
+  color: #c9302c;
+}
+
+.acct-sal__teller {
+  color: #3c763d;
+}
+
+.acct-sal__transfer {
+  color: #337ab7;
+}
+
+@media (max-width: 720px) {
+  .acct-sal__filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acct-sal__label {
+    text-align: left;
+  }
+}

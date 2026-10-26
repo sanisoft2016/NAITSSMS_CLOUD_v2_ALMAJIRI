@@ -1,0 +1,409 @@
+__migrationhistory|migrationid|character varying|150|YES
+__migrationhistory|contextkey|character varying|300|YES
+__migrationhistory|model|bytea||NO
+__migrationhistory|productversion|character varying|32|YES
+affectiveandpsychomotxtorassessments|id|character varying|40|YES
+affectiveandpsychomotxtorassessments|itemid|integer||NO
+affectiveandpsychomotxtorassessments|score|integer||NO
+affectiveandpsychomotxtorassessments|yearlyandtermlystatusid|integer||NO
+affectiveandpsychomotxtorassessments|studentid|character varying|40|YES
+affectiveandpsychomotxtorassessments|classarmid|integer||NO
+affectiveandpsychomotxtorassessments|formmasterid|integer||NO
+affectivexzandpsychomotors|id|integer||NO
+affectivexzandpsychomotors|itemsname|character varying|25|YES
+agents|id|smallint||NO
+agents|userid|character varying|40|YES
+agents|timestatus|integer||NO
+agents|fulladdress|character varying|100|YES
+agents|schoolregid|character varying|7|YES
+aspnetroles|id|character varying|40|YES
+aspnetroles|name|character varying|20|YES
+aspnetroles|discriminator|character varying|20|YES
+aspnetuserclaims|id|integer||NO
+aspnetuserclaims|userid|character varying|40|YES
+aspnetuserclaims|claimtype|character varying||YES
+aspnetuserclaims|claimvalue|character varying||YES
+aspnetuserlogins|loginprovider|character varying|128|YES
+aspnetuserlogins|providerkey|character varying|128|YES
+aspnetuserlogins|userid|character varying|40|YES
+aspnetuserroles|userid|character varying|40|YES
+aspnetuserroles|roleid|character varying|40|YES
+aspnetusers|id|character varying|40|YES
+aspnetusers|username|character varying|50|YES
+aspnetusers|email|character varying|50|YES
+aspnetusers|phonenumber|character varying|25|YES
+aspnetusers|passwordhash|character varying|150|YES
+aspnetusers|securitystamp|character varying|40|YES
+aspnetusers|firstname|character varying|20|YES
+aspnetusers|middlename|character varying|20|YES
+aspnetusers|surname|character varying|20|YES
+aspnetusers|createddate|timestamp without time zone||NO
+aspnetusers|gender|integer||NO
+aspnetusers|accessstatus|integer||NO
+aspnetusers|userstatus|integer||NO
+aspnetusers|emailconfirmed|bit|1|NO
+aspnetusers|phonenumberconfirmed|bit|1|NO
+aspnetusers|twofactorenabled|bit|1|NO
+aspnetusers|lockoutenddateutc|timestamp without time zone||YES
+aspnetusers|lockoutenabled|bit|1|NO
+aspnetusers|accessfailedcount|integer||NO
+axclassarms|id|integer||NO
+axclassarms|sno|integer||NO
+axclassarms|classid|integer||NO
+axclassarms|armname|integer||NO
+axclassarms|formmaster|character varying||YES
+cbtquestionandanswers|id|integer||NO
+cbtquestionandanswers|question|character varying|600|YES
+cbtquestionandanswers|answeroptions|character varying|2010|YES
+cbtquestionandanswers|answer|integer||NO
+cbtquestionandanswers|assessmenttype|integer||NO
+cbtquestionandanswers|termid|integer||NO
+cbtquestionandanswers|classid|integer||NO
+cbtquestionandanswers|subjectid|integer||NO
+cbtsetquestions|id|integer||NO
+cbtsetquestions|questionandanswerid|integer||NO
+continuousassessmenttypes|id|smallint||NO
+continuousassessmenttypes|schoolid|character varying|40|YES
+continuousassessmenttypes|assessmenttype|integer||NO
+licenstyings|id|integer||NO
+licenstyings|schoolsmsid|character varying|40|YES
+licenstyings|subscriptionid|integer||NO
+licenstyings|paymentdate|timestamp without time zone||NO
+licenstyings|expirydate|timestamp without time zone||NO
+licenstyings|agentuserid|smallint||NO
+licenstyings|licensecategory|integer||NO
+licenstyings|charges|real||NO
+licenstyings|timestatus|integer||NO
+licenstyings|renewalconsumptionstatus|integer||NO
+localgovernments|id|smallint||NO
+localgovernments|stateid|integer||NO
+localgovernments|name|character varying|50|YES
+optionalxychargeitems|id|integer||NO
+optionalxychargeitems|itemcategoryid|smallint||NO
+optionalxychargeitems|itemname|character varying|30|YES
+optionalxychargeitems|Cost|double precision||NO
+optionalxychargeitems|yearlyandtermlystatusid|integer||NO
+optionalxychargeitems|createddate|timestamp without time zone||NO
+optionalxychargeitems|createdby|character varying|70|YES
+optionalxychargeitems|updateddate|timestamp without time zone||NO
+optionalxychargeitems|updatedby|character varying|70|YES
+programyinfoes|id|integer||NO
+programyinfoes|machines|character varying|150|YES
+programyinfoes|matches|character varying|70|YES
+regions|id|integer||NO
+regions|name|character varying|50|YES
+rxclassses|id|integer||NO
+rxclassses|sno|integer||NO
+rxclassses|classname|integer||NO
+rxclassses|classlabel|character varying|40|YES
+rxclassses|schoolinfoid|character varying|40|YES
+rxsubjects|id|integer||NO
+rxsubjects|subjectname|character varying|50|YES
+rxsubjects|timestatus|integer||NO
+rxsubjects|subjectcategoryid|smallint||NO
+schoolheadtxcategories|id|integer||NO
+schoolheadtxcategories|headstatus|integer||NO
+schoolheadtxes|id|smallint||NO
+schoolheadtxes|headsname|character varying|40|YES
+schoolheadtxes|phonenumber|character varying|15|YES
+schoolheadtxes|signatureimagestring|character varying|40|YES
+schoolheadtxes|status|integer||NO
+schoolheadtxes|schoolinfoid|character varying|40|YES
+schoolheadtxes|schoolheadcategoryid|integer||NO
+schoolheadtxes|gender|integer||NO
+schoollevelcategorieslabels|schoolinfoid|character varying|40|YES
+schoollevelcategorieslabels|generalsujectlabel|character varying|30|YES
+schoollevelcategorieslabels|religionsubjectlabel|character varying|30|YES
+schoollevelcategorieslabels|prenurserylabel|character varying|30|YES
+schoollevelcategorieslabels|nurserylabel|character varying|30|YES
+schoollevelcategorieslabels|primarylabel|character varying|30|YES
+schoollevelcategorieslabels|jsslabel|character varying|30|YES
+schoollevelcategorieslabels|sslabel|character varying|30|YES
+schoollevelcategorieslabels|customlevellabel|character varying|30|YES
+schoollevelcategorieslabels|playclasslabel|character varying|30|YES
+schoolregistrationofficers|id|character varying|40|YES
+schoolregistrationofficers|fulladdress|character varying|100|YES
+schoolregistrationofficers|lastlogin|timestamp without time zone||YES
+schoolregistrationofficers|dateofbirth|timestamp without time zone||YES
+schoolregistrationofficers|userid|character varying|40|YES
+schoolregistrationofficers|signatureimagestring|character varying|50|YES
+schoolregistrationofficers|timestatus|integer||NO
+schoolregistrationofficers|accessstatus|integer||NO
+schoolregistrationofficers|agentuserid|smallint||NO
+schooltyinfoes|schoolregistrationofficerid|character varying|40|YES
+schooltyinfoes|ssno|smallint||NO
+schooltyinfoes|schoolname|character varying|70|YES
+schooltyinfoes|schooladdress|character varying|150|YES
+schooltyinfoes|telephone|character varying|50|YES
+schooltyinfoes|poaddress|character varying|100|YES
+schooltyinfoes|emailaddress|character varying|50|YES
+schooltyinfoes|website|character varying|70|YES
+schooltyinfoes|schoollogostring|character varying|40|YES
+schooltyinfoes|motto|character varying|70|YES
+schooltyinfoes|schooladminaccountantstatus|integer||NO
+schooltyinfoes|accountingstarttermid|integer||YES
+schooltyinfoes|electiveaccessstatus|integer||NO
+schooltyinfoes|systemimplementationtype|character varying|162|YES
+schooltyinfoes|mystatus|integer||NO
+schooltyinfoes|smsapikey|character varying|150|YES
+schooltyinfoes|smsapitoken|character varying|70|YES
+schooltyinfoes|totalstudents|character varying|170|YES
+schooltyinfoes|featureimplementationtype|character varying|162|YES
+schooltyinfoes|networkimplementationtype|character varying|162|YES
+setemployeesalaries|id|integer||NO
+setemployeesalaries|employeeid|integer||NO
+setemployeesalaries|timestatus|integer||NO
+setemployeesalaries|salary|numeric||YES
+setemployeesalaries|createddate|timestamp without time zone||NO
+setemployeesalaries|createdby|character varying|70|YES
+setemployeesalaries|updateddate|timestamp without time zone||NO
+setemployeesalaries|updatedby|character varying|70|YES
+setschoolfeestrs|id|integer||NO
+setschoolfeestrs|schoolid|character varying|40|YES
+setschoolfeestrs|yearlyandtermlystatusid|integer||NO
+setschoolfeestrs|freshplayclass|double precision||NO
+setschoolfeestrs|freshprenursery|double precision||NO
+setschoolfeestrs|freshnursery|double precision||NO
+setschoolfeestrs|freshprimary|double precision||NO
+setschoolfeestrs|freshjss|double precision||NO
+setschoolfeestrs|freshscience|double precision||NO
+setschoolfeestrs|freshart|double precision||NO
+setschoolfeestrs|freshcommercial|double precision||NO
+setschoolfeestrs|retnplayclass|double precision||NO
+setschoolfeestrs|retnprenursery|double precision||NO
+setschoolfeestrs|retnnursery|double precision||NO
+setschoolfeestrs|retnprimary|double precision||NO
+setschoolfeestrs|retnjss|double precision||NO
+setschoolfeestrs|retnscience|double precision||NO
+setschoolfeestrs|retnart|double precision||NO
+setschoolfeestrs|retncommercial|double precision||NO
+setschoolfeestrs|createddate|timestamp without time zone||NO
+setschoolfeestrs|createdby|character varying|70|YES
+setschoolfeestrs|updateddate|timestamp without time zone||NO
+setschoolfeestrs|updatedby|character varying|70|YES
+smspaymentbalances|schoolsmsid|character varying|40|YES
+smspaymentbalances|pricepersms|real||NO
+smspaymentbalances|amount|real||NO
+smspurchases|id|integer||NO
+smspurchases|schoolsmsid|character varying|40|YES
+smspurchases|paymentdate|timestamp without time zone||NO
+smspurchases|agentuserid|smallint||NO
+smspurchases|balb4purchase|real||NO
+smspurchases|amountpurchase|real||NO
+smspurchases|timestatus|integer||NO
+smsuseds|id|integer||NO
+smsuseds|schoolsmsid|character varying|40|YES
+smsuseds|useddate|timestamp without time zone||NO
+smsuseds|pricepersms|real||NO
+smsuseds|noofpages|integer||NO
+smsuseds|noofrecipient|smallint||NO
+smsuseds|balb4sendindsms|real||NO
+states|id|integer||NO
+states|name|character varying|50|YES
+states|regionid|integer||YES
+studentacademictxprogresshistories|id|integer||NO
+studentacademictxprogresshistories|studentid|character varying|40|YES
+studentacademictxprogresshistories|yearlyandtermlystatusid|integer||NO
+studentacademictxprogresshistories|classid|integer||NO
+studentacademictxprogresshistories|classcategory|integer||NO
+studentoptionalchargesassignments|id|integer||NO
+studentoptionalchargesassignments|studentid|character varying|40|YES
+studentoptionalchargesassignments|optionalfeesitemid|integer||NO
+studentsattexzndanceandcommentsreports|id|integer||NO
+studentsattexzndanceandcommentsreports|attendance|integer||NO
+studentsattexzndanceandcommentsreports|teachercomments|character varying|150|YES
+studentsattexzndanceandcommentsreports|schoolheadcomments|character varying|150|YES
+studentsattexzndanceandcommentsreports|yearlyandtermlystatusid|integer||NO
+studentsattexzndanceandcommentsreports|studentid|character varying|40|YES
+studentsattexzndanceandcommentsreports|classarmid|integer||NO
+studenttermlyoptionalcharges|id|character varying|40|YES
+studenttermlyoptionalcharges|studentid|character varying|40|YES
+studenttermlyoptionalcharges|classarmid|integer||NO
+studenttermlyoptionalcharges|optionalfeesitemid|integer||NO
+studenttermlyoptionalcharges|asigneddate|timestamp without time zone||NO
+studenttermlyoptionalpaymentdiscounts|id|integer||NO
+studenttermlyoptionalpaymentdiscounts|studenttermlyoptionalchargesid|character varying|40|YES
+studenttermlyoptionalpaymentdiscounts|discountamount|double precision||NO
+studenttermlyoptionalpaymentdiscounts|reasonsfordiscount|character varying|100|YES
+studenttermlyoptionalpaymentdiscounts|createddate|timestamp without time zone||NO
+studenttermlyoptionalpaymentdiscounts|createdby|character varying|70|YES
+studenttermlyoptionalpaymentdiscounts|updateddate|timestamp without time zone||NO
+studenttermlyoptionalpaymentdiscounts|updatedby|character varying|70|YES
+studenttermlyoptionalpayments|id|character varying|40|YES
+studenttermlyoptionalpayments|studenttermlyoptionalchargesid|character varying|40|YES
+studenttermlyoptionalpayments|paymentdate|timestamp without time zone||NO
+studenttermlyoptionalpayments|paymenttype|integer||NO
+studenttermlyoptionalpayments|paymentid|character varying|10|YES
+studenttermlyoptionalpayments|amount|double precision||NO
+studenttermlyoptionalpayments|createddate|timestamp without time zone||NO
+studenttermlyoptionalpayments|createdby|character varying|70|YES
+studenttermlyoptionalpayments|updateddate|timestamp without time zone||NO
+studenttermlyoptionalpayments|updatedby|character varying|70|YES
+studenttytermlyfixedpaymentdiscounts|id|smallint||NO
+studenttytermlyfixedpaymentdiscounts|studentacademicprogressid|integer||NO
+studenttytermlyfixedpaymentdiscounts|discountamount|double precision||NO
+studenttytermlyfixedpaymentdiscounts|reasonsfordiscount|character varying|100|YES
+studenttytermlyfixedpaymentdiscounts|createddate|timestamp without time zone||NO
+studenttytermlyfixedpaymentdiscounts|createdby|character varying|70|YES
+studenttytermlyfixedpaymentdiscounts|updateddate|timestamp without time zone||NO
+studenttytermlyfixedpaymentdiscounts|updatedby|character varying|70|YES
+studenttytermlyfixedpayments|id|integer||NO
+studenttytermlyfixedpayments|studentacademicprogresshistoryid|integer||NO
+studenttytermlyfixedpayments|paymenttype|integer||NO
+studenttytermlyfixedpayments|paymentid|character varying|10|YES
+studenttytermlyfixedpayments|paymentdate|timestamp without time zone||NO
+studenttytermlyfixedpayments|amount|double precision||NO
+studenttytermlyfixedpayments|createddate|timestamp without time zone||NO
+studenttytermlyfixedpayments|createdby|character varying|70|YES
+studenttytermlyfixedpayments|updateddate|timestamp without time zone||NO
+studenttytermlyfixedpayments|updatedby|character varying|70|YES
+studenxtaccessments|id|character varying|40|YES
+studenxtaccessments|lastupdatedate|timestamp without time zone||NO
+studenxtaccessments|subjectid|integer||NO
+studenxtaccessments|studentid|character varying|40|YES
+studenxtaccessments|employeeid|integer||NO
+studenxtaccessments|classarmid|integer||NO
+studenxtaccessments|yearlyandtermlystatusid|integer||NO
+studenxtaccessments|ca1|real||NO
+studenxtaccessments|ca2|real||NO
+studenxtaccessments|ca3|real||NO
+studenxtaccessments|exams|real||NO
+subjectrxcategories|id|smallint||NO
+subjectrxcategories|subjectstatus|integer||NO
+subjectrxcategories|subjectstatuslabel|character varying|50|YES
+subjectrxcategories|schoolid|character varying|40|YES
+subjectstudenttxassignments|id|integer||NO
+subjectstudenttxassignments|studentid|character varying|40|YES
+subjectstudenttxassignments|subjectid|integer||NO
+teacherclassarmtxassignments|id|integer||NO
+teacherclassarmtxassignments|employeeid|integer||NO
+teacherclassarmtxassignments|armid|integer||NO
+teacherclassarmtxassignments|armtermlyassessmentstatus|integer||NO
+teachtxersubjectarmassignments|id|integer||NO
+teachtxersubjectarmassignments|subjectid|integer||NO
+teachtxersubjectarmassignments|employeeid|integer||NO
+teachtxersubjectarmassignments|armid|integer||NO
+terms|id|integer||NO
+terms|termstatus|integer||NO
+txacademicsessions|id|smallint||NO
+txacademicsessions|Session|character varying|9|YES
+txacademicsessions|status|integer||NO
+txacademicsessions|schoolinfoid|character varying|40|YES
+txemployeeincomestructures|employeeid|integer||NO
+txemployeeincomestructures|basicsalary|double precision||NO
+txemployeeincomestructures|allowance|double precision||NO
+txemployeemonthlypaymentlevels|id|integer||NO
+txemployeemonthlypaymentlevels|monthid|integer||NO
+txemployeemonthlypaymentlevels|employeemonthlypaymentlevel|integer||NO
+txemployees|id|integer||NO
+txemployees|fulladdress|character varying|100|YES
+txemployees|lastlogin|timestamp without time zone||YES
+txemployees|dateofbirth|timestamp without time zone||YES
+txemployees|userid|character varying|40|YES
+txemployees|signatureimagestring|character varying|50|YES
+txemployees|timestatus|integer||NO
+txemployees|employeestatus|integer||NO
+txemployees|schoolid|character varying|40|YES
+txemployees|employeeincomestructurestatus|integer||NO
+txemployees|employeeidno|character varying|20|YES
+txemployees|decipline|character varying|30|YES
+txemployees|employeequalificationstatus|integer||NO
+txemployeesmonthlypayments|id|integer||NO
+txemployeesmonthlypayments|employeemonthlypaymentlevelid|integer||NO
+txemployeesmonthlypayments|employeeid|integer||NO
+txemployeesmonthlypayments|basicsalary|double precision||NO
+txemployeesmonthlypayments|allowance|double precision||NO
+txemployeesmonthlypayments|bonus|double precision||NO
+txemployeesmonthlypayments|deduction|double precision||NO
+txemployeesmonthlypayments|employeemonthlypaymentstatus|integer||NO
+txemployeesmonthlypayments|paymenttype|integer||NO
+txemployeesmonthlypayments|Comments|character varying|170|YES
+txemployeesmonthlypayments|createddate|timestamp without time zone||NO
+txemployeesmonthlypayments|createdby|character varying|70|YES
+txemployeesmonthlypayments|updateddate|timestamp without time zone||NO
+txemployeesmonthlypayments|updatedby|character varying|70|YES
+txmonths|id|integer||NO
+txmonths|yearid|smallint||NO
+txmonths|Month|integer||NO
+txstudentdetails|id|character varying|40|YES
+txstudentdetails|sno|smallint||NO
+txstudentdetails|idno|character varying|15|YES
+txstudentdetails|dateofbirth|timestamp without time zone||NO
+txstudentdetails|placeofbirth|character varying|50|YES
+txstudentdetails|religion|integer||NO
+txstudentdetails|bloodgroup|character varying|10|YES
+txstudentdetails|dateofadmsn|timestamp without time zone||NO
+txstudentdetails|dateofdischarge|timestamp without time zone||YES
+txstudentdetails|transferedfromwhere|character varying|150|YES
+txstudentdetails|startclass|character varying|40|YES
+txstudentdetails|currentclass|integer||NO
+txstudentdetails|passport|character varying|40|YES
+txstudentdetails|classarmid|integer||NO
+txstudentdetails|guardiansname|character varying|50|YES
+txstudentdetails|relationship|character varying|50|YES
+txstudentdetails|guardianaddress|character varying|200|YES
+txstudentdetails|occupation|character varying|50|YES
+txstudentdetails|mobilenumber|character varying|50|YES
+txstudentdetails|homenumber|character varying|50|YES
+txstudentdetails|emailaddress|character varying|100|YES
+txstudentdetails|mailingaddress|character varying|150|YES
+txstudentdetails|country|character varying|50|YES
+txstudentdetails|userid|character varying|40|YES
+txstudentdetails|schoolinfoid|character varying|40|YES
+txstudentdetails|classcategory|integer||NO
+txstudentdetails|status|integer||NO
+txstudentdetails|studentinitialregstatus|integer||NO
+txstudentdetails|admisntermid|integer||NO
+txyearlyandtermlystatus|id|integer||NO
+txyearlyandtermlystatus|createddate|timestamp without time zone||NO
+txyearlyandtermlystatus|termlyaccessmentstatus|integer||NO
+txyearlyandtermlystatus|termstatus|integer||NO
+txyearlyandtermlystatus|cascategory|integer||NO
+txyearlyandtermlystatus|percasvalue|integer||YES
+txyearlyandtermlystatus|minpassmark|integer||YES
+txyearlyandtermlystatus|nexttermbeginsdate|timestamp without time zone||YES
+txyearlyandtermlystatus|assessmtenddate|timestamp without time zone||YES
+txyearlyandtermlystatus|totalattendance|integer||YES
+txyearlyandtermlystatus|sessionid|smallint||NO
+txyearlyandtermlystatus|headmasterid|smallint||YES
+txyearlyandtermlystatus|principalid|smallint||YES
+txyears|id|smallint||NO
+txyears|schoolid|character varying|40|YES
+txyears|Year|smallint||NO
+xyexpenditureweeks|id|integer||NO
+xyexpenditureweeks|timestatus|integer||NO
+xyexpenditureweeks|weekofmonth|integer||NO
+xyexpenditureweeks|schoolid|character varying|40|YES
+xyexpenses|id|integer||NO
+xyexpenses|weekid|integer||NO
+xyexpenses|itemcategoryid|smallint||NO
+xyexpenses|captureddate|timestamp without time zone||NO
+xyexpenses|details|character varying|150|YES
+xyexpenses|Cost|double precision||NO
+xyexpenses|createddate|timestamp without time zone||NO
+xyexpenses|createdby|character varying|70|YES
+xyexpenses|updateddate|timestamp without time zone||NO
+xyexpenses|updatedby|character varying|70|YES
+xyexpensescategories|id|smallint||NO
+xyexpensescategories|schoolid|character varying|40|YES
+xyexpensescategories|categoryname|character varying|50|YES
+xyincomecategories|id|smallint||NO
+xyincomecategories|schoolid|character varying|40|YES
+xyincomecategories|categoryname|character varying|50|YES
+xyincomes|id|integer||NO
+xyincomes|weekid|integer||NO
+xyincomes|itemcategoryid|smallint||NO
+xyincomes|captureddate|timestamp without time zone||NO
+xyincomes|details|character varying|150|YES
+xyincomes|Cost|double precision||NO
+xyincomes|createddate|timestamp without time zone||NO
+xyincomes|createdby|character varying|70|YES
+xyincomes|updateddate|timestamp without time zone||NO
+xyincomes|updatedby|character varying|70|YES
+xyincomeweeks|id|integer||NO
+xyincomeweeks|timestatus|integer||NO
+xyincomeweeks|weekofmonth|integer||NO
+xyincomeweeks|schoolid|character varying|40|YES
+xyoptionalchargecategories|id|smallint||NO
+xyoptionalchargecategories|schoolid|character varying|40|YES
+xyoptionalchargecategories|categoryname|character varying|50|YES

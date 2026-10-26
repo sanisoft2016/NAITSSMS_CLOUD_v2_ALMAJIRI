@@ -1,0 +1,123 @@
+<section class="acct-dashboard">
+  @if (flashSuccess()) {
+    <div class="acct-dashboard__flash" role="status">
+      <span>{{ flashSuccess() }}</span>
+      <button type="button" class="acct-dashboard__flash-close" (click)="dismissFlash()" aria-label="Dismiss">
+        ×
+      </button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="acct-dashboard__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else if (error()) {
+    <p class="lead text-center text-danger">{{ error() }}</p>
+  } @else {
+    @if (summary()?.hasData) {
+      <div class="row acct-dashboard__filters">
+        <div class="form-group col-md-4">
+          @if (isSuperAccountant()) {
+            <button type="button" class="btn btn-info" (click)="beginNewAcademicTerm()">
+              Begin New Academic Term
+            </button>
+          }
+        </div>
+        <div class="form-group col-md-4">
+          <label class="control-label col-md-3" for="acctSession">Session</label>
+          <div class="col-md-9">
+            <select
+              id="acctSession"
+              class="form-control"
+              [ngModel]="selectedSessionId()"
+              (ngModelChange)="onSessionChange($event)"
+            >
+              @for (session of sessions(); track session.value) {
+                <option [value]="session.value">{{ session.text }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4 term-col">
+          <div class="form-group">
+            <label class="control-label col-md-3" for="acctTerm">Term</label>
+            <div class="col-md-9">
+              <select
+                id="acctTerm"
+                class="form-control"
+                [ngModel]="selectedTermId()"
+                (ngModelChange)="onTermChange($event)"
+              >
+                @for (term of terms(); track term.value) {
+                  <option [value]="term.value">{{ term.text }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row tile_count tile_count--primary">
+        <div class="col-md-3 col-sm-6 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-clock-o"></i> Cleared students</span>
+          <div class="count"><span class="bg-aqua text-center">{{ summary()!.clearedStudents }}</span></div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-clock-o"></i> Total Payments</span>
+          <div class="count">
+            <span class="bg-aqua text-success">{{ formatNaira(summary()!.totalPayments) }}</span>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-clock-o"></i> Partly-cleared students</span>
+          <div class="count"><span class="bg-green">{{ summary()!.partlyClearedStudents }}</span></div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6 tile_stats_count">
+          <span class="count_top"
+            ><i class="fa fa-clock-o"></i> Total Part-Payments<br />
+            / Outstanding
+          </span>
+          <div class="count">
+            <span class="text-success">{{ formatNaira(summary()!.partPayments) }}</span>
+            /
+            <span class="text-danger">{{ formatNaira(summary()!.partOutstanding) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row tile_count">
+        <div class="col-md-3 col-sm-6 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-user"></i> Un-cleared total</span>
+          <div class="count"><span class="bg-red text-center">{{ summary()!.unclearedStudents }}</span></div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6 tile_stats_count">
+          <span class="count_top"><i class="fa fa-user"></i> Outstanding</span>
+          <div class="count">
+            <span class="bg-yellow text-danger">{{ formatNaira(summary()!.outstanding) }}</span>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-12 col-xs-12 tile_stats_count">
+          <span class="count_top"
+            ><i class="fa fa-user"></i> Summary of Total <br />
+            Payments / Outstanding
+          </span>
+          <div class="count">
+            <span class="bg-yellow text-success">{{ formatNaira(summary()!.summaryTotalPayments) }}</span>
+            /
+            <span class="bg-yellow text-danger">{{ formatNaira(summary()!.summaryTotalOutstanding) }}</span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="form-group col-md-12">
+        @if (isSuperAccountant()) {
+          <button type="button" class="btn btn-info" (click)="beginNewAcademicTerm()">
+            Begin New Academic Term
+          </button>
+        }
+      </div>
+      <p class="lead text-center text-danger">Sorry! You need to set a new 'Academic Session' and term.</p>
+    }
+  }
+</section>

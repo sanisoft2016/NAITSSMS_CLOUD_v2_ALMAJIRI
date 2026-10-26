@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /auth/login
+Allow: /auth/about
+Allow: /auth/contact
+Allow: /auth/register-school-admin
+Disallow: /auth/register-teacher
+Disallow: /auth/register-student
+Disallow: /auth/register-student2nd
+Disallow: /admin/
+Disallow: /teacher/
+Disallow: /student/
+Disallow: /supper-admin/
+Disallow: /accounting/
+Disallow: /profile/
+Disallow: /permissions/
+Disallow: /dashboard
+Disallow: /api/
+
+Sitemap: https://ourschoolonline.ng/sitemap.xml

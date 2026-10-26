@@ -1,0 +1,117 @@
+<section class="acct-rec-exp">
+  <header class="acct-rec-exp__header">
+    <h1 class="acct-rec-exp__title">Expenses Capturing Page</h1>
+    @if (dateDisplay()) {
+      <p class="acct-rec-exp__subtitle">
+        <span class="acct-rec-exp__date">{{ dateDisplay() }}</span>
+        <span class="acct-rec-exp__week"> ({{ weekPosition() }} week of the month)</span>
+      </p>
+    }
+  </header>
+
+  @if (error()) {
+    <div class="acct-rec-exp__alert acct-rec-exp__alert--error" role="alert">{{ error() }}</div>
+  }
+  @if (warn()) {
+    <div class="acct-rec-exp__alert acct-rec-exp__alert--warn" role="status">{{ warn() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="acct-rec-exp__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <form class="acct-rec-exp__card" (submit)="$event.preventDefault(); save()">
+      @if (fieldError()) {
+        <div class="acct-rec-exp__alert acct-rec-exp__alert--error" role="alert">
+          {{ fieldError() }}
+        </div>
+      }
+
+      <div class="acct-rec-exp__group">
+        <label class="acct-rec-exp__label" for="CapturedDate">Item' Date</label>
+        <div class="acct-rec-exp__date-wrap">
+          <input
+            id="CapturedDate"
+            name="CapturedDate"
+            type="text"
+            class="acct-rec-exp__control acct-rec-exp__date-input"
+            placeholder="dd/mm/yyyy"
+            autocomplete="off"
+            readonly
+            [matDatepicker]="capturedDatePicker"
+            [ngModel]="capturedDate()"
+            (ngModelChange)="onCapturedDateChange($event)"
+            (click)="capturedDatePicker.open()"
+          />
+          <mat-datepicker-toggle
+            class="acct-rec-exp__date-toggle"
+            [for]="capturedDatePicker"
+          ></mat-datepicker-toggle>
+          <mat-datepicker
+            #capturedDatePicker
+            panelClass="acct-rec-exp-datepicker"
+            [touchUi]="true"
+          ></mat-datepicker>
+        </div>
+      </div>
+
+      <div class="acct-rec-exp__group">
+        <label class="acct-rec-exp__label" for="ItemCategoryId">Expenses Category</label>
+        <select
+          id="ItemCategoryId"
+          name="ItemCategoryId"
+          class="acct-rec-exp__control"
+          [ngModel]="itemCategoryId()"
+          (ngModelChange)="itemCategoryId.set($event); fieldError.set('')"
+        >
+          @for (cat of categories(); track cat.value) {
+            <option [value]="cat.value">{{ cat.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="acct-rec-exp__group acct-rec-exp__group--top">
+        <label class="acct-rec-exp__label" for="Details">Details</label>
+        <textarea
+          id="Details"
+          name="Details"
+          rows="4"
+          maxlength="150"
+          class="acct-rec-exp__control acct-rec-exp__textarea"
+          [ngModel]="details()"
+          (ngModelChange)="details.set($event); fieldError.set('')"
+        ></textarea>
+      </div>
+
+      <div class="acct-rec-exp__group">
+        <label class="acct-rec-exp__label" for="Cost">Cost</label>
+        <input
+          id="Cost"
+          name="Cost"
+          type="text"
+          inputmode="decimal"
+          class="acct-rec-exp__control"
+          placeholder="0.00"
+          [ngModel]="costDisplay()"
+          (ngModelChange)="onCostInput($event)"
+        />
+      </div>
+
+      <div class="acct-rec-exp__actions">
+        <button
+          type="submit"
+          class="acct-rec-exp__btn acct-rec-exp__btn--primary"
+          [disabled]="saving()"
+        >
+          @if (saving()) {
+            <mat-spinner diameter="18"></mat-spinner>
+            Saving…
+          } @else {
+            Save
+          }
+        </button>
+      </div>
+    </form>
+  }
+</section>

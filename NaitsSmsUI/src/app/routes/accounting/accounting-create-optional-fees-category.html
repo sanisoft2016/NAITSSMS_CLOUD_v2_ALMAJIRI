@@ -1,0 +1,44 @@
+<section class="acct-opt-cat">
+  <header class="acct-opt-cat__header">
+    <h1 class="acct-opt-cat__title">Create Optional Fees Category</h1>
+  </header>
+
+  @if (error()) {
+    <div class="acct-opt-cat__alert acct-opt-cat__alert--error" role="alert">{{ error() }}</div>
+  }
+  @if (warn()) {
+    <div class="acct-opt-cat__alert acct-opt-cat__alert--warn" role="status">{{ warn() }}</div>
+  }
+
+  <form class="acct-opt-cat__card" (submit)="$event.preventDefault(); save()">
+    <label class="acct-opt-cat__label" for="CategoryName">Category Name</label>
+
+    <div class="acct-opt-cat__row">
+      <div class="acct-opt-cat__field">
+        <input
+          id="CategoryName"
+          name="CategoryName"
+          type="text"
+          class="acct-opt-cat__input"
+          maxlength="50"
+          placeholder="e.g. Uniform, Excursion…"
+          [ngModel]="categoryName()"
+          (ngModelChange)="categoryName.set($event); fieldError.set(''); warn.set('')"
+          [attr.aria-invalid]="!!fieldError()"
+        />
+        @if (fieldError()) {
+          <span class="acct-opt-cat__field-error">{{ fieldError() }}</span>
+        }
+      </div>
+
+      <button type="submit" class="acct-opt-cat__btn acct-opt-cat__btn--primary" [disabled]="saving()">
+        @if (saving()) {
+          <mat-spinner diameter="18"></mat-spinner>
+          Saving…
+        } @else {
+          Save
+        }
+      </button>
+    </div>
+  </form>
+</section>

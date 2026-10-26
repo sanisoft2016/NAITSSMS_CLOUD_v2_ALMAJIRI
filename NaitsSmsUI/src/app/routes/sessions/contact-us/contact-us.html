@@ -1,0 +1,94 @@
+<div class="public-page public-page--wide public-page--contact">
+  <main class="public-page__main">
+    <header class="public-page__hero">
+      <div class="public-page__hero-mark">
+        <img src="images/naits-asms.svg" alt="" width="56" height="56" />
+      </div>
+      <p class="public-page__eyebrow">Contact Us</p>
+      <h1>NAITS-ASMS</h1>
+      <p class="public-page__tagline">Talk to the NAITS team</p>
+      <p class="public-page__lead">
+        For subscriptions, onboarding, licensing, or technical assistance, use the channels below or
+        send an enquiry. Schools on dedicated hosts—including Hills—reach the same support desk.
+      </p>
+    </header>
+
+    <div class="public-page__contact-layout">
+      <aside class="public-page__contact-aside" aria-label="Contact details">
+        <p class="public-page__section-kicker">Reach us</p>
+        <h2>Direct channels</h2>
+
+        <ul class="public-page__channels">
+          <li>
+            <span class="public-page__channel-label">Email</span>
+            <a [href]="'mailto:' + supportEmail">{{ supportEmail }}</a>
+          </li>
+          <li>
+            <span class="public-page__channel-label">Phone</span>
+            <div class="public-page__channel-stack">
+              @for (phone of phones; track phone) {
+                <a [href]="'tel:' + phone">{{ phone }}</a>
+              }
+            </div>
+          </li>
+          <li>
+            <span class="public-page__channel-label">Platform</span>
+            <a [href]="website" rel="noopener" target="_blank">ourschoolonline.ng</a>
+          </li>
+        </ul>
+
+        <div class="public-page__addresses">
+          <p class="public-page__section-kicker">Offices</p>
+          <ul class="public-page__address-list">
+            @for (office of offices; track office.city) {
+              <li>
+                <strong>{{ office.city }}</strong>
+                <span>{{ office.address }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </aside>
+
+      <section class="public-page__enquiry" aria-labelledby="enquiry-heading">
+        <p class="public-page__section-kicker">Message</p>
+        <h2 id="enquiry-heading">Send an enquiry</h2>
+        <p class="public-page__enquiry-lead">
+          Tell us about your school and how we can help. We reply to the email you provide.
+        </p>
+
+        <form class="public-page__form" [formGroup]="form" (ngSubmit)="sendMessage()">
+          <div class="public-page__form-row">
+            <label>
+              Full name
+              <input formControlName="name" autocomplete="name" required />
+            </label>
+            <label>
+              Email
+              <input formControlName="email" type="email" autocomplete="email" required />
+            </label>
+          </div>
+          <label>
+            School name
+            <input formControlName="school" autocomplete="organization" />
+          </label>
+          <label>
+            Message
+            <textarea formControlName="message" required></textarea>
+          </label>
+          <button class="public-page__button" type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Sending…' : 'Send message' }}
+          </button>
+          @if (submitted()) {
+            <p class="public-page__note public-page__note--success">
+              Your message was sent successfully. We will respond using the email you provided.
+            </p>
+          }
+          @if (submitError()) {
+            <p class="public-page__note public-page__note--error">{{ submitError() }}</p>
+          }
+        </form>
+      </section>
+    </div>
+  </main>
+</div>

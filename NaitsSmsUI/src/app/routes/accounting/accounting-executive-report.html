@@ -1,0 +1,223 @@
+<section class="acct-exec">
+  <h3 class="acct-exec__page-title">Executive Report</h3>
+
+  @if (error()) {
+    <div class="acct-exec__alert acct-exec__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="acct-exec__loading"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <!-- Legacy ExecutiveReport.cshtml filter row -->
+    <div class="acct-exec__filters row">
+      <div class="acct-exec__filter-group form-group">
+        <label class="control-label" for="ResultStatus">Result Type</label>
+        <select
+          id="ResultStatus"
+          class="form-control"
+          [ngModel]="resultType()"
+          (ngModelChange)="onResultTypeChange($event)"
+        >
+          <option [ngValue]="1">Termly</option>
+          <option [ngValue]="0">Yearly</option>
+        </select>
+      </div>
+
+      <div class="acct-exec__filter-group form-group">
+        <label class="control-label" for="Session">Session</label>
+        <select
+          id="Session"
+          class="form-control"
+          [ngModel]="sessionId()"
+          (ngModelChange)="onSessionChange($event)"
+        >
+          @for (opt of sessions(); track opt.value) {
+            <option [value]="opt.value">{{ opt.text }}</option>
+          }
+        </select>
+      </div>
+
+      @if (showTermFilter()) {
+        <div class="acct-exec__filter-group form-group" id="termDiv">
+          <label class="control-label" for="Term">Term</label>
+          @if (termsLoading()) {
+            <mat-spinner class="acct-exec__mini-spin" diameter="20"></mat-spinner>
+          } @else {
+            <select
+              id="Term"
+              class="form-control"
+              [ngModel]="termId()"
+              (ngModelChange)="onTermChange($event)"
+            >
+              @for (opt of terms(); track opt.value) {
+                <option [value]="opt.value">{{ opt.text }}</option>
+              }
+            </select>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="acct-exec__content" id="pageContent">
+      @if (reportLoading()) {
+        <div class="acct-exec__loading acct-exec__loading--inline">
+          <mat-spinner diameter="32"></mat-spinner>
+        </div>
+      } @else if (report(); as data) {
+        @if (orderedRows().length === 0) {
+          <p class="lead acct-exec__empty">Other things needs to be before here.</p>
+        } @else {
+          <div class="acct-exec__report">
+            <p class="lead acct-exec__report-title">{{ reportTitle() }}</p>
+
+            <div class="acct-exec__table-scroll">
+              <table class="table table-bordered table-striped acct-exec__table">
+                <thead>
+                  <tr>
+                    <th>Class Category</th>
+                    <th>Status</th>
+                    <th>Fees</th>
+                    <th>Cleared</th>
+                    <th>Discount</th>
+                    <th>Total Paid</th>
+                    <th>Partly Cleared</th>
+                    <th>Total Paid</th>
+                    <th>Outstanding</th>
+                    <th>Un Cleared</th>
+                    <th>Outstanding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of orderedRows(); track $index) {
+                    <tr>
+                      <td>{{ classCategoryLabel(item.classCategory) }}</td>
+                      <td>{{ rowStatusLabel(item.rowStatus) }}</td>
+                      <td>{{ formatPlain(item.fees) }}</td>
+                      <td>
+                        @if (item.clearedStuds > 0) {
+                          <a
+                            href="javascript:void(0)"
+                            class="btn btn-default btn-xs"
+                            (click)="openDetail(item.clearedStudsDetails, 'List of Cleared Students')"
+                          >{{ item.clearedStuds }}</a>
+                        } @else {
+                          {{ item.clearedStuds }}
+                        }
+                      </td>
+                      <td>{{ formatPlain(item.discount) }}</td>
+                      <td>{{ formatPlain(item.takeHome1) }}</td>
+                      <td>
+                        @if (item.partlyClearedStuds > 0) {
+                          <a
+                            href="javascript:void(0)"
+                            class="btn btn-default btn-xs"
+                            (click)="openDetail(item.partlyClearedStudsDetails, 'Fees Part-payment Students')"
+                          >{{ item.partlyClearedStuds }}</a>
+                        } @else {
+                          {{ item.partlyClearedStuds }}
+                        }
+                      </td>
+                      <td>{{ formatPlain(item.takeHome2) }}</td>
+                      <td>{{ formatPlain(item.outstanding1) }}</td>
+                      <td>
+                        @if (item.unClearStuds > 0) {
+                          <a
+                            href="javascript:void(0)"
+                            class="btn btn-default btn-xs"
+                            (click)="openDetail(item.unClearStudsDetails, 'Fees Payments Defaulted Students')"
+                          >{{ item.unClearStuds }}</a>
+                        } @else {
+                          {{ item.unClearStuds }}
+                        }
+                      </td>
+                      <td>{{ formatPlain(item.outstanding2) }}</td>
+                    </tr>
+                  }
+                  <!-- Legacy TermlyReport.cshtml sum row: raw Sum() values -->
+                  <tr>
+                    <td colspan="3"></td>
+                    <td>{{ totals().clearedStuds }}</td>
+                    <td>{{ formatPlain(totals().discount) }}</td>
+                    <td>{{ formatPlain(totals().takeHome1) }}</td>
+                    <td>{{ totals().partlyClearedStuds }}</td>
+                    <td>{{ formatPlain(totals().takeHome2) }}</td>
+                    <td>{{ formatPlain(totals().outstanding1) }}</td>
+                    <td>{{ totals().unClearStuds }}</td>
+                    <td>{{ formatPlain(totals().outstanding2) }}</td>
+                  </tr>
+                  <!-- Legacy TermlyReport.cshtml summary rows (exact highlight colors) -->
+                  <tr class="lead">
+                    <th colspan="4" style="text-align: right">
+                      Total Payment:<span style="background-color: yellow">{{ formatNaira(totals().totalPayment) }}</span>
+                    </th>
+                    <th colspan="3" style="text-align: right">
+                      Total Discount:<span style="background-color: greenyellow">{{ formatNaira(totals().totalDiscount) }}</span>
+                    </th>
+                    <th colspan="4" style="text-align: right">
+                      Total Outstanding Payment:<span style="color: red">{{ formatNaira(totals().totalOutstanding) }}</span>
+                    </th>
+                  </tr>
+                  <tr class="lead">
+                    <th colspan="5" style="text-align: right" class="text-success">
+                      Cash Payment Total: {{ formatNaira(paymentTypeTotals().cash) }}
+                    </th>
+                    <th colspan="3" style="text-align: right" class="text-primary">
+                      Teller Payment Total: {{ formatNaira(paymentTypeTotals().teller) }}
+                    </th>
+                    <th colspan="3" style="text-align: right" class="text-warning">
+                      Transfer Payment Total: {{ formatNaira(paymentTypeTotals().transfer) }}
+                    </th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  @if (showDetailModal() && detail(); as d) {
+    <div class="acct-exec__overlay" role="dialog" aria-modal="true">
+      <div class="acct-exec__modal">
+        <div id="exec-report-detail-print" class="acct-exec__detail-print">
+          <table class="table table-bordered table-striped acct-exec__detail-table">
+            <thead>
+              <tr>
+                <th colspan="5" class="text-center text-danger">
+                  {{ d.headLabel }}, Actual Fees: {{ d.actualFeeLabel }}
+                </th>
+              </tr>
+              <tr>
+                <th>S/No</th>
+                <th>Admission No</th>
+                <th>Full Name</th>
+                <th>Class/Arm</th>
+                <th>{{ d.paymentHeading }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of d.rows; track row.admisnNo + $index) {
+                <tr>
+                  <td class="text-left">{{ $index + 1 }}</td>
+                  <td class="text-left">{{ row.admisnNo }}</td>
+                  <td class="text-left">{{ row.fullName }}</td>
+                  <td class="text-left">{{ row.classLabel }}</td>
+                  <td class="text-left" [innerHTML]="row.paymentHtml"></td>
+                </tr>
+              }
+              <tr>
+                <th colspan="4" class="text-right">Total:</th>
+                <th [innerHTML]="d.totalHtml"></th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="acct-exec__modal-actions">
+          <button type="button" class="btn btn-success btn-xs" (click)="printDetail()">Print</button>
+          <button type="button" class="btn btn-warning btn-xs" (click)="closeDetailModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

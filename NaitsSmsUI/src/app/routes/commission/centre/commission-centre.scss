@@ -1,0 +1,115 @@
+.legend {
+  display: flex;
+  gap: 16px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend__swatch {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.legend__swatch--learners {
+  background: #138a62;
+}
+
+.legend__swatch--facilitators {
+  background: #2a5c86;
+}
+
+.spark {
+  display: block;
+  width: 100%;
+  height: 140px;
+  overflow: visible;
+}
+
+.spark__guide {
+  stroke: #e7eaf0;
+  stroke-dasharray: 4 4;
+  stroke-width: 1;
+}
+
+.spark__line {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.spark__line--learners {
+  stroke: #138a62;
+}
+
+.spark__line--facilitators {
+  stroke: #2a5c86;
+  stroke-dasharray: 6 4;
+}
+
+.spark__axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: #8b93a7;
+  font-size: 12px;
+}
+
+.roll-filter {
+  min-width: 240px;
+  padding: 9px 12px;
+  border: 1px solid #d5dde8;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.register-lines {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.cx-table td .flag {
+  margin-top: 4px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  ::ng-deep app-header,
+  ::ng-deep app-sidebar,
+  ::ng-deep app-sidebar-notice,
+  ::ng-deep app-topmenu,
+  ::ng-deep app-customizer,
+  ::ng-deep mat-sidenav {
+    display: none !important;
+  }
+
+  ::ng-deep mat-sidenav-content.mat-sidenav-content,
+  ::ng-deep .mat-drawer-content,
+  ::ng-deep .matero-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  // Matero offsets the content by --sidenav-width with a more specific !important rule.
+  ::ng-deep .matero-content-width-fix {
+    --sidenav-width: 0px !important;
+  }
+
+  ::ng-deep body,
+  ::ng-deep .matero-container,
+  ::ng-deep .matero-page-content {
+    background: #fff !important;
+  }
+}

@@ -1,0 +1,85 @@
+<section class="student-portal-results">
+  @if (!accountChecked()) {
+    <div class="ajax-loader" aria-live="polite" aria-busy="true">
+      <div class="ajax-loader__spinner"></div>
+    </div>
+  } @else if (accountDisabled()) {
+    <p class="account-disabled-notice" role="alert">{{ accountDisabledMessage }}</p>
+  } @else {
+  @if (isLoading()) {
+    <div class="ajax-loader" aria-live="polite" aria-busy="true">
+      <div class="ajax-loader__spinner"></div>
+    </div>
+  }
+
+  <div class="page-header">
+    <div class="page-title">Student Result Checking Environment</div>
+    <div class="print-col" [class.hide-content]="!showPrintButton()">
+      <button
+        type="button"
+        class="btn btn-primary print-result"
+        [disabled]="isLoading() || reportSheets().length === 0"
+        (click)="printReport()">
+        Print
+      </button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="inline-field">
+      <label class="control-label" for="ResultStatus">Result Type</label>
+      <select
+        id="ResultStatus"
+        class="form-control"
+        name="ResultStatus"
+        [(ngModel)]="resultCategory"
+        (ngModelChange)="onResultCategoryChange()">
+        <option value="1">Termly</option>
+        <option value="0">Yearly</option>
+      </select>
+    </div>
+
+    <div class="inline-field">
+      <label class="control-label" for="Session">Session</label>
+      <select
+        id="Session"
+        class="form-control"
+        name="Session"
+        [(ngModel)]="sessionId"
+        [compareWith]="compareOptionValues"
+        (ngModelChange)="onSessionChange()">
+        @for (option of sessions(); track option.value) {
+          <option [ngValue]="option.value">{{ option.text }}</option>
+        }
+      </select>
+    </div>
+
+    @if (showTermField) {
+      <div id="termDiv" class="inline-field">
+        <label class="control-label" for="Term">Term</label>
+        <select
+          id="Term"
+          class="form-control"
+          name="Term"
+          [(ngModel)]="termStatus"
+          [compareWith]="compareOptionValues"
+          (ngModelChange)="onTermChange()">
+          @for (option of terms(); track option.value) {
+            <option [ngValue]="option.value">{{ option.text }}</option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+
+  <div id="pageContent" class="page-content">
+    @if (reportMessage()) {
+      <p class="report-message">{{ reportMessage() }}</p>
+    }
+
+    @for (sheet of reportSheets(); track sheet.studentId + sheet.reportTitle) {
+      <app-student-result-sheet [sheet]="sheet" />
+    }
+  </div>
+  }
+</section>

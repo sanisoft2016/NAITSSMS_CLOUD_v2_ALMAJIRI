@@ -1,0 +1,22 @@
+-- Repairs SchoolInfos.SchoolRegistrationOfficerId when legacy imports kept officer.Id
+-- in the school row but SchoolRegistrationOfficer.UserId holds the ASP.NET login id.
+--
+-- Run against NaitsSMSApr2026 after confirming the join returns the expected rows:
+--   SELECT s."SchoolRegistrationOfficerId", o."UserId", s."SchoolName"
+--   FROM "SchoolInfos" s
+--   JOIN "SchoolRegistrationOfficer" o ON o."UserId" IS NOT NULL
+--   WHERE s."SchoolRegistrationOfficerId" <> o."UserId";
+
+-- Example one-off fix when you know the login user id and the legacy school scope id:
+-- UPDATE "SchoolInfos"
+-- SET "SchoolRegistrationOfficerId" = '<aspnet-user-id>'
+-- WHERE "SchoolRegistrationOfficerId" = '<legacy-officer-id>';
+
+-- Safer pattern when each school should point at its registration officer login id:
+-- UPDATE "SchoolInfos" s
+-- SET "SchoolRegistrationOfficerId" = o."UserId"
+-- FROM "SchoolRegistrationOfficer" o
+-- WHERE s."SchoolRegistrationOfficerId" = o."UserId"
+--    OR s."SchoolRegistrationOfficerId" IN (
+--         SELECT legacy_id FROM legacy_officer_id_map WHERE aspnet_user_id = o."UserId"
+--       );

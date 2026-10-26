@@ -1,0 +1,90 @@
+<div class="subject-page-shell">
+  <div class="subject-page-header">
+    <div class="header-actions pulled-right">
+      <button type="button" class="secondary-button" (click)="backToIndex()">Back to subject home</button>
+      <button type="button" class="primary-button" (click)="createSubject()">Add subject</button>
+    </div>
+  </div>
+
+  <div class="summary-ribbon">
+    <div class="summary-card">
+      <span>Total Registered Subjects</span>
+      <strong>{{ totalNoOfSubjects() }}</strong>
+    </div>
+    <div class="summary-card muted">
+      <span>Selected Level Label</span>
+      <strong>{{ subjectLevelStatus() }}</strong>
+    </div>
+  </div>
+
+  <div class="legacy-table-card">
+    <table class="legacy-table" *ngIf="subjects().length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Subject Name</th>
+          <th>Current Status</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let subject of subjects(); let index = index; trackBy: trackBySubject">
+          <td>{{ index + 1 }}</td>
+          <td>{{ subject.subjectName || '-' }}</td>
+          <td>
+            <span class="status-pill" [class.previous]="getTimeStatusLabel(subject) === 'Previous'">
+              {{ getTimeStatusLabel(subject) }}
+            </span>
+          </td>
+          <td class="actions-col">
+            <button type="button" class="table-link" (click)="openEditModal(subject)">Edit</button>
+            <button type="button" class="table-link danger" (click)="deleteSubject(subject)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="empty-state" *ngIf="!isLoading(); else loadingState">
+        <h3>No subject has been registered yet</h3>
+        <p>Use the add subject action to create the first subject under this category.</p>
+        <button type="button" class="primary-button" (click)="createSubject()">Create subject</button>
+      </div>
+      <ng-template #loadingState>
+        <div class="empty-state">
+          <h3>Loading subjects…</h3>
+          <p>Fetching the registered subject list for this level.</p>
+        </div>
+      </ng-template>
+    </ng-template>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="isEditModalOpen">
+    <div class="legacy-modal">
+      <div class="modal-head">
+        <h3>Edit Subject</h3>
+        <button type="button" class="close-button" (click)="closeEditModal()">x</button>
+      </div>
+
+      <label class="field-block">
+        <span>Subject name</span>
+        <input type="text" [(ngModel)]="editForm.subjectName" maxlength="35" />
+      </label>
+
+      <label class="field-block">
+        <span>Time status</span>
+        <select [(ngModel)]="editForm.timeStatus">
+          <option [ngValue]="TimeStatusCode.Current">Current</option>
+          <option [ngValue]="TimeStatusCode.Previous">Previous</option>
+        </select>
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-button" (click)="closeEditModal()">Close</button>
+        <button type="button" class="primary-button" [disabled]="isSubmitting()" (click)="updateSubject()">
+          {{ isSubmitting() ? 'Updating...' : 'Update subject' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

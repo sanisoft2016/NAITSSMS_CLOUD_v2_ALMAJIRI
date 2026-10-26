@@ -1,0 +1,92 @@
+<mat-card class="assignment-page" appearance="outlined">
+  <div class="toolbar">
+    <button mat-stroked-button color="primary" type="button" (click)="goBack()">Go Back</button>
+  </div>
+
+  <p class="page-title">
+    Teachers / Class-Arm Assignment
+    <span class="title-action">
+      <button mat-raised-button color="accent" type="button" (click)="openTransferAssignment()">
+        Transfer Assignment
+      </button>
+    </span>
+  </p>
+
+  <div class="selector-grid two-columns">
+    <div class="field-block">
+      <label class="field-label" for="class-arm-assignment-teachers">Teachers</label>
+
+      @if (isTeacherLocked) {
+        <input id="class-arm-assignment-teachers" class="field-input" type="text" [value]="selectedTeacherName || selectedTeacherId" readonly />
+      } @else {
+        <select
+          id="class-arm-assignment-teachers"
+          class="field-input"
+          [value]="selectedTeacherId"
+          (change)="onTeacherChange($any($event.target).value)"
+        >
+          <option value="">Select teacher</option>
+          @for (teacher of teacherOptions; track teacher.value) {
+            <option [value]="teacher.value">{{ teacher.text }}</option>
+          }
+        </select>
+      }
+    </div>
+
+    <div class="field-block">
+      <label class="field-label" for="class-arm-assignment-classes">Classes</label>
+      <select
+        id="class-arm-assignment-classes"
+        class="field-input"
+        [value]="selectedClassId"
+        (change)="onClassChange($any($event.target).value)"
+      >
+        <option value="">Select class</option>
+        @for (classOption of classOptions; track classOption.value) {
+          <option [value]="classOption.value">{{ classOption.text }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <section class="content-shell">
+    @if (isLoading()) {
+      <div class="loading-state">Loading...</div>
+    } @else if (errorMessage()) {
+      <div class="error-state">{{ errorMessage() }}</div>
+    } @else if (contentMode === 'arms') {
+      @if (armResult.arms.length > 0) {
+        <div class="table-wrap">
+          <table class="legacy-table">
+            <thead>
+              <tr>
+                <th>S/No</th>
+                <th>Arm Name</th>
+                <th>Assignment</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (arm of armResult.arms; track arm.id; let index = $index) {
+                <tr>
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ classLabel(arm.classs?.classLabel) }} <span class="arm-gap">{{ armLabel(arm.armName) }}</span></td>
+                  <td>
+                    <button mat-stroked-button color="primary" type="button" [disabled]="isAssigning" (click)="assignArm(arm.id)">
+                      Assign
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="empty-state">{{ armResult.message || 'Either No Arm in this Class or all the Arm has been assigned.' }}</p>
+      }
+    } @else {
+      <div class="blank-state"></div>
+    }
+  </section>
+</mat-card>

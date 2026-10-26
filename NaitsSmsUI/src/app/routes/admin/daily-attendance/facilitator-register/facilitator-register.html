@@ -1,0 +1,135 @@
+<div class="attendance-shell">
+  <div class="header-card">
+    <div>
+      <p class="page-breadcrumb">Daily attendance</p>
+      <h2>Facilitator register</h2>
+      <p>
+        Confirm which facilitators reported for duty today. This is the record that answers questions
+        about unverified or absent teaching staff.
+      </p>
+    </div>
+    <button type="button" class="secondary-button" (click)="goToSummary()">Attendance summary</button>
+  </div>
+
+  <div class="filter-card">
+    <div class="filter-grid period-filter-grid">
+      <mat-form-field appearance="outline" class="period-field date-field" subscriptSizing="dynamic">
+        <mat-label>Register date</mat-label>
+        <input
+          matInput
+          [matDatepicker]="datePicker"
+          [max]="maxDate"
+          [ngModel]="selectedDateValue"
+          (ngModelChange)="onDateChange($event)"
+          name="attendanceDate"
+          placeholder="Choose date" />
+        <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+        <mat-datepicker #datePicker panelClass="attendance-range-panel"></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    @if (registerAlreadyTaken) {
+      <p class="warning-copy">
+        This register was already taken for
+        {{ selectedDateValue ? (selectedDateValue | date: 'dd MMM yyyy') : selectedDate }}. Saving again will
+        overwrite the marks.
+      </p>
+    } @else if (rosterLoaded && entries.length) {
+      <p class="helper-copy">
+        Register not yet taken for
+        {{ selectedDateValue ? (selectedDateValue | date: 'dd MMM yyyy') : selectedDate }}. Everyone defaults to
+        present.
+      </p>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="result-card">
+      <p>Loading register...</p>
+    </div>
+  } @else if (entries.length) {
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <h3>
+            Facilitators &mdash;
+            {{ selectedDateValue ? (selectedDateValue | date: 'dd MMM yyyy') : selectedDate }}
+          </h3>
+          <p>{{ entries.length }} facilitator(s) on this register.</p>
+        </div>
+        <button type="button" class="secondary-button" (click)="markAllPresent()">Mark all present</button>
+      </div>
+
+      <div class="tally-strip">
+        <span class="tally-chip present"><strong>{{ presentCount }}</strong> present</span>
+        <span class="tally-chip absent"><strong>{{ absentCount }}</strong> absent</span>
+        <span class="tally-chip late"><strong>{{ lateCount }}</strong> late</span>
+        <span class="tally-chip excused"><strong>{{ excusedCount }}</strong> excused</span>
+      </div>
+
+      <table class="legacy-table">
+        <thead>
+          <tr>
+            <th class="row-index">#</th>
+            <th>Facilitator</th>
+            <th>Staff no</th>
+            <th class="status-col">Status</th>
+            <th>Remark</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of entries; track entry.personId; let i = $index) {
+            <tr>
+              <td class="row-index">{{ i + 1 }}</td>
+              <td>{{ entry.fullName }}</td>
+              <td>{{ entry.identificationNo }}</td>
+              <td class="status-col">
+                <div class="status-toggle">
+                  @for (option of statusOptions; track option.value) {
+                    <button
+                      type="button"
+                      [class]="option.cssClass"
+                      [class.active]="entry.status === option.value"
+                      (click)="setStatus(entry, option.value)">
+                      {{ option.label }}
+                    </button>
+                  }
+                </div>
+              </td>
+              <td>
+                <input
+                  class="remark-input"
+                  type="text"
+                  maxlength="150"
+                  placeholder="Optional reason"
+                  [(ngModel)]="entry.remark"
+                  [name]="'remark-' + entry.personId" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="action-row">
+        <button type="button" class="secondary-button" (click)="printRegister()">Print</button>
+        <button type="button" class="primary-button" [disabled]="isSubmitting()" (click)="saveRegister()">
+          {{ isSubmitting() ? 'Saving...' : 'Save register' }}
+        </button>
+      </div>
+    </div>
+  } @else if (rosterLoaded) {
+    <div class="result-card empty-state">
+      <h3>No facilitators found</h3>
+      <p>Register facilitators for this centre before taking a staff register.</p>
+    </div>
+  } @else {
+    <div class="result-card empty-state">
+      <h3>Loading</h3>
+      <p>Select a date to load the facilitator register.</p>
+    </div>
+  }
+</div>

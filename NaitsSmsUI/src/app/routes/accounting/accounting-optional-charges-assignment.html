@@ -1,0 +1,199 @@
+<section class="acct-opt-assign">
+  <header class="acct-opt-assign__header">
+    <h1 class="acct-opt-assign__title">Student Optional Charges Assignment Index</h1>
+    <button
+      type="button"
+      class="acct-opt-assign__link-btn"
+      (click)="viewCategoryItems()"
+      [disabled]="!categoryId() || categoryId() === '-1'"
+    >
+      View selected category list of optional Charges items
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="acct-opt-assign__alert acct-opt-assign__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="acct-opt-assign__loading">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  } @else {
+    <div class="acct-opt-assign__filters">
+      <div class="acct-opt-assign__filter acct-opt-assign__filter--category">
+        <label class="acct-opt-assign__label" for="ItemCategoryId">Category Name</label>
+        <select
+          id="ItemCategoryId"
+          class="acct-opt-assign__control"
+          [ngModel]="categoryId()"
+          (ngModelChange)="onCategoryChange($event)"
+        >
+          @for (cat of categories(); track cat.value) {
+            <option [value]="cat.value">{{ cat.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="acct-opt-assign__filter acct-opt-assign__filter--class">
+        <label class="acct-opt-assign__label" for="ClassLabelDropdown">Classes</label>
+        <select
+          id="ClassLabelDropdown"
+          class="acct-opt-assign__control"
+          [ngModel]="classId()"
+          (ngModelChange)="onClassChange($event)"
+        >
+          @for (cls of classes(); track cls.value) {
+            <option [value]="cls.value">{{ cls.text }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="acct-opt-assign__filter acct-opt-assign__filter--arm" id="armDiv">
+        <label class="acct-opt-assign__label" for="arms">Arms</label>
+        @if (loadingArms()) {
+          <mat-spinner diameter="22"></mat-spinner>
+        } @else {
+          <select
+            id="arms"
+            class="acct-opt-assign__control"
+            [ngModel]="armId()"
+            (ngModelChange)="onArmChange($event)"
+          >
+            @for (arm of arms(); track arm.value) {
+              <option [value]="arm.value">{{ arm.text }}</option>
+            }
+          </select>
+        }
+      </div>
+    </div>
+
+    <div class="acct-opt-assign__panel" id="pageContent">
+      @if (loadingStudents()) {
+        <div class="acct-opt-assign__loading">
+          <mat-spinner diameter="36"></mat-spinner>
+        </div>
+      } @else if (students().length === 0) {
+        @if (studentMessage()) {
+          <p class="acct-opt-assign__empty">{{ studentMessage() }}</p>
+        }
+      } @else {
+        <div class="acct-opt-assign__toolbar">
+          <div class="acct-opt-assign__student-cat">
+            <span>Student Category:</span>
+            <select
+              id="categories"
+              class="acct-opt-assign__control"
+              [ngModel]="catStatus()"
+              (ngModelChange)="onStudentCategoryChange($event)"
+            >
+              <option [ngValue]="1">All Students</option>
+              <option [ngValue]="2">Art Students</option>
+              <option [ngValue]="3">Science Students</option>
+              <option [ngValue]="4">Commercial Students</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="acct-opt-assign__table-wrap" id="studentList">
+          <table class="acct-opt-assign__table">
+            <thead>
+              <tr>
+                <th>S/No</th>
+                <th>Full Name</th>
+                <th>Admission No.</th>
+                <th>
+                  Selections
+                  <input
+                    type="checkbox"
+                    id="selectAll"
+                    [checked]="selectAll()"
+                    (change)="toggleSelectAll(($any($event.target)).checked)"
+                  />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of students(); track item.id; let sno = $index) {
+                <tr>
+                  <td>{{ sno + 1 }}</td>
+                  <td>{{ item.fullName }}</td>
+                  <td>{{ item.idNo }}</td>
+                  <td>
+                    <input
+                      type="checkbox"
+                      class="selections"
+                      [checked]="isSelected(item.id)"
+                      (change)="toggleStudent(item.id, ($any($event.target)).checked)"
+                    />
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="acct-opt-assign__submit-wrap">
+            <button
+              type="button"
+              class="acct-opt-assign__submit"
+              id="SubmitSelectionsId"
+              [disabled]="submitting()"
+              (click)="submitSelections()"
+            >
+              @if (submitting()) {
+                Please Wait …
+              } @else {
+                Submit Selections
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (showItemsModal()) {
+    <div class="acct-opt-assign__overlay" role="dialog" aria-modal="true" (click)="closeItemsModal()">
+      <div class="acct-opt-assign__modal" (click)="$event.stopPropagation()">
+        <div class="acct-opt-assign__modal-head">
+          <h2 class="acct-opt-assign__modal-title">Optional fee items</h2>
+          <button type="button" class="acct-opt-assign__modal-close" (click)="closeItemsModal()" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <div class="acct-opt-assign__modal-body">
+          @if (itemsLoading()) {
+            <div class="acct-opt-assign__loading">
+              <mat-spinner diameter="32"></mat-spinner>
+            </div>
+          } @else if (categoryItems().length === 0) {
+            <p class="acct-opt-assign__empty acct-opt-assign__empty--danger">
+              Sorry! No optional fee item under your selected category.
+            </p>
+          } @else {
+            <table class="acct-opt-assign__table">
+              <thead>
+                <tr>
+                  <th>Created Date</th>
+                  <th>Category Name</th>
+                  <th>Item Name</th>
+                  <th>Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of categoryItems(); track item.id) {
+                  <tr>
+                    <td>{{ formatCreatedDate(item.createdDate) }}</td>
+                    <td>{{ item.categoryName }}</td>
+                    <td>{{ item.itemName }}</td>
+                    <td>{{ item.cost }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</section>

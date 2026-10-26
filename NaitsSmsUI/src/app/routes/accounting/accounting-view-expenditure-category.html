@@ -1,0 +1,337 @@
+<section class="acct-exp-list">
+  <header class="acct-exp-list__toolbar">
+    <button type="button" class="acct-exp-list__btn acct-exp-list__btn--primary" (click)="refreshPage()">
+      Refresh page
+    </button>
+    <button type="button" class="acct-exp-list__btn acct-exp-list__btn--success" (click)="loadReportAnalysis()">
+      Expenditure Category Report Analysis
+    </button>
+  </header>
+
+  <form class="acct-exp-list__filters" (submit)="$event.preventDefault()">
+    <div class="acct-exp-list__filter">
+      <label class="acct-exp-list__filter-label" for="Year">Year</label>
+      <select
+        id="Year"
+        name="Year"
+        class="acct-exp-list__select"
+        [ngModel]="year()"
+        (ngModelChange)="year.set($event); onYearChange()"
+      >
+        @for (opt of years(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="acct-exp-list__filter">
+      <label class="acct-exp-list__filter-label" for="startMonth">Start Month</label>
+      <select
+        id="startMonth"
+        name="startMonth"
+        class="acct-exp-list__select"
+        [ngModel]="startMonth()"
+        (ngModelChange)="startMonth.set($event); onPeriodFilterChange()"
+      >
+        @for (opt of months(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="acct-exp-list__filter">
+      <label class="acct-exp-list__filter-label" for="endMonth">End Month</label>
+      <select
+        id="endMonth"
+        name="endMonth"
+        class="acct-exp-list__select"
+        [ngModel]="endMonth()"
+        (ngModelChange)="endMonth.set($event); onPeriodFilterChange()"
+      >
+        @for (opt of months(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+    </div>
+
+    @if (showCategoryFilter()) {
+      <div class="acct-exp-list__filter acct-exp-list__filter--wide" id="category1st">
+        <label class="acct-exp-list__filter-label" for="ItemCategoryId">Expenses Category</label>
+        <select
+          id="ItemCategoryId"
+          name="ItemCategoryId"
+          class="acct-exp-list__select"
+          [ngModel]="itemCategoryId()"
+          (ngModelChange)="itemCategoryId.set($event); onPeriodFilterChange()"
+        >
+          @for (opt of categoryOptions(); track opt.value) {
+            <option [value]="opt.value">{{ opt.text }}</option>
+          }
+        </select>
+      </div>
+    }
+  </form>
+
+  @if (flashSuccess()) {
+    <div class="acct-exp-list__alert acct-exp-list__alert--success" role="status">
+      {{ flashSuccess() }}
+    </div>
+  }
+  @if (error()) {
+    <div class="acct-exp-list__alert acct-exp-list__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="acct-exp-list__panel" id="pageContent">
+    @if (loading() || reportLoading()) {
+      <div class="acct-exp-list__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (mode() === 'analysis') {
+      <div class="acct-exp-list__analysis">
+        <div class="acct-exp-list__analysis-filters">
+          <div class="acct-exp-list__filter">
+            <label class="acct-exp-list__filter-label" for="Category">Category</label>
+            <select
+              id="Category"
+              class="acct-exp-list__select"
+              [ngModel]="analysisCategoryMode()"
+              (ngModelChange)="analysisCategoryMode.set($event); onAnalysisCategoryModeChange()"
+            >
+              <option value="0">All Category</option>
+              <option value="1">Selected Category</option>
+            </select>
+          </div>
+
+          <div class="acct-exp-list__filter">
+            <label class="acct-exp-list__filter-label" for="sortType">Sort Type</label>
+            <select
+              id="sortType"
+              class="acct-exp-list__select"
+              [ngModel]="sortType()"
+              (ngModelChange)="sortType.set($event); getAnalysisResult()"
+            >
+              <option value="0">Hihgest</option>
+              <option value="1">Lowest</option>
+            </select>
+          </div>
+
+          <div class="acct-exp-list__filter">
+            <label class="acct-exp-list__filter-label" for="NoToPick">No. To Show</label>
+            <input
+              id="NoToPick"
+              type="number"
+              class="acct-exp-list__input"
+              [ngModel]="numberToPick()"
+              (ngModelChange)="numberToPick.set($event)"
+            />
+          </div>
+
+          @if (analysisCategoryMode() === '1') {
+            <div class="acct-exp-list__filter acct-exp-list__filter--wide" id="category2nd">
+              <label class="acct-exp-list__filter-label" for="CategoryId">Expenditure Category</label>
+              <select
+                id="CategoryId"
+                class="acct-exp-list__select"
+                [ngModel]="analysisCategoryId()"
+                (ngModelChange)="analysisCategoryId.set($event); getAnalysisResult()"
+              >
+                @for (opt of categoryOptions(); track opt.value) {
+                  <option [value]="opt.value">{{ opt.text }}</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div class="acct-exp-list__filter">
+              <button
+                type="button"
+                class="acct-exp-list__btn acct-exp-list__btn--primary"
+                (click)="getAnalysisResult(true)"
+              >
+                Get Result
+              </button>
+            </div>
+          }
+        </div>
+
+        <div id="pageContent2nd" class="acct-exp-list__analysis-result">
+          @if (analysisItems().length > 0) {
+            <p class="acct-exp-list__lead">{{ analysisHeading() }}</p>
+            <div class="acct-exp-list__table-wrap">
+              <table class="acct-exp-list__table">
+                <thead>
+                  <tr>
+                    <th>Created Date</th>
+                    <th>Week</th>
+                    <th>Category Name</th>
+                    <th>Cost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of analysisItems(); track item.id) {
+                    <tr>
+                      <td>{{ formatCapturedDate(item.capturedDate) }}</td>
+                      <td>{{ item.weekOfMonth }}</td>
+                      <td>{{ item.categoryName }}</td>
+                      <td>{{ formatCost(item.cost) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          } @else if (numberToPick()) {
+            <p class="acct-exp-list__empty-title acct-exp-list__empty-title--danger">
+              Sorry! No record to display.
+            </p>
+          }
+        </div>
+      </div>
+    } @else if (mode() === 'period') {
+      @if (periodItems().length === 0) {
+        <p class="acct-exp-list__lead">Sorry! No expenditure within the selected range.</p>
+      } @else {
+        <p class="acct-exp-list__lead">
+          <span class="acct-exp-list__accent">{{ periodCategoryName() }}</span>
+          Expenditure within the selected period is:
+          <span class="acct-exp-list__danger">{{ formatCost(periodTotal()) }}</span>
+        </p>
+
+        @for (monthGroup of periodGroups(); track monthGroup.year + '-' + monthGroup.month) {
+          <div class="acct-exp-list__period-block">
+            <h3 class="acct-exp-list__period-month">
+              <span class="acct-exp-list__danger"
+                >{{ monthGroup.monthLabel }} {{ monthGroup.year }}</span
+              >, overall total expenses =
+              <span class="acct-exp-list__danger">{{ formatCost(monthGroup.total) }}</span>
+            </h3>
+
+            @for (week of monthGroup.weeks; track week.weekId) {
+              <div class="acct-exp-list__period-week">
+                <p class="acct-exp-list__period-week-title">
+                  <span class="acct-exp-list__danger">{{ week.weekLabel }}</span>, overall total
+                  expenses =
+                  <span class="acct-exp-list__danger">{{ formatCost(week.total) }}</span>
+                </p>
+                <div class="acct-exp-list__table-wrap">
+                  <table class="acct-exp-list__table acct-exp-list__table--nested">
+                    <thead>
+                      <tr>
+                        <th>S/N</th>
+                        <th>Date</th>
+                        <th>Categories</th>
+                        <th>Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of week.items; track item.id; let i = $index) {
+                        <tr>
+                          <td>{{ i + 1 }}</td>
+                          <td>{{ formatDayMonth(item.capturedDate) }}</td>
+                          <td>{{ item.categoryName }}</td>
+                          <td>{{ formatCost(item.cost) }}</td>
+                        </tr>
+                      }
+                      <tr class="acct-exp-list__footer-row">
+                        <td colspan="3" class="acct-exp-list__total-label">Total Cost:</td>
+                        <td>
+                          <span class="acct-exp-list__danger">{{ formatCost(week.total) }}</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    } @else if (categories().length === 0) {
+      <div class="acct-exp-list__empty">
+        <div class="acct-exp-list__empty-icon" aria-hidden="true">∅</div>
+        <p class="acct-exp-list__empty-title">No category yet.</p>
+        <p class="acct-exp-list__empty-text">
+          Create an Expenditure Category first, then record expenditure against it.
+        </p>
+      </div>
+    } @else {
+      <h1 class="acct-exp-list__heading">Expenditure Category List</h1>
+      <div class="acct-exp-list__table-wrap">
+        <table class="acct-exp-list__table">
+          <thead>
+            <tr>
+              <th>Category Name</th>
+              <th class="acct-exp-list__actions-head">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of categories(); track item.id) {
+              <tr>
+                <td>{{ item.categoryName }}</td>
+                <td class="acct-exp-list__actions-cell">
+                  <div class="acct-exp-list__actions">
+                    <button
+                      type="button"
+                      class="acct-exp-list__btn acct-exp-list__btn--edit"
+                      (click)="openEdit(item)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="acct-exp-list__btn acct-exp-list__btn--delete"
+                      (click)="deleteCategory(item)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (showEditModal()) {
+    <div class="acct-exp-list__overlay" role="dialog" aria-modal="true" (click)="closeEditModal()">
+      <div class="acct-exp-list__modal" (click)="$event.stopPropagation()">
+        <div class="acct-exp-list__modal-head">
+          <h2 class="acct-exp-list__modal-title">Edit Category value</h2>
+        </div>
+
+        <div class="acct-exp-list__edit-form">
+          <div class="acct-exp-list__edit-group">
+            <label class="acct-exp-list__edit-label" for="CategoryName">Edit Category</label>
+            <input
+              id="CategoryName"
+              name="CategoryName"
+              type="text"
+              class="acct-exp-list__input"
+              maxlength="50"
+              [ngModel]="editCategoryName()"
+              (ngModelChange)="editCategoryName.set($event)"
+            />
+          </div>
+
+          <div class="acct-exp-list__edit-actions">
+            <button
+              type="button"
+              class="acct-exp-list__btn acct-exp-list__btn--edit"
+              [disabled]="saving()"
+              (click)="saveCategoryChanges()"
+            >
+              Save changes
+            </button>
+            <button
+              type="button"
+              class="acct-exp-list__btn acct-exp-list__btn--delete"
+              (click)="closeEditModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>

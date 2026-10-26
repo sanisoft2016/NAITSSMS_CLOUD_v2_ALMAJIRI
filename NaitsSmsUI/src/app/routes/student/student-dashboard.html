@@ -1,0 +1,48 @@
+<div class="student-dashboard">
+  @if (loading) {
+    <div class="student-dashboard__loader" aria-live="polite">Loading dashboard…</div>
+  } @else if (errorMessage) {
+    <p class="student-dashboard__error">{{ errorMessage }}</p>
+  } @else if (school) {
+    <div class="student-dashboard__school-panel">
+      <div class="student-dashboard__logo">
+        @if (logoUrl) {
+          <img [src]="logoUrl" alt="School logo" (error)="onLogoError($event)" />
+        }
+      </div>
+      <div class="student-dashboard__school-meta">
+        <span class="student-dashboard__school-name">{{ school.schoolName }}</span>
+        <span>{{ school.schoolAddress }}</span>
+        <span>
+          @if (school.telephone) {
+            <span>{{ school.telephone }},</span>
+          }
+          @if (school.poAddress) {
+            <span> {{ school.poAddress }},</span>
+          }
+          @if (school.emailAddress) {
+            <span> {{ school.emailAddress }}</span>
+          }
+          @if (school.website) {
+            <span> {{ school.website }}</span>
+          }
+        </span>
+      </div>
+    </div>
+  }
+
+  <header class="student-dashboard__header">
+    <h1>My Dashboard</h1>
+    <p>Welcome to the Student / Parent portal.</p>
+  </header>
+
+  <div class="student-dashboard__grid">
+    @for (link of quickLinks; track link.id) {
+      <a class="student-dashboard__card" [routerLink]="link.route">
+        <mat-icon>{{ link.icon }}</mat-icon>
+        <strong>{{ link.title }}</strong>
+        <span>{{ link.description }}</span>
+      </a>
+    }
+  </div>
+</div>

@@ -1,0 +1,212 @@
+.screen-only {
+  padding: 0;
+}
+
+.print-only {
+  display: none;
+}
+
+.status-pill {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+}
+
+.transition {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  border-color: #cfe1ef;
+  background: #f3f8fc;
+}
+
+.transition mat-icon {
+  color: #14618a;
+  font-size: 34px;
+  width: 34px;
+  height: 34px;
+}
+
+.transition h3 {
+  margin: 0;
+  color: #14313f;
+  font-family: Cambria, Georgia, serif;
+}
+
+.transition p {
+  margin: 4px 0 0;
+  color: #33415c;
+}
+
+.register-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.register-day {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  padding: 8px 10px;
+  border: 1px solid #eef1f6;
+  border-radius: 10px;
+}
+
+.register-day small {
+  color: #667085;
+}
+
+.term-card__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  color: #667085;
+  font-size: 13px;
+}
+
+.term-card__summary strong {
+  color: #14313f;
+}
+
+.comments {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.comments p {
+  margin: 0;
+  color: #33415c;
+}
+
+.comments span {
+  display: inline-block;
+  min-width: 100px;
+  color: #8b93a7;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+// --- Printed academic record ---------------------------------------------------------------
+
+@media print {
+  // Hide the application chrome so only the record prints.
+  ::ng-deep app-header,
+  ::ng-deep app-sidebar,
+  ::ng-deep app-sidebar-notice,
+  ::ng-deep app-topmenu,
+  ::ng-deep app-customizer,
+  ::ng-deep mat-sidenav {
+    display: none !important;
+  }
+
+  ::ng-deep mat-sidenav-content.mat-sidenav-content,
+  ::ng-deep .mat-drawer-content,
+  ::ng-deep .matero-content {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  // Matero offsets the content by --sidenav-width with a more specific !important rule.
+  ::ng-deep .matero-content-width-fix {
+    --sidenav-width: 0px !important;
+  }
+
+  ::ng-deep body,
+  ::ng-deep .matero-container,
+  ::ng-deep .matero-page-content {
+    background: #fff !important;
+  }
+
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .cx {
+    padding: 0;
+  }
+}
+
+.transcript {
+  color: #000;
+  font-family: Cambria, Georgia, serif;
+  font-size: 11pt;
+}
+
+.transcript__head {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0f3b57;
+  text-align: center;
+}
+
+.transcript__head h1 {
+  margin: 4px 0;
+  font-size: 18pt;
+}
+
+.transcript__head p {
+  margin: 0;
+}
+
+.transcript table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transcript th,
+.transcript td {
+  padding: 3px 6px;
+  border: 1px solid #9aa4b2;
+  text-align: left;
+}
+
+.transcript__facts th {
+  width: 16%;
+  background: #eef2f6;
+}
+
+.transcript__term {
+  margin-top: 12px;
+  break-inside: avoid;
+}
+
+.transcript__term h2 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 12pt;
+}
+
+.transcript__term h2 span {
+  font-size: 10pt;
+  font-weight: normal;
+}
+
+.transcript__comment {
+  margin: 4px 0 0;
+  font-size: 10pt;
+  font-style: italic;
+}
+
+.transcript__foot {
+  margin-top: 14px;
+  font-size: 9pt;
+}
+
+.transcript__sign {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+}

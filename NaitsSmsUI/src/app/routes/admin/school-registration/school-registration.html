@@ -1,0 +1,84 @@
+<section class="school-registration-page">
+  <header class="page-header">
+    <div>
+      <h1>School Registration</h1>
+      <p>Update your school profile and logo.</p>
+    </div>
+    <a class="legacy-btn legacy-btn-plain" routerLink="/admin">Back to Registry Home</a>
+  </header>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  <form class="school-form" [formGroup]="schoolForm" (ngSubmit)="saveSchoolProfile()">
+    <div class="form-grid">
+      <label class="field-group">
+        <span class="field-label">Registration Id</span>
+        <input class="legacy-input" type="text" [value]="registrationId()" readonly />
+      </label>
+
+      <label class="field-group">
+        <span class="field-label">School Name</span>
+        <input class="legacy-input" type="text" formControlName="schoolName" maxlength="70" />
+      </label>
+
+      <label class="field-group">
+        <span class="field-label">Email Address</span>
+        <input class="legacy-input" type="email" formControlName="emailAddress" maxlength="50" />
+      </label>
+
+      <label class="field-group field-group-full">
+        <span class="field-label">School Address</span>
+        <input class="legacy-input" type="text" formControlName="schoolAddress" maxlength="150" />
+      </label>
+
+      <label class="field-group">
+        <span class="field-label">Telephone</span>
+        <input class="legacy-input" type="text" formControlName="telephone" maxlength="50" />
+      </label>
+
+      <label class="field-group">
+        <span class="field-label">Post Office Address</span>
+        <input class="legacy-input" type="text" formControlName="poAddress" maxlength="100" />
+      </label>
+
+      <label class="field-group">
+        <span class="field-label">Website</span>
+        <input class="legacy-input" type="text" formControlName="website" maxlength="70" />
+      </label>
+
+      <label class="field-group">
+        <span class="field-label">Motto</span>
+        <input class="legacy-input" type="text" formControlName="motto" maxlength="70" />
+      </label>
+
+      <label class="field-group field-group-full">
+        <span class="field-label">Upload School Logo (JPEG/PNG, auto-compressed to max 16kb)</span>
+        <input
+          type="file"
+          accept="image/jpeg,image/png"
+          (change)="onLogoSelected($event)"
+          [disabled]="isLoading() || isCompressingLogo()"
+        />
+        @if (isCompressingLogo()) {
+          <span class="field-hint">Compressing logo…</span>
+        }
+        @if (logoPreviewUrl()) {
+          <img class="logo-preview" [src]="logoPreviewUrl()" alt="School logo preview" />
+        }
+      </label>
+    </div>
+
+    <footer class="form-actions">
+      <button type="button" class="legacy-btn legacy-btn-plain" routerLink="/admin" [disabled]="isLoading()">Cancel</button>
+      <button
+        type="submit"
+        class="legacy-btn legacy-btn-primary"
+        [disabled]="isLoading() || isCompressingLogo() || schoolForm.invalid"
+      >
+        {{ isLoading() ? 'Saving...' : 'Save' }}
+      </button>
+    </footer>
+  </form>
+</section>

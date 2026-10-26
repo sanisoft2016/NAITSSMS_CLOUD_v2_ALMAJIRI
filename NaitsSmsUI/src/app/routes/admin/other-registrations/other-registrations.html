@@ -1,0 +1,155 @@
+<section class="other-registrations-page">
+
+  @if (errorMessage()) {
+    <div class="alert-bar">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @for (group of actionGroups; track group.title) {
+    <section class="ql-section">
+      <!-- <h2 class="ql-group-title">{{ group.title }}</h2> -->
+
+      <div class="ql-row">
+        @for (action of group.items; track action.id) {
+          <div class="ql-tile">
+            <button
+              type="button"
+              class="ql-icon-btn"
+              [class]="'ql-icon-btn--' + action.accent"
+              (click)="runAction(action.id)"
+              [disabled]="isLoading()"
+              [attr.title]="action.description">
+              <mat-icon>{{ action.icon }}</mat-icon>
+            </button>
+
+            <button
+              type="button"
+              class="ql-title-btn"
+              (click)="runAction(action.id)"
+              [disabled]="isLoading()">
+              <h3>{{ action.title }}</h3>
+            </button>
+
+            <p class="ql-desc">{{ action.description }}</p>
+
+            @if (action.note) {
+              <p class="ql-note">{{ action.note }}</p>
+            }
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+</section>
+
+@if (showResumptionModal) {
+  <div class="ca-modal-backdrop" (click)="closeResumptionModal()"></div>
+  <section class="ca-modal" role="dialog" aria-modal="true" aria-labelledby="resumption-modal-title">
+    <header class="ca-modal__header">
+      <h3 id="resumption-modal-title">Next Term Resumption Date</h3>
+      <button type="button" class="ca-modal__close" (click)="closeResumptionModal()" [disabled]="resumptionSaving">✕</button>
+    </header>
+
+    <div class="ca-modal__body">
+      <label for="resumption-date">Enter next term resumption date</label>
+      <mat-form-field class="resumption-picker" appearance="outline">
+        <input
+          id="resumption-date"
+          matInput
+          [matDatepicker]="resumptionPicker"
+          [value]="resumptionDateModel"
+          (dateChange)="resumptionDateModel = $event.value"
+          (focus)="resumptionPicker.open()"
+          [disabled]="resumptionSaving" />
+        <mat-datepicker-toggle matSuffix [for]="resumptionPicker"></mat-datepicker-toggle>
+        <mat-datepicker #resumptionPicker [panelClass]="'resumption-calendar-panel'"></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <footer class="ca-modal__footer">
+      <button type="button" class="ca-modal__btn ca-modal__btn--plain" (click)="closeResumptionModal()" [disabled]="resumptionSaving">
+        Cancel
+      </button>
+      <button type="button" class="ca-modal__btn ca-modal__btn--primary" (click)="saveResumptionDate()" [disabled]="resumptionSaving">
+        {{ resumptionSaving ? 'Saving...' : 'Save' }}
+      </button>
+    </footer>
+  </section>
+}
+
+@if (showElectiveModal) {
+  <div class="ca-modal-backdrop" (click)="closeElectiveModal()"></div>
+  <section class="ca-modal" role="dialog" aria-modal="true" aria-labelledby="elective-modal-title">
+    <header class="ca-modal__header">
+      <h3 id="elective-modal-title">Enable / Disable Elective Subject Selection</h3>
+      <button type="button" class="ca-modal__close" (click)="closeElectiveModal()" [disabled]="electiveSaving">✕</button>
+    </header>
+
+    <div class="ca-modal__body">
+      <label for="elective-access-status">Elective Access Status</label>
+      <select
+        id="elective-access-status"
+        [value]="electiveSelectedStatus"
+        (change)="electiveSelectedStatus = $any($event.target).value"
+        [disabled]="electiveSaving">
+        @for (option of electiveOptions; track option.value) {
+          <option [value]="option.value">{{ option.text }}</option>
+        }
+      </select>
+    </div>
+
+    <footer class="ca-modal__footer">
+      <button type="button" class="ca-modal__btn ca-modal__btn--plain" (click)="closeElectiveModal()" [disabled]="electiveSaving">
+        Cancel
+      </button>
+      <button type="button" class="ca-modal__btn ca-modal__btn--primary" (click)="saveElectiveAccessStatus()" [disabled]="electiveSaving">
+        {{ electiveSaving ? 'Saving...' : 'Save' }}
+      </button>
+    </footer>
+  </section>
+}
+
+@if (showCaModal) {
+  <div class="ca-modal-backdrop" (click)="closeCaModal()"></div>
+  <section class="ca-modal" role="dialog" aria-modal="true" aria-labelledby="ca-modal-title">
+    <header class="ca-modal__header">
+      <h3 id="ca-modal-title">Number of CA's and the maximum value per CA setting</h3>
+      <button type="button" class="ca-modal__close" (click)="closeCaModal()" [disabled]="caSaving">✕</button>
+    </header>
+
+    <div class="ca-modal__body">
+      <label for="ca-category">CA's Categories</label>
+      <select
+        id="ca-category"
+        [value]="caSelectedCategory"
+        (change)="caSelectedCategory = $any($event.target).value"
+        [disabled]="caSaving">
+        @for (option of caOptions; track option.value) {
+          <option [value]="option.value">{{ option.text }}</option>
+        }
+      </select>
+
+      <label for="ca-per-value">Per CA's Value</label>
+      <input
+        id="ca-per-value"
+        type="number"
+        min="1"
+        max="255"
+        [value]="caPerValue"
+        (input)="caPerValue = +$any($event.target).value"
+        [disabled]="caSaving" />
+    </div>
+
+    <footer class="ca-modal__footer">
+      <button type="button" class="ca-modal__btn ca-modal__btn--plain" (click)="closeCaModal()" [disabled]="caSaving">
+        Cancel
+      </button>
+      <button type="button" class="ca-modal__btn ca-modal__btn--primary" (click)="saveCaSettings()" [disabled]="caSaving">
+        {{ caSaving ? 'Saving...' : 'Save' }}
+      </button>
+    </footer>
+  </section>
+}

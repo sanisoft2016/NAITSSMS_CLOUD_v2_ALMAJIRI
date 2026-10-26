@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"path": "../../../.."
+		},
+		{
+			"path": "../../../../../../NaitsSmsBackupFeb2026"
+		},
+		{
+			"path": "../../../../../NaitsSmsApi"
+		}
+	],
+	"settings": {
+		"ngx-translate.lookup.resourcesType": "json",
+		"ngx-translate.lookup.resourcesPath": "public/i18n/zh-CN.json",
+		"powershell.cwd": "NaitsSmsUI"
+	}
+}

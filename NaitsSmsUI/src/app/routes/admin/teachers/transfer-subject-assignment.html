@@ -1,0 +1,128 @@
+<mat-card class="transfer-assignment-page" appearance="outlined">
+  <div class="toolbar">
+    <button mat-stroked-button color="primary" type="button" (click)="goBackToAssignment()">
+      <mat-icon>undo</mat-icon>
+      Back
+    </button>
+    <h2 class="page-title">Subject / Teacher / Assignment Transfer</h2>
+  </div>
+
+  <div class="instruction-panel">
+    <p class="instruction-text">
+      Please, select all or any of the Teacher Subject / Class / Assignment to be transferred from the Current Teacher to the Proposed Teacher
+    </p>
+
+    <div class="panel-row">
+      <label class="panel-label" for="current-teacher">Current Teacher</label>
+      <select
+        id="current-teacher"
+        class="panel-input"
+        [ngModel]="currentTeacherId"
+        (ngModelChange)="onCurrentTeacherChange($event)"
+        [disabled]="teachersLoading"
+      >
+        <option value="">{{ teachersLoading ? 'Loading teachers...' : 'Select current teacher' }}</option>
+        @for (teacher of teacherOptions; track teacher.value) {
+          <option [value]="teacher.value">{{ teacher.text }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="panel-row search-row">
+      <label class="panel-label" for="teacher-search">Search Teacher</label>
+      <input
+        id="teacher-search"
+        class="panel-input search-input"
+        type="text"
+        placeholder="Search"
+        [(ngModel)]="teacherSearchTerm"
+        (keyup.enter)="submitTeacherSearch()"
+      />
+      <button class="legacy-btn legacy-btn-primary search-btn" type="button" (click)="submitTeacherSearch()" [disabled]="teachersLoading">
+        Search
+      </button>
+    </div>
+
+    <div class="panel-row">
+      <label class="panel-label" for="proposed-teacher">Proposed Teacher</label>
+      <select
+        id="proposed-teacher"
+        class="panel-input"
+        [(ngModel)]="proposedTeacherId"
+        [disabled]="teachersLoading"
+      >
+        <option value="">Select proposed teacher</option>
+        @for (teacher of proposedTeacherOptions; track teacher.value) {
+          <option [value]="teacher.value">{{ teacher.text }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="status-message status-message--error">{{ errorMessage() }}</p>
+  }
+
+  @if (currentTeacherId) {
+    @if (assignmentsLoading) {
+      <p class="status-message">Loading assignments...</p>
+    } @else if (displayAssignments.length > 0) {
+      <div class="table-wrap">
+        <table class="transfer-table">
+          <thead>
+            <tr>
+              <th class="sno-col">S/No</th>
+              <th>Fullname</th>
+              <th>User Name</th>
+              <th>Subject</th>
+              <th>Class</th>
+              <th class="select-col">
+                <label class="select-all-label">
+                  Select All
+                  <input
+                    type="checkbox"
+                    class="legacy-checkbox"
+                    [checked]="allAssignmentsSelected"
+                    (change)="toggleSelectAll($any($event.target).checked)"
+                  />
+                </label>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (assignment of displayAssignments; track assignment.id; let index = $index) {
+              <tr>
+                <td class="sno-col">{{ index + 1 }}</td>
+                <td>{{ assignmentFullName(assignment) }}</td>
+                <td>{{ assignmentUserName(assignment) }}</td>
+                <td>{{ assignment.subject?.subjectName || '-' }}</td>
+                <td>{{ assignmentClassArmLabel(assignment) }}</td>
+                <td class="select-col">
+                  <input
+                    type="checkbox"
+                    class="legacy-checkbox"
+                    [checked]="isAssignmentSelected(assignmentId(assignment))"
+                    (change)="toggleAssignment(assignmentId(assignment), $any($event.target).checked)"
+                  />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="actions-row">
+        <button
+          class="legacy-btn legacy-btn-success transfer-btn"
+          type="button"
+          [disabled]="isTransferring"
+          (click)="transferAssignments()"
+        >
+          {{ isTransferring ? 'Transferring...' : 'Transfer' }}
+        </button>
+      </div>
+    } @else {
+      <p class="status-message status-message--error">This teacher has no subject assignments to transfer.</p>
+    }
+  }
+</mat-card>

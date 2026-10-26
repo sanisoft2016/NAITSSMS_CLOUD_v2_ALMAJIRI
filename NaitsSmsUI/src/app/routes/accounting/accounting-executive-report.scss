@@ -1,0 +1,292 @@
+/* Closely mirrors legacy ExecutiveReport + TermlyReport.cshtml look. */
+.acct-exec {
+  padding: 0.5rem 0.75rem 2.5rem;
+  color: #2a3f54;
+}
+
+.acct-exec__page-title {
+  margin: 0.5rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.acct-exec__alert {
+  margin: 1rem 0;
+  padding: 0.85rem 1rem;
+  border-radius: 4px;
+}
+
+.acct-exec__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-exec__loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.acct-exec__loading--inline {
+  padding: 2rem 0;
+}
+
+.acct-exec__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  padding: 2.5rem 0 1.5rem;
+  align-items: flex-end;
+}
+
+.acct-exec__filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 220px;
+  min-width: 200px;
+}
+
+.acct-exec__filter-group .control-label {
+  margin: 0;
+  white-space: nowrap;
+  text-align: right;
+  font-weight: 600;
+  min-width: 5.5rem;
+}
+
+.acct-exec__filter-group .form-control {
+  flex: 1;
+  min-height: 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.35rem 0.55rem;
+  background: #fff;
+}
+
+.acct-exec__mini-spin {
+  margin-left: 0.5rem;
+}
+
+.acct-exec__content {
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 1.5rem;
+}
+
+.acct-exec__empty {
+  text-align: center;
+  color: #73879c;
+}
+
+.acct-exec__report-title {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.acct-exec__table-scroll {
+  overflow-x: auto;
+}
+
+.acct-exec__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.acct-exec__table > thead > tr > th,
+.acct-exec__table > tbody > tr > th,
+.acct-exec__table > tbody > tr > td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  vertical-align: middle;
+}
+
+.acct-exec__table > thead > tr > th {
+  background: #f9f9f9;
+  font-weight: 700;
+}
+
+.acct-exec__table.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+.btn {
+  display: inline-block;
+  margin-bottom: 0;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+}
+
+.btn-xs {
+  padding: 1px 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+
+.btn-default {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+  text-decoration: none;
+}
+
+.btn-default:hover {
+  background-color: #e6e6e6;
+  border-color: #adadad;
+  text-decoration: none;
+  color: #333;
+}
+
+.btn-success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+
+.btn-warning {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+
+.acct-exec__total-cell {
+  text-align: right !important;
+  white-space: normal !important;
+  font-size: 1.05rem;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.acct-exec__hl-pay {
+  background-color: yellow;
+  padding: 0 0.25rem;
+  margin-left: 0.2rem;
+}
+
+.acct-exec__hl-discount {
+  background-color: greenyellow;
+  padding: 0 0.25rem;
+  margin-left: 0.2rem;
+}
+
+.acct-exec__hl-out {
+  color: red;
+  margin-left: 0.2rem;
+}
+
+.text-success {
+  color: #3c763d !important;
+}
+
+.text-primary {
+  color: #337ab7 !important;
+}
+
+.text-warning {
+  color: #8a6d3b !important;
+}
+
+.text-danger {
+  color: #a94442 !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+/* Bootstrap 3 .lead — large summary row text like legacy TermlyReport */
+.lead {
+  font-size: 21px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.acct-exec__table > tbody > tr.lead > th {
+  font-weight: 700;
+  white-space: normal;
+  vertical-align: middle;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.acct-exec__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow: auto;
+  background: rgb(0 0 0 / 45%);
+  left: var(--sidenav-width, 0);
+}
+
+.acct-exec__modal {
+  width: min(210mm, 97%);
+  margin: 1rem auto;
+  padding: 1em;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 5px 15px rgb(0 0 0 / 30%);
+}
+
+.acct-exec__detail-print {
+  border: 1px solid #333;
+  margin: 1em;
+  padding: 0.5em;
+}
+
+.acct-exec__detail-table {
+  width: 100%;
+  margin: 1.4em auto;
+  border-collapse: collapse;
+}
+
+.acct-exec__detail-table th,
+.acct-exec__detail-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.acct-exec__modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.75rem 1em 0.25rem;
+}
+
+@media (max-width: 900px) {
+  .acct-exec__filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acct-exec__filter-group .control-label {
+    text-align: left;
+  }
+
+  .acct-exec__overlay {
+    left: 0;
+  }
+}

@@ -1,0 +1,348 @@
+<mat-card class="school-list-page" appearance="outlined">
+  <header class="page-header">
+    <div>
+      <h2>School List</h2>
+      <h4 class="school-count">
+        Number of schools: <span>{{ noOfSchools }}</span>
+      </h4>
+    </div>
+  </header>
+
+  @if (isLoading() && !hasLoaded) {
+    <div class="loading-state">Loading...</div>
+  } @else if (errorMessage() && !hasLoaded) {
+    <div class="error-state">{{ errorMessage() }}</div>
+  } @else if (hasLoaded && schools.length === 0 && noOfSchools === 0) {
+    <p class="lead-empty">You have not registered any school yet.</p>
+  } @else {
+    <div class="well-box search-well">
+      <div class="search-row">
+        <label class="search-label" for="parameter">Search complex:</label>
+        <input
+          id="parameter"
+          class="search-input"
+          type="text"
+          name="parameter"
+          placeholder="Type in parameter"
+          [(ngModel)]="searchParameter"
+          required
+        />
+        <label class="search-by" for="SearchStatus">By</label>
+        <select
+          id="SearchStatus"
+          class="search-select"
+          name="SearchStatus"
+          [(ngModel)]="searchStatus"
+          (change)="onSearchStatusChange($event)"
+        >
+          @for (opt of searchOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div id="pageContent" class="page-content">
+      @if (isLoading()) {
+        <div class="loading-state">Loading...</div>
+      } @else if (schools.length === 0) {
+        <p class="lead-empty">Failed! The parameter you have entered does not match for any School.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="legacy-table">
+            <thead>
+              <tr>
+                <th>S/No</th>
+                <th>Full Name</th>
+                <th>User Name</th>
+                <th>Phone Number</th>
+                <th>Implementation Type</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (school of schools; track trackBySchool($index, school); let index = $index) {
+                <tr>
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ officerFullName(school) }}</td>
+                  <td>{{ officerUserName(school) }}</td>
+                  <td>{{ officerPhone(school) }}</td>
+                  <td>
+                    @if (implementationTypeCode(school) === 1) {
+                      <select
+                        class="impl-select"
+                        [ngModel]="officerId(school) + ',1'"
+                        (ngModelChange)="onImplementationTypeChange(school, $event)"
+                      >
+                        <option [value]="officerId(school) + ',1'">Per Student Per Term</option>
+                        <option [value]="officerId(school) + ',0'">Per Term</option>
+                      </select>
+                    } @else if (implementationTypeCode(school) === 0) {
+                      <select
+                        class="impl-select"
+                        [ngModel]="officerId(school) + ',0'"
+                        (ngModelChange)="onImplementationTypeChange(school, $event)"
+                      >
+                        <option [value]="officerId(school) + ',0'">Per Term</option>
+                        <option [value]="officerId(school) + ',1'">Per Student Per Term</option>
+                      </select>
+                    } @else {
+                      <select class="impl-select" disabled>
+                        <option value="">—</option>
+                      </select>
+                    }
+                  </td>
+                  <td>
+                    <div class="action-strip">
+                      <button
+                        type="button"
+                        class="legacy-btn legacy-btn-warning legacy-btn-xs"
+                        (click)="openAgentInfo(school)"
+                      >
+                        Agent
+                      </button>
+                      <button
+                        type="button"
+                        class="legacy-btn legacy-btn-success legacy-btn-xs"
+                        (click)="editSchoolRegistrar(school)"
+                      >
+                        Edit
+                      </button>
+                      @if (isAccountDisabled(school)) {
+                        <button
+                          type="button"
+                          class="legacy-btn legacy-btn-warning legacy-btn-xs"
+                          (click)="enableRegistrarAccount(school)"
+                        >
+                          Enable Account
+                        </button>
+                      } @else {
+                        <button
+                          type="button"
+                          class="legacy-btn legacy-btn-link legacy-btn-xs"
+                          (click)="disableRegistrarAccount(school)"
+                        >
+                          Disable Account
+                        </button>
+                      }
+                      <button
+                        type="button"
+                        class="legacy-btn legacy-btn-danger legacy-btn-xs"
+                        (click)="deleteRecord(school)"
+                        title="Delete"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                      <button
+                        type="button"
+                        class="legacy-btn legacy-btn-primary legacy-btn-xs"
+                        (click)="openSchoolDetails(school)"
+                      >
+                        School Info
+                      </button>
+                      <button
+                        type="button"
+                        class="legacy-btn legacy-btn-info legacy-btn-xs"
+                        (click)="openSmsAndMore(school)"
+                      >
+                        SMS and More
+                      </button>
+                      <button
+                        type="button"
+                        class="legacy-btn legacy-btn-success legacy-btn-xs"
+                        (click)="openLicensing(school)"
+                      >
+                        Licensing
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</mat-card>
+
+@if (showAgentModal) {
+  <div class="modal-backdrop" (click)="closeAgentModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-content agent-modal">
+        <h4>School's name: {{ agentSchoolName }}</h4>
+        <hr />
+        <dl class="detail-list">
+          <div><dt>User Name</dt><dd>{{ agentDetails?.userName || '-' }}</dd></div>
+          <div><dt>Email Address</dt><dd>{{ agentDetails?.email || '-' }}</dd></div>
+          <div><dt>Phone Number</dt><dd>{{ agentDetails?.phoneNumber || '-' }}</dd></div>
+          <div><dt>First Name</dt><dd>{{ agentDetails?.firstName || '-' }}</dd></div>
+          <div><dt>Middle Name</dt><dd>{{ agentDetails?.middleName || '-' }}</dd></div>
+          <div><dt>Sur Name</dt><dd>{{ agentDetails?.surName || '-' }}</dd></div>
+          <div><dt>Full Name</dt><dd>{{ agentFullName(agentDetails) }}</dd></div>
+          <div><dt>Full Address</dt><dd>{{ agentDetails?.fullAddress || '-' }}</dd></div>
+        </dl>
+        <div class="modal-footer">
+          <button type="button" class="legacy-btn legacy-btn-warning" (click)="closeAgentModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showSchoolModal && schoolDetails) {
+  <div class="modal-backdrop" (click)="closeSchoolModal()">
+    <div class="modal-dialog modal-wide" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-content school-modal">
+        <h4 class="text-center">
+          School Details =&gt; Registration Officer's name:
+          <span class="text-danger">{{ schoolDetailsFullName }}</span>
+          @if ((schoolDetails.schoolAdminAccountantStatus ?? 0) === 0) {
+            <button
+              type="button"
+              class="legacy-btn legacy-btn-primary legacy-btn-xs"
+              (click)="createAdminAccountant(schoolDetails.schoolRegistrationOfficerId)"
+            >
+              Create Admin Accountant
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="legacy-btn legacy-btn-primary legacy-btn-xs"
+              (click)="viewAdminAccountant(schoolDetails.schoolRegistrationOfficerId)"
+            >
+              View Admin Accountant
+            </button>
+            <button
+              type="button"
+              class="legacy-btn legacy-btn-success legacy-btn-xs"
+              (click)="createSubordinateAccountant(schoolDetails.schoolRegistrationOfficerId)"
+            >
+              Create Subordinate Accountant
+            </button>
+          }
+        </h4>
+        <hr />
+        <div class="school-details-grid">
+          <dl class="detail-list">
+            <div><dt>School Name</dt><dd>{{ schoolDetails.schoolName || '-' }}</dd></div>
+            <div><dt>School Address</dt><dd>{{ schoolDetails.schoolAddress || '-' }}</dd></div>
+            <div><dt>Telephone</dt><dd>{{ schoolDetails.telephone || '-' }}</dd></div>
+            <div><dt>Post Office Address</dt><dd>{{ schoolDetails.poAddress || '-' }}</dd></div>
+            <div><dt>Email Address</dt><dd>{{ schoolDetails.emailAddress || '-' }}</dd></div>
+            <div><dt>Website</dt><dd>{{ schoolDetails.website || '-' }}</dd></div>
+          </dl>
+          <div class="logo-holder">
+            @if (schoolDetails.schoolLogoString) {
+              <img
+                [src]="resolveLogoUrl(schoolDetails.schoolLogoString)"
+                alt="School logo"
+                class="thumb-image"
+              />
+            }
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="legacy-btn legacy-btn-warning" (click)="closeSchoolModal()">Close</button>
+          <button type="button" class="legacy-btn legacy-btn-danger" (click)="printSchoolDetails()">Print</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showAccountantModal && accountantDetails) {
+  <div class="modal-backdrop" (click)="closeAccountantModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-content accountant-modal">
+        @if (!showAccountantEditForm) {
+          <div class="accountant-box">
+            <table class="legacy-table" id="AccountantDetails">
+              <tr>
+                <th colspan="2" class="text-center text-danger">Super Admin Accountant Info</th>
+              </tr>
+              <tr>
+                <th>School Name</th>
+                <td>{{ accountantDetails.schoolInfo?.schoolName || '-' }}</td>
+              </tr>
+              <tr>
+                <th>Emplopyee Name</th>
+                <td>{{ accountantFullName(accountantDetails) }}</td>
+              </tr>
+              <tr>
+                <th>User Name</th>
+                <td>{{ accountantDetails.user?.userName || '-' }}</td>
+              </tr>
+              <tr>
+                <th>Employee Status</th>
+                <td>{{ accountantDetails.employeeStatus || '-' }}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer accountant-actions">
+            <button type="button" class="legacy-btn legacy-btn-primary legacy-btn-xs" (click)="openEditAdminAccountant()">
+              Edit
+            </button>
+            @if (isAccountantDisabled(accountantDetails)) {
+              <button
+                type="button"
+                class="legacy-btn legacy-btn-success legacy-btn-xs"
+                (click)="enableAdminAccountantAccount()"
+              >
+                Enable Account
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="legacy-btn legacy-btn-warning legacy-btn-xs"
+                (click)="disableAdminAccountantAccount()"
+              >
+                Disable Account
+              </button>
+            }
+            <button type="button" class="legacy-btn legacy-btn-danger legacy-btn-xs" (click)="deleteAdminAccountantInfo()">
+              Delete
+            </button>
+            <button type="button" class="legacy-btn legacy-btn-warning legacy-btn-xs" (click)="closeAccountantModal()">
+              Cancel
+            </button>
+          </div>
+        } @else {
+          <form class="accountant-edit-form" (ngSubmit)="submitAccountantChanges()">
+            <div class="edit-row">
+              <label for="accFirstName">First Name</label>
+              <input id="accFirstName" type="text" [(ngModel)]="accountantEdit.firstName" name="accFirstName" required />
+            </div>
+            <div class="edit-row">
+              <label for="accMiddleName">Middle Name</label>
+              <input id="accMiddleName" type="text" [(ngModel)]="accountantEdit.middleName" name="accMiddleName" />
+            </div>
+            <div class="edit-row">
+              <label for="accSurName">Sur Name</label>
+              <input id="accSurName" type="text" [(ngModel)]="accountantEdit.surName" name="accSurName" required />
+            </div>
+            <div class="edit-row">
+              <label for="accPassword">Password</label>
+              <input id="accPassword" type="password" [(ngModel)]="accountantEdit.password" name="accPassword" />
+            </div>
+            <div class="edit-row">
+              <label for="accConfirmPassword">Confirm Password</label>
+              <input
+                id="accConfirmPassword"
+                type="password"
+                [(ngModel)]="accountantEdit.confirmPassword"
+                name="accConfirmPassword"
+              />
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="legacy-btn legacy-btn-primary legacy-btn-xs">Save Changes</button>
+              <button type="button" class="legacy-btn legacy-btn-warning legacy-btn-xs" (click)="closeAccountantModal()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+}

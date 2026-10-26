@@ -1,0 +1,12 @@
+**/.git
+**/.vs
+**/bin
+**/obj
+**/_copilot_build
+**/_copilot_build_validate
+**/publish
+**/node_modules
+**/.angular
+**/*.user
+**/*.suo
+**/API_Backup

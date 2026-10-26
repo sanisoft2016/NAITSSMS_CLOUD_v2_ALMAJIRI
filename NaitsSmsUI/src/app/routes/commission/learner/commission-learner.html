@@ -1,0 +1,275 @@
+<div class="cx">
+  @if (isLoading() && !record()) {
+    <div class="cx-loading">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>Retrieving learner record...</span>
+    </div>
+  } @else if (failed()) {
+    <div class="cx-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() || 'This learner record could not be loaded.' }}</span>
+      <button mat-stroked-button (click)="back()">Back</button>
+    </div>
+  } @else if (record(); as r) {
+    <!-- ================= Screen view ================= -->
+    <div class="screen-only cx">
+      <header class="cx-header">
+        <div>
+          <button type="button" class="back-link" (click)="back()">
+            <mat-icon>arrow_back</mat-icon>
+            Back
+          </button>
+          <p class="cx-header__eyebrow">{{ r.centreName }} · {{ r.state }} State</p>
+          <h1>{{ r.fullName }}</h1>
+          <p class="cx-header__sub">
+            {{ r.identificationNo }} · {{ r.level }} · {{ r.gender }}, {{ r.age }} years ·
+            <span class="status-pill">{{ r.status }}</span>
+          </p>
+        </div>
+        <div class="cx-header__actions">
+          <button mat-flat-button (click)="openCentre(r.centreId)">
+            <mat-icon>apartment</mat-icon>
+            Centre
+          </button>
+          <button mat-flat-button (click)="print()">
+            <mat-icon>print</mat-icon>
+            Print academic record
+          </button>
+        </div>
+      </header>
+
+      <section class="cx-grid-2">
+        <article class="panel">
+          <header class="panel__head"><h3>Learner profile</h3></header>
+          <dl class="facts">
+            <div><dt>Date of birth</dt><dd>{{ r.dateOfBirth | date: 'dd MMM yyyy' }}</dd></div>
+            <div><dt>Place of birth</dt><dd>{{ r.placeOfBirth || '—' }}</dd></div>
+            <div><dt>Programme category</dt><dd>{{ r.category || '—' }}</dd></div>
+            <div><dt>State of origin</dt><dd>{{ r.stateOfOrigin || '—' }}{{ r.lgaOfOrigin ? ' · ' + r.lgaOfOrigin + ' LGA' : '' }}</dd></div>
+            <div><dt>Admitted</dt><dd>{{ r.admissionDate | date: 'dd MMM yyyy' }} · {{ r.startLevel }}</dd></div>
+            <div><dt>Prior schooling</dt><dd>{{ r.priorSchooling || '—' }}</dd></div>
+            @if (r.tsangaya) {
+              <div><dt>Tsangaya</dt><dd>{{ r.tsangaya }}</dd></div>
+            }
+            @if (r.quranJuzMemorised) {
+              <div><dt>Qur'an memorised</dt><dd>{{ r.quranJuzMemorised }} of 30 Juz</dd></div>
+            }
+          </dl>
+        </article>
+
+        <article class="panel">
+          <header class="panel__head"><h3>Guardian</h3></header>
+          <dl class="facts">
+            <div><dt>Name</dt><dd>{{ r.guardianName || '—' }}</dd></div>
+            <div><dt>Relationship</dt><dd>{{ r.guardianRelationship || '—' }}</dd></div>
+            <div><dt>Telephone</dt><dd>{{ r.guardianPhone || '—' }}</dd></div>
+            @if (r.guardianAltPhone) {
+              <div><dt>Parent's telephone</dt><dd>{{ r.guardianAltPhone }}</dd></div>
+            }
+            <div><dt>Occupation</dt><dd>{{ r.guardianOccupation || '—' }}</dd></div>
+            <div><dt>Address</dt><dd>{{ r.guardianAddress || '—' }}</dd></div>
+          </dl>
+        </article>
+      </section>
+
+      @if (r.status !== 'On roll') {
+        <section class="panel transition">
+          <mat-icon>{{ r.transitionStatus.startsWith('Transitioned') ? 'trending_up' : 'logout' }}</mat-icon>
+          <div>
+            <h3>{{ r.transitionStatus }}</h3>
+            <p>
+              {{ r.transitionDestination }}
+              @if (r.transitionDate) {
+                · {{ r.transitionDate | date: 'dd MMM yyyy' }}
+              }
+            </p>
+          </div>
+        </section>
+      } @else {
+        <section class="cx-kpis">
+          <article class="kpi">
+            <span class="kpi__label">This term's attendance</span>
+            <strong class="kpi__value" [class]="rateTone(r.currentTermAttendanceRate)">{{ r.currentTermAttendanceRate }}%</strong>
+            <span class="kpi__foot">{{ r.currentTermDaysPresent }} of {{ r.currentTermDaysRegistered }} school days</span>
+          </article>
+          <article class="kpi">
+            <span class="kpi__label">Days absent</span>
+            <strong class="kpi__value">{{ r.currentTermDaysAbsent }}</strong>
+            <span class="kpi__foot">{{ r.currentTermDaysLate }} day(s) late</span>
+          </article>
+          <article class="kpi" [class.kpi--alert]="r.currentAbsenceStreak >= 3">
+            <span class="kpi__label">Current absence run</span>
+            <strong class="kpi__value">{{ r.currentAbsenceStreak }}</strong>
+            <span class="kpi__foot">
+              {{ r.currentAbsenceStreak >= 3 ? 'At risk — follow up with the guardian' : 'School days in a row' }}
+            </span>
+          </article>
+        </section>
+      }
+
+      @if (r.recentRegister.length) {
+        <section class="panel">
+          <header class="panel__head">
+            <div>
+              <h3>Recent register</h3>
+              <p>The last {{ r.recentRegister.length }} days this learner was marked, newest first.</p>
+            </div>
+          </header>
+          <div class="register-strip">
+            @for (mark of r.recentRegister; track mark.date) {
+              <span class="register-day" [title]="mark.remark || mark.status">
+                <small>{{ mark.date | date: 'EEE dd MMM' }}</small>
+                <span class="flag" [class]="statusTone(mark.status)">{{ mark.status }}</span>
+              </span>
+            }
+          </div>
+        </section>
+      }
+
+      @for (term of termsNewestFirst(); track term.session + term.term) {
+        <section class="panel term-card">
+          <header class="panel__head">
+            <div>
+              <h3>{{ term.term }} {{ term.session }}</h3>
+              <p>{{ term.level }}</p>
+            </div>
+            <div class="term-card__summary">
+              @if (term.complete) {
+                <span>Average <strong [class]="scoreTone(term.averageScore)">{{ term.averageScore }}</strong></span>
+                <span>Grade <strong>{{ term.grade }}</strong></span>
+                <span>Position <strong>{{ term.position }} of {{ term.classSize }}</strong></span>
+              } @else {
+                <span class="flag flag--info">In progress · CA1 and CA2 recorded</span>
+              }
+              <span>
+                Attendance <strong [class]="rateTone(term.attendanceRate)">{{ term.daysPresent }}/{{ term.daysOpen }}</strong>
+              </span>
+            </div>
+          </header>
+          @if (term.subjects.length) {
+            <div class="table-scroll">
+              <table class="cx-table">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th class="num">CA1 (10)</th>
+                    <th class="num">CA2 (10)</th>
+                    <th class="num">CA3 (10)</th>
+                    <th class="num">Exam (70)</th>
+                    <th class="num">Total</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (s of term.subjects; track s.subject) {
+                    <tr>
+                      <td>{{ s.subject }}</td>
+                      <td class="num">{{ s.ca1 }}</td>
+                      <td class="num">{{ term.complete ? s.ca2 : s.ca2 || '—' }}</td>
+                      <td class="num">{{ term.complete ? s.ca3 : '—' }}</td>
+                      <td class="num">{{ term.complete ? s.exam : '—' }}</td>
+                      <td class="num" [class]="term.complete ? scoreTone(s.total) : ''">{{ term.complete ? s.total : '—' }}</td>
+                      <td>{{ term.complete ? s.grade : '' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+          @if (term.teacherComment || term.headComment) {
+            <div class="comments">
+              @if (term.teacherComment) {
+                <p><span>Facilitator</span>{{ term.teacherComment }}</p>
+              }
+              @if (term.headComment) {
+                <p><span>Centre head</span>{{ term.headComment }}</p>
+              }
+            </div>
+          }
+        </section>
+      }
+    </div>
+
+    <!-- ================= Printed academic record ================= -->
+    <article class="print-only transcript">
+      <header class="transcript__head">
+        <p>National Commission for Almajiri and Out-of-School Children Education</p>
+        <h1>Learner Academic Record</h1>
+        <p>{{ r.centreName }} · {{ r.centreAddress }}</p>
+      </header>
+
+      <table class="transcript__facts">
+        <tbody>
+          <tr>
+            <th>Name</th><td>{{ r.fullName }}</td>
+            <th>Programme ID</th><td>{{ r.identificationNo }}</td>
+          </tr>
+          <tr>
+            <th>Gender</th><td>{{ r.gender }}</td>
+            <th>Date of birth</th><td>{{ r.dateOfBirth | date: 'dd MMM yyyy' }}</td>
+          </tr>
+          <tr>
+            <th>State of origin</th><td>{{ r.stateOfOrigin }}{{ r.lgaOfOrigin ? ', ' + r.lgaOfOrigin : '' }}</td>
+            <th>Category</th><td>{{ r.category }}</td>
+          </tr>
+          <tr>
+            <th>Admitted</th><td>{{ r.admissionDate | date: 'dd MMM yyyy' }} ({{ r.startLevel }})</td>
+            <th>Current status</th><td>{{ r.status }}</td>
+          </tr>
+          @if (r.status !== 'On roll') {
+            <tr>
+              <th>Transition</th>
+              <td colspan="3">{{ r.transitionStatus }}: {{ r.transitionDestination }}{{ r.transitionDate ? ' (' + (r.transitionDate | date: 'dd MMM yyyy') + ')' : '' }}</td>
+            </tr>
+          }
+          @if (r.quranJuzMemorised) {
+            <tr>
+              <th>Qur'an memorised</th><td>{{ r.quranJuzMemorised }} of 30 Juz</td>
+              <th>Tsangaya</th><td>{{ r.tsangaya || '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @for (term of completedTerms(); track term.session + term.term) {
+        <section class="transcript__term">
+          <h2>
+            {{ term.term }} {{ term.session }} · {{ term.level }}
+            <span>
+              Average {{ term.averageScore }} ({{ term.grade }}) · Position {{ term.position }} of {{ term.classSize }} ·
+              Attendance {{ term.daysPresent }}/{{ term.daysOpen }}
+            </span>
+          </h2>
+          <table>
+            <thead>
+              <tr><th>Subject</th><th>CA1</th><th>CA2</th><th>CA3</th><th>Exam</th><th>Total</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+              @for (s of term.subjects; track s.subject) {
+                <tr>
+                  <td>{{ s.subject }}</td><td>{{ s.ca1 }}</td><td>{{ s.ca2 }}</td><td>{{ s.ca3 }}</td>
+                  <td>{{ s.exam }}</td><td>{{ s.total }}</td><td>{{ s.grade }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (term.teacherComment) {
+            <p class="transcript__comment">Facilitator: {{ term.teacherComment }}</p>
+          }
+        </section>
+      }
+
+      <footer class="transcript__foot">
+        <p>Grades: A 70–100 · B 60–69 · C 50–59 · D 45–49 · E 40–44 · F 0–39. CA1–CA3 out of 10 each; examination out of 70.</p>
+        <p>
+          Generated from NAITS-ASMS on {{ printedOn | date: 'dd MMM yyyy, HH:mm' }}. Attendance figures are counted
+          from the centre's daily registers.
+        </p>
+        <div class="transcript__sign">
+          <span>Centre head: ______________________</span>
+          <span>Commission officer: ______________________</span>
+        </div>
+      </footer>
+    </article>
+  }
+</div>

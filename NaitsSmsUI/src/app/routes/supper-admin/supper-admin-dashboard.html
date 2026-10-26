@@ -1,0 +1,239 @@
+<section class="sa-dashboard">
+  <header class="sa-dashboard__hero">
+    <div>
+      <p class="sa-dashboard__eyebrow">Platform administration</p>
+      <h1 class="sa-dashboard__title">Schools overview</h1>
+      <p class="sa-dashboard__lead">
+        Monitor subscriptions, access and account readiness across every school.
+      </p>
+    </div>
+    <div class="sa-dashboard__hero-actions">
+      <a mat-stroked-button routerLink="/supper-admin/school-list">
+        <mat-icon>domain</mat-icon>
+        School directory
+      </a>
+      <button mat-flat-button color="primary" type="button" (click)="refresh()" [disabled]="isLoading()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="sa-dashboard__state" role="status">
+      <mat-progress-spinner diameter="44" mode="indeterminate" />
+      <p>Loading the platform overview…</p>
+    </div>
+  } @else if (loadFailed()) {
+    <div class="sa-dashboard__state sa-dashboard__state--error" role="alert">
+      <mat-icon>cloud_off</mat-icon>
+      <h2>Dashboard unavailable</h2>
+      <p>The system overview could not be loaded. Check the API and try again.</p>
+      <button mat-flat-button color="primary" type="button" (click)="refresh()">Try again</button>
+    </div>
+  } @else if (summary(); as data) {
+    <div class="sa-dashboard__kpis">
+      <article class="sa-dashboard__kpi sa-dashboard__kpi--schools">
+        <div class="sa-dashboard__kpi-icon"><mat-icon>domain</mat-icon></div>
+        <div>
+          <span>Total schools</span>
+          <strong>{{ data.totalSchools | number }}</strong>
+          <small>{{ data.activeSchools | number }} accounts active</small>
+        </div>
+      </article>
+      <article class="sa-dashboard__kpi sa-dashboard__kpi--active">
+        <div class="sa-dashboard__kpi-icon"><mat-icon>verified_user</mat-icon></div>
+        <div>
+          <span>Active subscriptions</span>
+          <strong>{{ data.activeSubscriptions | number }}</strong>
+          <small>{{ data.expiringWithin30Days | number }} expire within 30 days</small>
+        </div>
+      </article>
+      <article class="sa-dashboard__kpi sa-dashboard__kpi--warning">
+        <div class="sa-dashboard__kpi-icon"><mat-icon>event_busy</mat-icon></div>
+        <div>
+          <span>Expired / unlicensed</span>
+          <strong>{{ data.expiredSubscriptions + data.noSubscription | number }}</strong>
+          <small>{{ data.noSubscription | number }} have no subscription</small>
+        </div>
+      </article>
+      <article class="sa-dashboard__kpi sa-dashboard__kpi--disabled">
+        <div class="sa-dashboard__kpi-icon"><mat-icon>lock_person</mat-icon></div>
+        <div>
+          <span>Access revoked</span>
+          <strong>{{ data.disabledSchools | number }}</strong>
+          <small>School registrar accounts</small>
+        </div>
+      </article>
+      <article class="sa-dashboard__kpi sa-dashboard__kpi--accounting">
+        <div class="sa-dashboard__kpi-icon"><mat-icon>account_balance</mat-icon></div>
+        <div>
+          <span>Without accountant</span>
+          <strong>{{ data.schoolsWithoutAccountant | number }}</strong>
+          <small>{{ data.schoolsWithAccountant | number }} are configured</small>
+        </div>
+      </article>
+    </div>
+
+    <div class="sa-dashboard__main-grid">
+      <article class="sa-dashboard__panel sa-dashboard__panel--health">
+        <header class="sa-dashboard__panel-head">
+          <div>
+            <p class="sa-dashboard__panel-kicker">Portfolio health</p>
+            <h2>Subscription coverage</h2>
+          </div>
+          <a routerLink="/supper-admin/school-list">View schools <mat-icon>arrow_forward</mat-icon></a>
+        </header>
+        <div class="sa-dashboard__health-body">
+          <div class="sa-dashboard__ring" [style.background]="subscriptionRing()">
+            <div class="sa-dashboard__ring-centre">
+              <strong>{{ data.totalSchools | number }}</strong>
+              <span>schools</span>
+            </div>
+          </div>
+          <ul class="sa-dashboard__legend">
+            @for (segment of subscriptionSegments(); track segment.label) {
+              <li>
+                <i [style.background]="segment.color"></i>
+                <span>{{ segment.label }}</span>
+                <strong>{{ segment.value | number }}</strong>
+                <small>{{ segment.percentage }}%</small>
+              </li>
+            }
+          </ul>
+        </div>
+      </article>
+
+      <article class="sa-dashboard__panel sa-dashboard__panel--actions">
+        <header class="sa-dashboard__panel-head">
+          <div>
+            <p class="sa-dashboard__panel-kicker">Operations</p>
+            <h2>Quick actions</h2>
+          </div>
+        </header>
+        <div class="sa-dashboard__actions-grid">
+          @for (action of quickActions; track action.route) {
+            <a class="sa-dashboard__action" [class]="'sa-dashboard__action sa-dashboard__action--' + action.tone" [routerLink]="action.route">
+              <span class="sa-dashboard__action-icon"><mat-icon>{{ action.icon }}</mat-icon></span>
+              <span>
+                <strong>{{ action.label }}</strong>
+                <small>{{ action.description }}</small>
+              </span>
+              <mat-icon class="sa-dashboard__action-arrow">chevron_right</mat-icon>
+            </a>
+          }
+        </div>
+      </article>
+    </div>
+
+    <article class="sa-dashboard__panel sa-dashboard__panel--attention">
+      <header class="sa-dashboard__panel-head">
+        <div>
+          <p class="sa-dashboard__panel-kicker">Action centre</p>
+          <h2>Schools needing attention</h2>
+          <p>Revoked access, expired subscriptions and incomplete account setup.</p>
+        </div>
+        <span class="sa-dashboard__count">{{ data.schoolsNeedingAttention.length }}</span>
+      </header>
+
+      @if (data.schoolsNeedingAttention.length) {
+        <div class="sa-dashboard__table-wrap">
+          <table class="sa-dashboard__table">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>Registrar</th>
+                <th>Access</th>
+                <th>Subscription</th>
+                <th>Expiry</th>
+                <th>Accountant</th>
+                <th><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (school of data.schoolsNeedingAttention; track school.schoolId) {
+                <tr>
+                  <td>
+                    <strong>{{ school.schoolName || 'Unnamed school' }}</strong>
+                    <small>#{{ school.registrationNumber }}</small>
+                  </td>
+                  <td>
+                    <span>{{ school.registrarName || school.registrarUserName || 'Not assigned' }}</span>
+                    <small>{{ school.registrarUserName }}</small>
+                  </td>
+                  <td>
+                    <span class="sa-dashboard__badge" [class.sa-dashboard__badge--danger]="school.accessStatus !== 0">
+                      {{ accessLabel(school) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      class="sa-dashboard__badge"
+                      [class.sa-dashboard__badge--warning]="school.subscriptionHealth === 'Expiring soon'"
+                      [class.sa-dashboard__badge--danger]="school.subscriptionHealth === 'Expired'"
+                      [class.sa-dashboard__badge--muted]="school.subscriptionHealth === 'No subscription'"
+                    >
+                      {{ school.subscriptionHealth }}
+                    </span>
+                  </td>
+                  <td>{{ school.subscriptionExpiryDate ? (school.subscriptionExpiryDate | date: 'mediumDate') : '—' }}</td>
+                  <td>
+                    <span class="sa-dashboard__badge" [class.sa-dashboard__badge--muted]="school.accountantStatus === 0">
+                      {{ school.accountantStatus === 1 ? 'Configured' : 'Not configured' }}
+                    </span>
+                  </td>
+                  <td class="sa-dashboard__row-actions">
+                    <a
+                      mat-icon-button
+                      [routerLink]="['/supper-admin/licensing-index', school.schoolId]"
+                      aria-label="Open licensing"
+                      title="Licensing"
+                    ><mat-icon>key</mat-icon></a>
+                    <a
+                      mat-icon-button
+                      routerLink="/supper-admin/edit-school-registrar"
+                      [queryParams]="{ userId: school.registrarUserId }"
+                      aria-label="Edit registrar"
+                      title="Edit registrar"
+                    ><mat-icon>manage_accounts</mat-icon></a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="sa-dashboard__all-clear">
+          <mat-icon>task_alt</mat-icon>
+          <div>
+            <strong>Everything looks healthy</strong>
+            <span>No schools currently require administrative attention.</span>
+          </div>
+        </div>
+      }
+    </article>
+
+    <article class="sa-dashboard__panel sa-dashboard__panel--recent">
+      <header class="sa-dashboard__panel-head">
+        <div>
+          <p class="sa-dashboard__panel-kicker">Onboarding</p>
+          <h2>Recently added schools</h2>
+        </div>
+      </header>
+      <div class="sa-dashboard__recent-grid">
+        @for (school of data.recentSchools; track school.schoolId) {
+          <a class="sa-dashboard__recent-school" routerLink="/supper-admin/edit-school-registrar" [queryParams]="{ userId: school.registrarUserId }">
+            <span class="sa-dashboard__school-avatar">{{ (school.schoolName || 'S').charAt(0) }}</span>
+            <span>
+              <strong>{{ school.schoolName || 'Unnamed school' }}</strong>
+              <small>{{ school.createdDate ? (school.createdDate | date: 'mediumDate') : 'Date unavailable' }}</small>
+            </span>
+            <mat-icon>arrow_outward</mat-icon>
+          </a>
+        } @empty {
+          <p class="sa-dashboard__empty">No schools have been added yet.</p>
+        }
+      </div>
+    </article>
+  }
+</section>

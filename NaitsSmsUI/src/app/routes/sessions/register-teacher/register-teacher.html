@@ -1,0 +1,197 @@
+<div class="register-page">
+  <mat-card class="register-card" appearance="outlined">
+    <mat-card-header class="register-header">
+      <mat-card-title style="text-align: center;">{{ pageTitle }}</mat-card-title>
+
+      <span class="spacer"></span>
+
+      <a href="/admin/teachers" color="primary">Go Back</a>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Employee ID No</mat-label>
+            <input matInput id="employeeIdNo" formControlName="employeeIdNo" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>User Name</mat-label>
+            <input matInput id="userName" formControlName="userName" required />
+            @if (registerForm.get('userName')?.touched && registerForm.get('userName')?.hasError('required')) {
+              <mat-error>validation.required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput id="firstName" formControlName="firstName" required />
+            @if (registerForm.get('firstName')?.touched && registerForm.get('firstName')?.hasError('required')) {
+              <mat-error>validation.required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Middle Name</mat-label>
+            <input matInput id="middleName" formControlName="middleName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>SurName</mat-label>
+            <input matInput id="surName" formControlName="surName" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput id="email" type="email" formControlName="email" />
+            @if (registerForm.get('email')?.touched && registerForm.get('email')?.hasError('email')) {
+              <mat-error>validation.email</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput id="phoneNumber" formControlName="phoneNumber" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput [matDatepicker]="dobPicker" id="dateOfBirth" formControlName="dateOfBirth" />
+            <mat-datepicker-toggle matSuffix [for]="dobPicker"></mat-datepicker-toggle>
+            <mat-datepicker #dobPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Gender</mat-label>
+            <mat-select id="gender" formControlName="gender" required>
+              <mat-option [value]="null" disabled>Select gender</mat-option>
+              @for (g of genders; track g.value) {
+                <mat-option [value]="g.value">{{ g.label }}</mat-option>
+              }
+            </mat-select>
+            @if (registerForm.get('gender')?.touched && registerForm.get('gender')?.hasError('required')) {
+              <mat-error>validation.required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Employee Status</mat-label>
+            <mat-select id="employeeStatus" formControlName="employeeStatus" required>
+              <mat-option [value]="null" disabled>Select status</mat-option>
+              @for (s of employeeStatuses; track s.value) {
+                <mat-option [value]="s.value">{{ s.label }}</mat-option>
+              }
+            </mat-select>
+            @if (registerForm.get('employeeStatus')?.touched && registerForm.get('employeeStatus')?.hasError('required')) {
+              <mat-error>validation.required</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="signature">
+            <div class="signature-title">Signature</div>
+
+            <app-signature-cropper
+              (imageSelected)="onSignatureImageSelected()"
+              (cropped)="onSignatureCropped($event)"
+              (cleared)="onSignatureCleared()"
+            ></app-signature-cropper>
+
+            @if (signatureError) {
+              <div class="signature-error">{{ signatureError }}</div>
+            }
+          </div>
+
+          <div class="submit-row">
+            <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting()">
+              {{ isSubmitting() ? (isEditMode ? 'Saving...' : 'Submitting...') : submitLabel }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<style>
+  .register-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--mat-sys-surface-container-low, #f5f5f5);
+  }
+  .register-card { width: min(980px, 100%); }
+  .register-header { display: flex; align-items: center; gap: 12px; }
+  .spacer { flex: 1 1 auto; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding-top: 16px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .signature { grid-column: 1 / -1; margin-top: 4px; }
+  .signature-title { font-weight: 600; margin-bottom: 8px; }
+  .signature-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .file-hidden { display: none; }
+  .signature-error { color: #b00020; margin-top: 8px; font-size: 12px; }
+  .signature-preview {
+    margin-top: 12px;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,.12);
+    background: #fff;
+    overflow: auto;
+  }
+  .signature-buttons { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .submit-row { grid-column: 1 / -1; display: flex; justify-content: flex-end; margin-top: 8px; }
+
+  /* Existing crop UX hardening */
+  #image-holder, #crop-frame { touch-action: none; -ms-touch-action: none; user-select: none; }
+  body.no-scroll { touch-action: none; overscroll-behavior: contain; }
+
+  #crop-frame {
+    box-sizing: border-box;
+    border: 2px dashed #00f;
+    background: transparent;
+    cursor: move;
+    z-index: 10;
+    position: absolute;
+  }
+  #crop-frame .resize-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border: 1px solid #00f;
+    z-index: 11;
+    box-sizing: border-box;
+  }
+  #crop-frame .resize-handle.nw { top: -6px; left: -6px; cursor: nwse-resize; }
+  #crop-frame .resize-handle.n  { top: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  #crop-frame .resize-handle.ne { top: -6px; right: -6px; cursor: nesw-resize; }
+  #crop-frame .resize-handle.e  { top: 50%; right: -6px; transform: translateY(-50%); cursor: ew-resize; }
+  #crop-frame .resize-handle.se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+  #crop-frame .resize-handle.s  { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+  #crop-frame .resize-handle.sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+  #crop-frame .resize-handle.w  { top: 50%; left: -6px; transform: translateY(-50%); cursor: ew-resize; }
+
+  @media (pointer: coarse) {
+    #crop-frame .resize-handle { width: 28px; height: 28px; border-width: 2px; }
+    #crop-frame .resize-handle.nw { top: -14px; left: -14px; }
+    #crop-frame .resize-handle.n  { top: -14px; left: 50%; transform: translateX(-50%); }
+    #crop-frame .resize-handle.ne { top: -14px; right: -14px; }
+    #crop-frame .resize-handle.e  { top: 50%; right: -14px; transform: translateY(-50%); }
+    #crop-frame .resize-handle.se { bottom: -14px; right: -14px; }
+    #crop-frame .resize-handle.s  { bottom: -14px; left: 50%; transform: translateX(-50%); }
+    #crop-frame .resize-handle.sw { bottom: -14px; left: -14px; }
+    #crop-frame .resize-handle.w  { top: 50%; left: -14px; transform: translateY(-50%); }
+  }
+</style>

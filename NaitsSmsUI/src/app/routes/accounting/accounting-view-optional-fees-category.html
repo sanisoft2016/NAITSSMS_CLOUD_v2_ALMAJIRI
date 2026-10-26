@@ -1,0 +1,109 @@
+<section class="acct-opt-list">
+  <header class="acct-opt-list__header">
+    <h1 class="acct-opt-list__heading">Optional Fees Category List</h1>
+  </header>
+
+  @if (flashSuccess()) {
+    <div class="acct-opt-list__alert acct-opt-list__alert--success" role="status">
+      {{ flashSuccess() }}
+    </div>
+  }
+  @if (error()) {
+    <div class="acct-opt-list__alert acct-opt-list__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="acct-opt-list__panel" id="pageContent">
+    @if (loading()) {
+      <div class="acct-opt-list__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (categories().length === 0) {
+      <div class="acct-opt-list__empty">
+        <div class="acct-opt-list__empty-icon" aria-hidden="true">∅</div>
+        <p class="acct-opt-list__empty-title">No category yet.</p>
+        <p class="acct-opt-list__empty-text">
+          Create a category first, then attach optional fee items to it.
+        </p>
+      </div>
+    } @else {
+      <div class="acct-opt-list__table-wrap">
+        <table class="acct-opt-list__table">
+          <thead>
+            <tr>
+              <th>Category Name</th>
+              <th class="acct-opt-list__actions-head">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of categories(); track item.id) {
+              <tr>
+                <td>{{ item.categoryName }}</td>
+                <td class="acct-opt-list__actions-cell">
+                  <div class="acct-opt-list__actions">
+                    <button
+                      type="button"
+                      class="acct-opt-list__btn acct-opt-list__btn--edit"
+                      (click)="openEdit(item)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="acct-opt-list__btn acct-opt-list__btn--delete"
+                      (click)="deleteCategory(item)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (showEditModal()) {
+    <div class="acct-opt-list__overlay" role="dialog" aria-modal="true" (click)="closeEditModal()">
+      <div class="acct-opt-list__modal" (click)="$event.stopPropagation()">
+        <div class="acct-opt-list__modal-head">
+          <h2 class="acct-opt-list__modal-title">Edit Category value</h2>
+        </div>
+
+        <div class="acct-opt-list__edit-form">
+          <div class="acct-opt-list__edit-group">
+            <label class="acct-opt-list__edit-label" for="CategoryName">Edit Category</label>
+            <input
+              id="CategoryName"
+              name="CategoryName"
+              type="text"
+              class="acct-opt-list__input"
+              maxlength="50"
+              [ngModel]="editCategoryName()"
+              (ngModelChange)="editCategoryName.set($event)"
+            />
+          </div>
+
+          <div class="acct-opt-list__edit-actions">
+            <button
+              type="button"
+              class="acct-opt-list__btn acct-opt-list__btn--edit"
+              [disabled]="saving()"
+              (click)="saveCategoryChanges()"
+            >
+              Save changes
+            </button>
+            <button
+              type="button"
+              class="acct-opt-list__btn acct-opt-list__btn--delete"
+              (click)="closeEditModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>

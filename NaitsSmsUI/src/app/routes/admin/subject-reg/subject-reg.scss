@@ -1,0 +1,138 @@
+.subject-form-shell {
+  display: grid;
+  gap: 20px;
+  padding: 18px 8px 36px;
+}
+
+.subject-form-card {
+  border: 1px solid #dbcdb4;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fffef8 0%, #ffffff 100%);
+  box-shadow: 0 14px 28px rgba(67, 50, 28, 0.08);
+}
+
+.hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  padding: 24px 28px;
+}
+
+.page-breadcrumb {
+  margin: 0 0 6px;
+  color: #8a6330;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-card h2 {
+  margin: 0;
+  color: #3c2c15;
+  font-family: Cambria, Georgia, serif;
+}
+
+.hero-card p {
+  margin: 10px 0 0;
+  color: #685847;
+  line-height: 1.6;
+}
+
+.form-card {
+  padding: 26px 28px;
+}
+
+.label-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #f8efdb 0%, #fffdf7 100%);
+}
+
+.label-band span {
+  color: #86643b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+
+.label-band strong {
+  color: #35240f;
+  font-size: 18px;
+}
+
+.field-block {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: #574431;
+  font-weight: 600;
+}
+
+.field-block input,
+.field-block select {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #dbcaa9;
+  border-radius: 12px;
+  background: #fffdf8;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.primary-button,
+.secondary-button {
+  min-width: 140px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: #165f84;
+  color: #fff;
+}
+
+.secondary-button {
+  background: #efe5d1;
+  color: #4b381b;
+}
+
+.primary-button[disabled] {
+  opacity: 0.72;
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .hero-card {
+    grid-template-columns: 1fr;
+    padding: 22px 20px;
+  }
+
+  .form-card {
+    padding: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+  }
+}

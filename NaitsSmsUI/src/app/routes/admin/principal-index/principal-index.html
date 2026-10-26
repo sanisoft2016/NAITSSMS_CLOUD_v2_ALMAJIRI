@@ -1,0 +1,141 @@
+<section class="principal-page">
+  <p id="pageLabel" class="page-label">
+    Shcool Head
+
+    <button type="button" class="legacy-btn legacy-btn-warning" (click)="refreshPage()" [disabled]="isLoading()">
+      Refresh page
+    </button>
+  </p>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <div class="action-row">
+    <button type="button" class="legacy-btn legacy-btn-success" (click)="beginCreate()" [disabled]="isLoading()">
+      Create School Head
+    </button>
+    <button type="button" class="legacy-btn legacy-btn-primary" (click)="setSchoolHead()" [disabled]="isLoading()">
+      Set School Head
+    </button>
+    <button type="button" class="legacy-btn legacy-btn-primary" (click)="viewSetSchoolHead()" [disabled]="isLoading()">
+      View Set School Head
+    </button>
+  </div>
+
+  @if (showEditor()) {
+    <div #editorPanel id="content" class="content-slot editor-panel">
+      <form class="principal-form" [formGroup]="headForm" (ngSubmit)="submitHead()">
+        <div class="editor-grid">
+          <label class="field-group">
+            <span class="field-label">Head's Name</span>
+            <input class="legacy-input" type="text" formControlName="headsName" maxlength="40" />
+          </label>
+
+          <label class="field-group">
+            <span class="field-label">Phone Number</span>
+            <input class="legacy-input" type="text" formControlName="phoneNumber" maxlength="15" />
+          </label>
+
+          <label class="field-group">
+            <span class="field-label">Gender</span>
+            <select class="legacy-select" formControlName="gender">
+              @for (option of genderOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="field-group">
+            <span class="field-label">Head Status</span>
+            <select class="legacy-select" formControlName="headStatus">
+              @for (option of headStatusOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="field-group">
+            <span class="field-label">Status</span>
+            <select class="legacy-select" formControlName="status">
+              @for (option of statusOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <div class="field-group field-group-full">
+            <span class="field-label">Upload Signature Image</span>
+            <input type="hidden" formControlName="signatureImageString" />
+
+            <app-signature-cropper
+              [initialPreviewUrl]="signaturePreviewUrl()"
+              [disabled]="isLoading()"
+              (imageSelected)="onSignatureImageSelected()"
+              (cropped)="onSignatureCropped($event)"
+              (cleared)="onSignatureCleared()"
+            ></app-signature-cropper>
+          </div>
+        </div>
+
+        <div class="editor-actions">
+          <button type="submit" class="legacy-btn legacy-btn-success" [disabled]="isLoading()">
+            {{ isEditing() ? 'Save changes' : 'Create School Head' }}
+          </button>
+          <button type="button" class="legacy-btn legacy-btn-default" (click)="cancelEdit()" [disabled]="isLoading()">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (hasHeads()) {
+    <div class="table-wrap">
+      <table class="principal-table">
+        <thead>
+          <tr>
+            <th>Head's Name</th>
+            <th>Head Status</th>
+            <th>Phone Number</th>
+            <th>Gender</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (head of heads(); track head.id) {
+            <tr>
+              <td>{{ head.headsName }}</td>
+              <td>
+                @if (head.headStatus === 1) {
+                  <span class="highlight-status">{{ getHeadStatusLabel(head.headStatus) }}</span>
+                } @else {
+                  <span>{{ getHeadStatusLabel(head.headStatus) }}</span>
+                }
+              </td>
+              <td>{{ head.phoneNumber }}</td>
+              <td>{{ getGenderLabel(head.gender) }}</td>
+              <td>
+                @if (head.status === 0) {
+                  <span class="highlight-status">{{ getStatusLabel(head.status) }}</span>
+                } @else {
+                  <span>{{ getStatusLabel(head.status) }}</span>
+                }
+              </td>
+              <td class="action-cell">
+                <button type="button" class="legacy-btn legacy-btn-primary legacy-btn-xs" (click)="beginEdit(head)">
+                  Edit
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="empty-state">No school head record has been created yet.</p>
+  }
+</section>

@@ -1,0 +1,314 @@
+<div class="form-master-page" id="formMasterPage">
+  @if (isLoading() && assignments().length === 0 && panelMode() === 'none') {
+    <p class="page-message page-message--center">Loading form-master assignments...</p>
+  } @else if (errorMessage() && assignments().length === 0 && panelMode() === 'none') {
+    <p class="page-message page-message--center page-message--danger">{{ errorMessage() }}</p>
+  } @else if (assignments().length > 0) {
+    <div class="page-header-row">
+      <div class="page-title lead">List of Class(es) assigned to you as a Form-master</div>
+      <div class="print-slot" [class.no-display]="panelMode() === 'none' || panelMode() === 'attendance'">
+        <button type="button" class="btn btn-primary btn-xs" (click)="printPanel()">Print</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table table-bordered legacy-table">
+        <thead>
+          <tr>
+            <th class="col-name">Full Name</th>
+            <th class="col-arm">Assigned Class Arm</th>
+            <th>Menu</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of assignments(); track item.id ?? item.Id ?? readClassArmLabel(item)) {
+            <tr>
+              <td>{{ readFormMasterFullName(item) }}</td>
+              <td>{{ readClassArmLabel(item) }}</td>
+              <td class="cell-menu">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-xs"
+                  [disabled]="isBusy(item, 'view-students')"
+                  (click)="viewStudents(item)"
+                >
+                  {{ isBusy(item, 'view-students') ? 'Please Wait ...' : 'View Students and More' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-warning btn-xs"
+                  [disabled]="isBusy(item, 'attendance')"
+                  (click)="studentAttendance(item)"
+                >
+                  {{ isBusy(item, 'attendance') ? 'Please Wait ...' : 'Student Attendance' }}
+                </button>
+                <!-- 
+                <button
+                  type="button"
+                  class="btn btn-warning btn-xs"
+                  [disabled]="isBusy(item, 'ca-report')"
+                  (click)="caReportSheet(item)"
+                >
+                  {{ isBusy(item, 'ca-report') ? 'Please Wait ...' : 'CA Report Sheet' }}
+                </button>
+                
+                <button
+                  type="button"
+                  class="btn btn-success btn-xs"
+                  [disabled]="isBusy(item, 'termly-report')"
+                  (click)="processReportSheet(item)"
+                >
+                  {{ isBusy(item, 'termly-report') ? 'Please Wait ...' : 'Termly Report Sheet' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-info btn-xs"
+                  [disabled]="isBusy(item, 'class-position')"
+                  (click)="armStudentClassPosition(item)"
+                >
+                  {{ isBusy(item, 'class-position') ? 'Please Wait ...' : "Student's Class Position" }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-warning btn-xs"
+                  [disabled]="isBusy(item, 'third-term')"
+                  (click)="thirdTermResultAlone(item)"
+                >
+                  {{ isBusy(item, 'third-term') ? 'Please Wait ...' : 'Third term result alone' }}
+                </button> -->
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="page-message page-message--center page-message--danger lead">
+      You have not been assigned as form master to any class.
+    </p>
+  }
+
+  <div id="pageContent" class="page-content" [class.no-display]="panelMode() === 'attendance'">
+    @if (panelMode() === 'students') {
+      @if (armStudents().length > 0) {
+        <div class="students-toolbar">
+          <div class="students-heading text-danger">
+            <span class="highlight">{{ panelClassLabel() }}</span>'s Students
+          </div>
+          <div class="students-status-label">Termly Assessment Status</div>
+          <div class="students-status-control">
+            <select
+              class="form-control"
+              id="ArmTermlyAssessmentStatus"
+              name="ArmTermlyAssessmentStatus"
+              [ngModel]="termlyStatusSelect()"
+              [disabled]="statusUpdating()"
+              (ngModelChange)="onTermlyAssessmentStatusChange($event)"
+            >
+              <option value="0">Uncompleted</option>
+              <option value="1">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <table class="table table-bordered students-table">
+          <thead>
+            <tr>
+              <th>S/No</th>
+              <th class="text-left">Full Name</th>
+              <th>Admission No.</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of armStudents(); track student.id ?? student.Id ?? readStudentIdNo(student); let index = $index) {
+              <tr>
+                <td>{{ index + 1 }}</td>
+                <td>{{ readStudentFullName(student) }}</td>
+                <td class="text-center">{{ readStudentIdNo(student) }}</td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-xs loadRemarkClass"
+                    (click)="openRemark(student)"
+                  >
+                    Remark
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <p class="page-message page-message--center page-message--danger">{{ panelMessage() || 'No Student in this Class.' }}</p>
+      }
+    } @else if (panelMode() !== 'none' && panelMode() !== 'attendance') {
+      <p class="page-message page-message--center" [class.page-message--danger]="!!panelMessage()">
+        {{ panelMessage() }}
+      </p>
+    }
+  </div>
+
+  <div id="attendanceContent" class="page-content" [class.no-display]="panelMode() !== 'attendance'">
+    <div class="attendance-shell">
+      <div class="header-card">
+        <div>
+          <p class="page-breadcrumb">Daily attendance</p>
+          <h2>Learner register</h2>
+          <p>
+            Take today's register for your assigned arm. Everyone starts as present, so you only need to
+            change the exceptions before saving.
+          </p>
+        </div>
+      </div>
+
+      <div class="filter-card">
+        <div class="filter-grid filter-grid--teacher">
+          <label class="field-block">
+            Assigned class arm
+            <input type="text" [value]="attendanceArmLabel()" readonly />
+          </label>
+
+          <mat-form-field appearance="outline" class="period-field date-field" subscriptSizing="dynamic">
+            <mat-label>Register date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="attendancePicker"
+              [max]="maxDate"
+              [ngModel]="attendanceDateValue()"
+              (ngModelChange)="onAttendanceDateChange($event)"
+              name="attendanceDate"
+              placeholder="Choose date"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="attendancePicker"></mat-datepicker-toggle>
+            <mat-datepicker #attendancePicker panelClass="attendance-range-panel"></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        @if (attendanceRegisterAlreadyTaken()) {
+          <p class="warning-copy">
+            This register was already taken for
+            {{ attendanceDateValue() ? (attendanceDateValue() | date: 'dd MMM yyyy') : attendanceDate() }}.
+            Saving again will overwrite the marks.
+          </p>
+        } @else if (attendanceRosterLoaded() && attendanceEntries().length) {
+          <p class="helper-copy">
+            Register not yet taken for
+            {{ attendanceDateValue() ? (attendanceDateValue() | date: 'dd MMM yyyy') : attendanceDate() }}. Tap a
+            status against any learner who is not present.
+          </p>
+        }
+      </div>
+
+      @if (attendanceError()) {
+        <div class="error-banner">{{ attendanceError() }}</div>
+      }
+
+      @if (isBusyLoadingAttendance()) {
+        <div class="result-card">
+          <p>Loading register...</p>
+        </div>
+      } @else if (attendanceEntries().length) {
+        <div class="result-card">
+          <div class="result-head">
+            <div>
+              <h3>
+                {{ attendanceArmLabel() }} &mdash;
+                {{ attendanceDateValue() ? (attendanceDateValue() | date: 'dd MMM yyyy') : attendanceDate() }}
+              </h3>
+              <p>{{ attendanceEntries().length }} learner(s) on this register.</p>
+            </div>
+            <button type="button" class="secondary-button" (click)="markAllPresent()">Mark all present</button>
+          </div>
+
+          <div class="tally-strip">
+            <span class="tally-chip present"><strong>{{ attendancePresentCount() }}</strong> present</span>
+            <span class="tally-chip absent"><strong>{{ attendanceAbsentCount() }}</strong> absent</span>
+            <span class="tally-chip late"><strong>{{ attendanceLateCount() }}</strong> late</span>
+            <span class="tally-chip excused"><strong>{{ attendanceExcusedCount() }}</strong> excused</span>
+          </div>
+
+          <table class="legacy-table attendance-table">
+            <thead>
+              <tr>
+                <th class="row-index">#</th>
+                <th>Learner</th>
+                <th>ID no</th>
+                <th class="status-col">Status</th>
+                <th>Remark</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of attendanceEntries(); track entry.personId; let i = $index) {
+                <tr>
+                  <td class="row-index">{{ i + 1 }}</td>
+                  <td>{{ entry.fullName }}</td>
+                  <td>{{ entry.identificationNo }}</td>
+                  <td class="status-col">
+                    <div class="status-toggle">
+                      @for (option of statusOptions; track option.value) {
+                        <button
+                          type="button"
+                          [class]="option.cssClass"
+                          [class.active]="entry.status === option.value"
+                          (click)="setAttendanceStatus(entry, option.value)"
+                        >
+                          {{ option.label }}
+                        </button>
+                      }
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      class="remark-input"
+                      type="text"
+                      maxlength="150"
+                      placeholder="Optional reason"
+                      [(ngModel)]="entry.remark"
+                      [name]="'remark-' + entry.personId"
+                    />
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <div class="action-row">
+            <button type="button" class="secondary-button" (click)="printAttendanceRegister()">Print</button>
+            <button
+              type="button"
+              class="primary-button"
+              [disabled]="isSubmitting()"
+              (click)="saveAttendanceRegister()"
+            >
+              {{ isSubmitting() ? 'Saving...' : 'Save register' }}
+            </button>
+          </div>
+        </div>
+      } @else if (attendanceRosterLoaded()) {
+        <div class="result-card empty-state">
+          <h3>No learners found</h3>
+          <p>There are no currently enrolled learners in this assigned arm.</p>
+        </div>
+      } @else if (panelMode() === 'attendance') {
+        <div class="result-card empty-state">
+          <h3>Select Student Attendance</h3>
+          <p>Click <strong>Student Attendance</strong> on an assigned arm above to load the register.</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (remarkContext(); as context) {
+  <app-affective-psychomotor-remark-modal
+    [studentId]="context.studentId"
+    [admissionNo]="context.admissionNo"
+    [studentName]="context.studentName"
+    [studentClass]="context.studentClass"
+    [studentArm]="context.studentArm"
+    [armId]="context.armId"
+    (closed)="closeRemarkModal()"
+    (submitted)="onRemarkSubmitted()"
+  />
+}

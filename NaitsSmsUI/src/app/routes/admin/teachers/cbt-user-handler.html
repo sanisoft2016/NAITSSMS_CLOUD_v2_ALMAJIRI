@@ -1,0 +1,102 @@
+<mat-card class="cbt-page" appearance="outlined">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <h3>Welcome to CBT Home Page!</h3>
+    </div>
+
+    <button mat-raised-button class="hero-action success" type="button" (click)="listOfRegisteredTeachers()">
+      <span class="hero-title">List of</span>
+      <span class="hero-copy-line">Registered Employees</span>
+    </button>
+
+    <button mat-raised-button class="hero-action primary" type="button" (click)="listOfCbtUsers()">
+      <span class="hero-title">List of</span>
+      <span class="hero-copy-line">List Of CBT Users</span>
+    </button>
+  </div>
+
+  <div class="page-divider"></div>
+
+  <section id="pageContent" class="page-content">
+    @if (contentMode === 'blank') {
+      <div class="blank-state"></div>
+    } @else if (isLoading()) {
+      <div class="loading-state">Loading...</div>
+    } @else if (errorMessage()) {
+      <div class="error-state">{{ errorMessage() }}</div>
+    } @else {
+      <div class="well-box">
+        <div class="search-row">
+          <label class="search-label" for="cbt-search">Search Employees:</label>
+          <input #searchBox id="cbt-search" class="search-input" type="text" placeholder="Search" (keyup.enter)="searchTeacher(searchBox.value)" />
+          <button mat-raised-button color="primary" type="button" (click)="searchTeacher(searchBox.value)">Search</button>
+        </div>
+      </div>
+
+      @if (visibleEmployees.length > 0) {
+        <p class="lead-heading">{{ filterMode === 'assigned' ? 'List Of CBT Users' : 'List of Registered Employees' }}</p>
+
+        <div class="table-wrap">
+          <table class="legacy-table">
+            <thead>
+              <tr>
+                <th>S/No</th>
+                <th>Full Name</th>
+                <th>Id No.</th>
+                <th>User Name</th>
+                <th>Phone Number</th>
+                <th>Employee Status</th>
+                <th>Time Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (employee of visibleEmployees; track employee.userId; let index = $index) {
+                <tr>
+                  <td>{{ index + 1 }}</td>
+                  <td>{{ fullName(employee) }}</td>
+                  <td>{{ employee.employeeIdNo || '-' }}</td>
+                  <td>{{ employee.userName || '-' }}</td>
+                  <td>{{ employee.phoneNumber || '-' }}</td>
+                  <td>
+                    @if (isNonTeacher(employee)) {
+                      <span class="status-highlight">{{ employee.employeeStatus || '-' }}</span>
+                    } @else {
+                      {{ employee.employeeStatus || '-' }}
+                    }
+                  </td>
+                  <td>{{ timeStatusLabel(employee.timeStatus) }}</td>
+                  <td>
+                    @if (isAssigned(employee)) {
+                      <button
+                        mat-stroked-button
+                        color="primary"
+                        type="button"
+                        [disabled]="isBusyFor(employee.userId)"
+                        (click)="unAssignAsCbtTeacher(employee.userId)"
+                      >
+                        {{ isBusyFor(employee.userId) ? 'Please Wait...' : 'Un-assign as Cbt Teacher' }}
+                      </button>
+                    } @else {
+                      <button
+                        mat-stroked-button
+                        color="accent"
+                        type="button"
+                        [disabled]="isBusyFor(employee.userId)"
+                        (click)="assignAsCbtTeacher(employee.userId)"
+                      >
+                        {{ isBusyFor(employee.userId) ? 'Please Wait...' : 'Assign as Cbt Teacher' }}
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="empty-state">{{ emptyMessage }}</p>
+      }
+    }
+  </section>
+</mat-card>

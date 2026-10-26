@@ -1,0 +1,415 @@
+<div
+  class="legacy-report-sheet legacy-report-sheet--legacy"
+  [ngStyle]="sheet.layoutVars"
+  [style.font-size]="sheet.fontSize">
+
+
+  <style>
+    body {
+                            font-size: var(--report-font-size);
+                        }
+
+                        .page {
+                            margin: 0;
+                            border: initial;
+                            border-radius: initial;
+                            width: initial;
+                            min-height: initial;
+                            box-shadow: initial;
+                            background: initial;
+                            background-color: #ffffff;
+                        }
+
+                        .text-left {
+                            text-align: left;
+                        }
+
+                        .text-right {
+                            text-align: right;
+                        }
+
+                        .text-center {
+                            text-align: center;
+                        }
+
+                        .table {
+                            border-collapse: collapse !important;
+                        }
+
+                        .table-bordered th,
+                        .table-bordered td {
+                            border: 1px solid #ddd !important;
+                        }
+
+                        .table td,
+                        .table th {
+                            background-color: #fff !important;
+                        }
+
+                        th.rotate {
+                            /* Something you can count on */
+                            height: 100px;
+                            width: 1em;
+                            white-space: nowrap;
+                        }
+
+                        .wrap {
+                            white-space: nowrap;
+                            width: 6%;
+                        }
+
+                        th.rotate > div {
+                            transform:
+                            /* Magic Numbers */
+                                     translate(2px, 51px)
+                            /* 45 is really 360 - 45 */
+                                     rotate(-90deg);
+                            width: 5px;
+                        }
+
+                        th.rotate > div > span {
+                            /*border-bottom: 1px solid #ccc;*/
+                            padding-left: 6px;
+                        }
+
+                        table {
+                            width: 100%;
+                            table-layout: fixed;
+                        }
+                        .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+                            vertical-align: middle;
+                        }
+                        .borderLess {
+                            border-width: 0px !important
+                        }
+                        .tableFontSize {
+                            font-size: var(--report-font-size);
+                        }
+</style>
+
+  <table class="page tableFontSize" style="padding-top: 0; width: 100%;">
+
+    <tbody>
+      <tr>
+        <td style="border-style: solid">
+          <table class="table table-bordered tableFontSize" style="width: 100%">
+        
+            <tr style="height: 10em;">
+              <td
+                colspan="1"
+                style="width: 16% !important; border-right-width: 0 !important; border-bottom-width: 0 !important;">
+                <img
+                  [src]="sheet.schoolLogoUrl"
+                  alt="School logo"
+                  class="img-responsive legacy-report__logo"
+                  style="width: 9em; height: 9em;"
+                  (error)="$any($event.target).src = ''" />
+              </td>
+              <td
+                [attr.colspan]="sheet.colSpan - 1"
+                style="width: 63% !important; border-left-width: 0 !important; border-right-width: 0 !important; text-align: center; border-bottom-width: 0 !important; padding-top: 1em; font-size: 12px !important;">
+                <span
+                  style="text-transform: uppercase; width: 100%; font-weight: 800; font-size: large; letter-spacing: 4px; text-align: center; display: inline-block;">
+                  {{ sheet.schoolName || 'SCHOOL NAME' }}
+                </span>
+                <br />
+                <span style="text-transform: uppercase; letter-spacing: 2px; color: blue; font-weight: 700;">
+                  CREED: {{ sheet.schoolMotto || '—' }}
+                </span>
+                <br />
+                <span><strong>Address: </strong>{{ sheet.schoolAddress || '—' }}</span>
+                <br />
+                <br />
+                <span
+                  style="letter-spacing: 1px; font-weight: 800; font-size: 11px !important; text-transform: uppercase;">
+                  {{ sheet.reportTitle }}
+                </span>
+              </td>
+              <td
+                colspan="1"
+                style="width: 21% !important; border-left-width: 0 !important; border-bottom-width: 0 !important; text-align: right;">
+                <img
+                  [src]="sheet.passportUrl"
+                  alt="Student photo"
+                  class="img-responsive"
+                  style="width: 9em; height: 9em;"
+                  (error)="onPassportError($event)" />
+              </td>
+            </tr>
+
+            <tr style="border-style: none; width: 100%">
+              <td [attr.colspan]="sheet.colSpan + 1" style="width: 100%">
+                <table class="table" style="width: 100%">
+                  <tr style="border-width: 0 !important">
+                    <td style="width: 42% !important; border-width: 0 !important" class="wrap" colspan="2">
+                      <strong>Name: </strong>
+                      <span style="text-transform: uppercase; padding-left: 1em">{{ sheet.studentName }}</span>
+                    </td>
+                    <td style="width: 21% !important; border-width: 0 !important;"></td>
+                    <td style="width: 9% !important; border-width: 0 !important;"></td>
+                    <td style="width: 20% !important; border-width: 0 !important;">
+                      Final Grade: <span style="padding-left: 1em">{{ sheet.finalGrade }}</span>
+                    </td>
+                    <td style="width: 8% !important; border-width: 0 !important"></td>
+                  </tr>
+                  <tr style="border-width: 0 !important;">
+                    <td style="border-width: 0 !important;"><strong>Class: </strong></td>
+                    <td style="border-width: 0 !important;">
+                      <span style="text-transform: uppercase">{{ sheet.classLabel }} {{ sheet.armLabel }}</span>
+                    </td>
+                    <td style="border-width: 0 !important" class="wrap" colspan="2"></td>
+                    <td style="border-width: 0 !important;"></td>
+                    <td style="border-width: 0 !important"></td>
+                  </tr>
+                  <tr style="border-width: 0 !important">
+                    <td class="wrap" style="border-width: 0 !important;"><strong>Admission No:</strong></td>
+                    <td style="border-width: 0 !important">{{ sheet.admissionNo }}</td>
+                    <td style="border-width: 0 !important">Total Score:</td>
+                    <td style="border-width: 0 !important">{{ sheet.totalScore }}</td>
+                    <td style="border-width: 0 !important">ATTENDANCE</td>
+                    <td style="border-width: 0 !important"></td>
+                  </tr>
+                  <tr style="border-width: 0 !important">
+                    <td style="border-width: 0 !important" class="wrap"><strong>Academic Year: </strong></td>
+                    <td style="border-width: 0 !important">{{ sheet.academicSession || 'Not set' }}</td>
+                    <td style="border-width: 0 !important">Final Average:</td>
+                    <td style="border-width: 0 !important">{{ sheet.finalAverage }}</td>
+                    <td style="border-width: 0 !important" class="wrap">Day(s) School Open:</td>
+                    <td style="border-width: 0 !important">{{ sheet.daysOpen }}</td>
+                  </tr>
+                  <tr style="border-width: 0 !important">
+                    <td style="border-width: 0 !important"><strong>Term:</strong></td>
+                    <td style="border-width: 0 !important"><span>{{ sheet.termLabel }}</span></td>
+                    <td style="border-width: 0 !important">Highest Ave. in Class:</td>
+                    <td style="border-width: 0 !important">{{ sheet.classHighestAverage }}</td>
+                    <td style="border-width: 0 !important">Day(s) Present:</td>
+                    <td style="border-width: 0 !important">{{ sheet.daysPresent }}</td>
+                  </tr>
+                  <tr style="border-width: 0 !important">
+                    <td style="border-width: 0 !important"><strong>No. in Class:</strong></td>
+                    <td style="border-width: 0 !important">{{ sheet.studentsInClass }}</td>
+                    <td style="border-width: 0 !important" class="wrap">Lowest Ave. in Class:</td>
+                    <td style="border-width: 0 !important">{{ sheet.classLowestAverage }}</td>
+                    <td style="border-width: 0 !important">Day(s) Absent:</td>
+                    <td style="border-width: 0 !important">{{ sheet.daysAbsent }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr style="width: 100%">
+              <td [attr.colspan]="sheet.colSpan + 1" style="width: 100%">
+                <table class="table table-bordered" style="width: 100%; table-layout: fixed;">
+                  <thead>
+                    <tr>
+                      <th rowspan="2" style="padding: 0; width: 27%; text-align: left">Subject's Name</th>
+                      @if (showCasColumn('ca1')) {
+                        <th rowspan="2" class="rotate" [style.width]="casMetricWidth">
+                          <div><span>{{ casLabel('ca1') }}</span></div>
+                        </th>
+                      }
+                      @if (showCasColumn('ca2')) {
+                        <th rowspan="2" class="rotate" style="padding: 0; width: 5%;">
+                          <div><span>{{ casLabel('ca2') }}</span></div>
+                        </th>
+                      }
+                      @if (showCasColumn('ca3')) {
+                        <th rowspan="2" class="rotate" style="padding: 0; width: 5%;">
+                          <div>
+                            <span> CA3</span><span style="font-weight: normal">({{ casPercent('ca3') }}%)</span>
+                          </div>
+                        </th>
+                      }
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 6%">
+                        <div><span style="font-weight: bold">Exam ({{ sheet.casLayout.examPercent }}%)</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 6%">
+                        <div><span style="font-weight: bold">Total (100%)</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 5%">
+                        <div><span>Grade</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 5%">
+                        <div><span>POS</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 5%">
+                        <div><span>Out Of</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 6%">
+                        <div><span>Min Score</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 6%">
+                        <div><span>Max Score</span></div>
+                      </th>
+                      <th rowspan="2" class="rotate" style="padding: 0; width: 7%">
+                        <div><span>Class AVG </span></div>
+                      </th>
+                      <th rowspan="2" colspan="2" style="padding: 0; text-align: left !important">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of sheet.subjects; track row.subjectName + '-' + row.position) {
+                      <tr>
+                        <td class="wrap">{{ row.subjectName }}</td>
+                        @if (showCasColumn('ca1')) {
+                          <td>{{ row.ca1 }}</td>
+                        }
+                        @if (showCasColumn('ca2')) {
+                          <td>{{ row.ca2 }}</td>
+                        }
+                        @if (showCasColumn('ca3')) {
+                          <td>{{ row.ca3 }}</td>
+                        }
+                        <td class="wrap">{{ row.exam }}</td>
+                        <td class="wrap">{{ row.total }}</td>
+                        <td style="white-space: nowrap; width: 6%">{{ row.grade }}</td>
+                        <td>{{ row.position }}</td>
+                        <td>{{ row.outOf }}</td>
+                        <td>{{ row.minScore }}</td>
+                        <td>{{ row.maxScore }}</td>
+                        <td>{{ row.classAvg }}</td>
+                        <td colspan="2">{{ row.remarks }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <div style="float: left">GRADE DETAILS:</div>
+          <div style="float: right">
+            <strong>Number of Subject Offered: </strong>
+            <span style="padding-right: 2em; color: red">{{ sheet.subjectCount }}</span>
+          </div>
+          <div style="clear: both"></div>
+          <div style="display: flex; justify-content: center; width: 100%; font-size: 14px; white-space: nowrap">
+            <span>70-100 = A(Excellence) 60-69 = B(V.Good) 50-59 = C(Good) 45-49 = D(Pass) 40-44 = E(Fair) 0-39 = F(Fail)</span>
+          </div>
+          <div style="border-style: solid; margin-bottom: 2px"></div>
+
+          <table class="table table-bordered" style="width: 100%">
+            <tbody>
+              <tr>
+                <td>
+                  <table class="table table-bordered tableFontSize" style="width: 100%">
+                    <tr>
+                      <td colspan="2" class="text-center">AFFECTIVE ASSESSMENT</td>
+                    </tr>
+                    <tr>
+                      <th style="text-align: left">Items' Name</th>
+                      <th style="text-align: center">Scores</th>
+                    </tr>
+                    @for (item of sheet.affectiveItems; track item.itemName) {
+                      <tr style="padding-top: 0; padding-bottom: 0">
+                        <td style="padding-top: 0; padding-bottom: 0">{{ item.itemName }}</td>
+                        <td style="padding-top: 0; padding-bottom: 0; text-align: center">{{ item.score }}</td>
+                      </tr>
+                    }
+                  </table>
+                </td>
+                <td>
+                  <table class="table table-bordered tableFontSize" style="width: 100%">
+                    <tr>
+                      <td colspan="2" class="text-center">PSYCHOMOTOR ASSESSMENT</td>
+                    </tr>
+                    <tr>
+                      <th style="text-align: left">Items' Name</th>
+                      <th>Scores</th>
+                    </tr>
+                    @for (item of sheet.psychomotorItems; track item.itemName) {
+                      <tr style="padding-top: 0; padding-bottom: 0">
+                        <td style="padding-top: 0; padding-bottom: 0">{{ item.itemName }}</td>
+                        <td style="padding-top: 0; padding-bottom: 0; text-align: center">{{ item.score }}</td>
+                      </tr>
+                    }
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div
+            style="margin-left: auto; margin-right: auto; width: 700px; max-width: 100%; font-size: 14px; text-align: center">
+            5 = A(Excellence) 4 = B(V.Good) 3 = C(Good) 2 = D(Pass) 1 = E(Fair) 0 = F(Fail)
+          </div>
+          <h6 style="border-style: dotted; border-width: 1px 0 0; margin: 0.4em 0;"></h6>
+
+          <div class="col-md-12">
+            Form Teacher's Comment:
+            <span style="font-style: italic" class="text-primary">{{ sheet.teacherComment || 'No Comment' }}</span>
+          </div>
+
+          <div class="col-md-12" style="padding-top: 0.5em">
+            <table class="table tableFontSize" style="width: 100%">
+              <tr>
+                <td colspan="2">
+                  Form Teacher's Name:
+                  <span style="font-style: italic; padding-left: 1em" class="text-primary">
+                    {{ sheet.formMasterName || '—' }}
+                  </span>
+                </td>
+                <td class="text-right">Signature:</td>
+                <td>
+                  @if (sheet.formMasterSignatureUrl) {
+                    <img
+                      class="img-responsive"
+                      style="width: 7em; height: 1.7em"
+                      [src]="sheet.formMasterSignatureUrl"
+                      alt="Form teacher signature"
+                      (error)="onSignatureError($event)" />
+                  } @else {
+                    <span>_ _ _ _ _ _ _ _ _ _ _ _ _</span>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td colspan="4">
+                  @if (sheet.schoolHeadTitle) {
+                    <div>
+                      {{ sheet.schoolHeadTitle }}'s Comment:
+                      <span style="font-style: italic; padding-left: 1em" class="text-primary">
+                        {{ sheet.headComment || 'No Comment' }}
+                      </span>
+                    </div>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  @if (sheet.schoolHeadTitle) {
+                    <div>
+                      {{ sheet.schoolHeadTitle }}'s Name:
+                      <span style="font-style: italic; padding-left: 1em" class="text-primary">
+                        {{ sheet.schoolHeadName || '—' }}
+                      </span>
+                    </div>
+                  }
+                </td>
+                <td class="text-right">Signature:</td>
+                <td>
+                  @if (sheet.schoolHeadSignatureUrl) {
+                    <img
+                      class="img-responsive"
+                      style="width: 7em; height: 1.7em"
+                      [src]="sheet.schoolHeadSignatureUrl"
+                      alt="School head signature"
+                      (error)="onSignatureError($event)" />
+                  } @else {
+                    <span>_ _ _ _ _ _ _ _ _ _ _ _ _</span>
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td class="text-right" colspan="4">
+                  Next Term Begins:
+                  <span style="font-style: italic" class="text-primary">{{ sheet.nextTermBegins }}</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

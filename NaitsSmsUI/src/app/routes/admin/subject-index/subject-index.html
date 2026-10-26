@@ -1,0 +1,196 @@
+<div class="subject-home-shell">
+	<div class="subject-hero card-panel">
+		
+		<div class="hero-actions">
+			<button type="button" class="action-chip neutral" (click)="openLabelEditor()">
+				Edit school level labels
+			</button>
+			<button type="button" class="action-chip accent" (click)="openAllSubjects()">
+				Manage all registered subjects
+			</button>
+			<button type="button" class="action-chip success" (click)="openStudentAssignment()">
+				Subject student assignment
+			</button>
+		</div>
+	</div>
+
+	<div class="legacy-board card-panel">
+		<div class="board-header">
+			<div>
+				<h3>Select Subject Environment</h3>
+			</div>
+		</div>
+
+		<div class="quick-grid">
+			<button type="button" class="quick-link rose" (click)="openSubjectIndex(SubjectStatusCode.PlayClass)">
+				<span class="quick-link-icon">PC</span>
+				<span class="quick-link-text">
+					<strong>{{ playClassLabel }}</strong>
+					<small>Play class subject register</small>
+				</span>
+			</button>
+
+			<button type="button" class="quick-link amber" (click)="openSubjectIndex(SubjectStatusCode.PreNursery)">
+				<span class="quick-link-icon">PN</span>
+				<span class="quick-link-text">
+					<strong>{{ preNurseryLabel }}</strong>
+					<small>Pre nursery subject register</small>
+				</span>
+			</button>
+
+			<button type="button" class="quick-link teal" (click)="openSubjectIndex(SubjectStatusCode.Nursery)">
+				<span class="quick-link-icon">NU</span>
+				<span class="quick-link-text">
+					<strong>{{ nurseryLabel }}</strong>
+					<small>Nursery subject register</small>
+				</span>
+			</button>
+
+			<button type="button" class="quick-link cobalt" (click)="openSubjectIndex(SubjectStatusCode.Primary)">
+				<span class="quick-link-icon">PR</span>
+				<span class="quick-link-text">
+					<strong>{{ primaryLabel }}</strong>
+					<small>Primary subject register</small>
+				</span>
+			</button>
+
+			<button type="button" class="quick-link olive" (click)="openSubjectIndex(SubjectStatusCode.Jss)">
+				<span class="quick-link-icon">JS</span>
+				<span class="quick-link-text">
+					<strong>{{ jssLabel }}</strong>
+					<small>Junior secondary subject register</small>
+				</span>
+			</button>
+
+			<button type="button" class="quick-link amber" (click)="openSubjectIndex(SubjectStatusCode.Elective, electiveLabel)">
+				<span class="quick-link-icon">EL</span>
+				<span class="quick-link-text">
+					<strong>{{ electiveLabel }}</strong>
+					<small>Elective subject collection</small>
+				</span>
+			</button>
+
+			<button type="button" class="quick-link parchment" (click)="openSeniorEnvironment()">
+				<span class="quick-link-icon">SD</span>
+				<span class="quick-link-text">
+					<strong>Senior departments</strong>
+					<small>SS, Science, Art, Commercial &amp; General</small>
+				</span>
+			</button>
+		</div>
+	</div>
+
+	<div class="legacy-modal-backdrop" *ngIf="isSeniorEnvironmentOpen">
+		<div class="legacy-modal card-panel wide-modal">
+			<div class="modal-head">
+				<h3>Senior Secondary Subject Environment</h3>
+				<button type="button" class="close-button" (click)="closeSeniorEnvironment()">x</button>
+			</div>
+
+			<p class="modal-copy">
+				Choose a senior secondary collection. Shared SS subjects are under Senior Secondary; department lists are Science, Art, and Commercial.
+			</p>
+
+			<div class="quick-grid compact-grid">
+				<button type="button" class="quick-link plum" (click)="openSubjectIndex(SubjectStatusCode.AllSeniors)">
+					<span class="quick-link-icon">SS</span>
+					<span class="quick-link-text">
+						<strong>{{ getLabel(SubjectStatusCode.AllSeniors) }}</strong>
+						<small>Shared senior secondary subjects</small>
+					</span>
+				</button>
+
+				<button type="button" class="quick-link parchment" (click)="openSubjectIndex(SubjectStatusCode.General, generalLabel)">
+					<span class="quick-link-icon">GE</span>
+					<span class="quick-link-text">
+						<strong>{{ generalLabel }}</strong>
+						<small>General subjects</small>
+					</span>
+				</button>
+
+				<button type="button" class="quick-link cobalt" (click)="openSubjectIndex(SubjectStatusCode.Science)">
+					<span class="quick-link-icon">SC</span>
+					<span class="quick-link-text">
+						<strong>Science Subjects</strong>
+						<small>Science department list</small>
+					</span>
+				</button>
+
+				<button type="button" class="quick-link rose" (click)="openSubjectIndex(SubjectStatusCode.Art)">
+					<span class="quick-link-icon">AR</span>
+					<span class="quick-link-text">
+						<strong>Art Subjects</strong>
+						<small>Art department list</small>
+					</span>
+				</button>
+
+				<button type="button" class="quick-link olive" (click)="openSubjectIndex(SubjectStatusCode.Commercial)">
+					<span class="quick-link-icon">CO</span>
+					<span class="quick-link-text">
+						<strong>Commercial Subjects</strong>
+						<small>Commercial department list</small>
+					</span>
+				</button>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="legacy-modal-backdrop" *ngIf="isLabelEditorOpen">
+		<div class="legacy-modal card-panel extra-wide-modal">
+			<div class="modal-head">
+				<h3>Edit School Level Categories Label</h3>
+				<button type="button" class="close-button" (click)="closeLabelEditor()">x</button>
+			</div>
+
+			<div class="label-grid">
+				<label>
+					<span>Play class subjects label</span>
+					<input type="text" [(ngModel)]="labelForm.playClassLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>Pre nursery subjects label</span>
+					<input type="text" [(ngModel)]="labelForm.preNurseryLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>Nursery subjects label</span>
+					<input type="text" [(ngModel)]="labelForm.nurseryLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>Primary subjects label</span>
+					<input type="text" [(ngModel)]="labelForm.primaryLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>JSS subjects label</span>
+					<input type="text" [(ngModel)]="labelForm.jssLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>General senior label</span>
+					<input type="text" [(ngModel)]="labelForm.generalSujectLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>Senior secondary label</span>
+					<input type="text" [(ngModel)]="labelForm.ssLabel" maxlength="30" />
+				</label>
+
+				<label>
+					<span>Elective subject label</span>
+					<input type="text" [(ngModel)]="labelForm.electiveSubjectLabel" maxlength="30" />
+				</label>
+			</div>
+
+			<div class="modal-actions">
+				<button type="button" class="secondary-button" (click)="closeLabelEditor()">Close</button>
+				<button type="button" class="primary-button" [disabled]="isSubmitting()" (click)="saveLabels()">
+					{{ isSubmitting() ? 'Saving...' : 'Update labels' }}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

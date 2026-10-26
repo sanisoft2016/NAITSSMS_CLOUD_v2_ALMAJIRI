@@ -1,0 +1,31 @@
+.edit-registrar-page {
+  display: block;
+  padding: 1.5rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #fffef9 0%, #ffffff 48%, #f7faf8 100%);
+}
+
+.back-row {
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+}
+
+.lead-text {
+  margin: 0 0 1.25rem;
+  padding-left: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #304347;
+}
+
+.form-shell {
+  max-width: 800px;
+  margin: 0 auto;
+  display: grid;
+  gap: 0.85rem;
+  padding-top: 0.5rem;
+}
+
+.actions {
+  margin-top: 0.5rem;
+}

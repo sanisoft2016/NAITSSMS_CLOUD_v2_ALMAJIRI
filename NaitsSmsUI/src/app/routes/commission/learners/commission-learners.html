@@ -1,0 +1,94 @@
+<div class="cx">
+  <header class="cx-header">
+    <div>
+      <p class="cx-header__eyebrow">Academic record retrieval</p>
+      <h1>Learner records</h1>
+      <p class="cx-header__sub">
+        Every learner's history stays on record after they leave — for reintegration into formal school,
+        vocational programmes or another centre.
+      </p>
+    </div>
+  </header>
+
+  <section class="panel">
+    <form class="search" (ngSubmit)="search()">
+      <mat-icon class="search__icon">search</mat-icon>
+      <input
+        name="q"
+        type="search"
+        [(ngModel)]="query"
+        placeholder="Name, programme ID (e.g. KN/GWL/24/0001), guardian or phone number"
+        aria-label="Search learners"
+        autocomplete="off"
+      />
+      <button mat-flat-button color="primary" type="submit" [disabled]="isLoading()">Search</button>
+    </form>
+    <p class="search__hint">
+      Searches all programme centres, including learners who have transitioned to formal school or vocational
+      training.
+    </p>
+  </section>
+
+  @if (isLoading()) {
+    <div class="cx-loading">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Searching programme records...</span>
+    </div>
+  } @else if (results(); as rows) {
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h3>{{ rows.length }} record(s) for “{{ searchedFor() }}”</h3>
+          @if (rows.length === 30) {
+            <p>Showing the first 30. Add more of the name or ID to narrow the search.</p>
+          }
+        </div>
+      </header>
+      @if (rows.length) {
+        <div class="table-scroll">
+          <table class="cx-table">
+            <thead>
+              <tr>
+                <th>Learner</th>
+                <th>Programme ID</th>
+                <th>Centre</th>
+                <th>Level</th>
+                <th>Age</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rows; track row.studentId) {
+                <tr class="clickable" (click)="open(row)">
+                  <td>
+                    <strong>{{ row.fullName }}</strong>
+                    <span class="muted">{{ row.gender }}</span>
+                  </td>
+                  <td>{{ row.identificationNo }}</td>
+                  <td>
+                    {{ row.centreName }}
+                    <span class="muted">{{ row.state }}</span>
+                  </td>
+                  <td>{{ row.level }}</td>
+                  <td>{{ row.age }}</td>
+                  <td>
+                    <span
+                      class="flag"
+                      [class.flag--good]="row.status === 'On roll'"
+                      [class.flag--info]="row.status.startsWith('Transitioned')"
+                      [class.flag--warn]="row.status === 'Withdrawn'"
+                    >
+                      {{ row.status }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="panel__empty">No programme learner matches that search.</p>
+      }
+    </section>
+  }
+</div>

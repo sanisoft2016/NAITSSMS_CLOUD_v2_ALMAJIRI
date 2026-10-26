@@ -1,0 +1,30 @@
+<div class="subject-form-shell">
+  <form class="subject-form-card form-card" [formGroup]="subjectForm" (ngSubmit)="submit()">
+    <div class="label-band">
+      <span>{{ subjectLevelStatus }}</span>
+      <strong>
+        <button type="button" class="secondary-button" (click)="backToList()">Back to subject list</button>
+      </strong>
+    </div>
+
+    <label class="field-block">
+      <span>Subject name</span>
+      <input type="text" formControlName="subjectName" maxlength="35" />
+    </label>
+
+    <label class="field-block">
+      <span>Time status</span>
+      <select formControlName="timeStatus">
+        <option [ngValue]="TimeStatusCode.Current">Current</option>
+        <option [ngValue]="TimeStatusCode.Previous">Previous</option>
+      </select>
+    </label>
+
+    <div class="form-actions">
+      <button type="button" class="secondary-button" (click)="backToList()">Cancel</button>
+      <button type="submit" class="primary-button" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Saving...' : 'Save subject' }}
+      </button>
+    </div>
+  </form>
+</div>

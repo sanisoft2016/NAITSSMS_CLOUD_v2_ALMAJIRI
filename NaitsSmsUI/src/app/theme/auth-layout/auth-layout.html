@@ -1,0 +1,29 @@
+<div class="matero-auth-container">
+  <header class="matero-auth-nav">
+    <a class="matero-auth-nav__brand" routerLink="/auth/login">
+      <img src="images/naits-asms.svg" alt="" width="32" height="32" />
+      <span>NAITS-ASMS</span>
+    </a>
+    <nav class="matero-auth-nav__links" aria-label="Site">
+      <a routerLink="/auth/about" routerLinkActive="is-active">About Us</a>
+      <a routerLink="/auth/contact" routerLinkActive="is-active">Contact Us</a>
+      @if (isLoggedIn()) {
+        <a class="matero-auth-nav__cta matero-auth-nav__cta--dashboard" [routerLink]="dashboardUrl()">
+          Dashboard
+        </a>
+      } @else {
+        <a
+          class="matero-auth-nav__cta"
+          routerLink="/auth/login"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          Sign in
+        </a>
+      }
+    </nav>
+  </header>
+  <div class="matero-auth-body">
+    <router-outlet />
+  </div>
+</div>

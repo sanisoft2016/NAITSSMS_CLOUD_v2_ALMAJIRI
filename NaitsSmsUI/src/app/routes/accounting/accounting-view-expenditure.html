@@ -1,0 +1,292 @@
+<section class="acct-view-exp">
+  <form class="acct-view-exp__filters" (submit)="$event.preventDefault()">
+    <div class="acct-view-exp__filter">
+      <label class="acct-view-exp__filter-label" for="Year">Select Year</label>
+      <select
+        id="Year"
+        name="Year"
+        class="acct-view-exp__select"
+        [ngModel]="year()"
+        (ngModelChange)="year.set($event); onYearChange()"
+      >
+        @for (opt of years(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="acct-view-exp__filter">
+      <label class="acct-view-exp__filter-label" for="startMonth">Start Month</label>
+      <select
+        id="startMonth"
+        name="startMonth"
+        class="acct-view-exp__select"
+        [ngModel]="startMonth()"
+        (ngModelChange)="startMonth.set($event); onPeriodFilterChange()"
+      >
+        @for (opt of months(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="acct-view-exp__filter">
+      <label class="acct-view-exp__filter-label" for="endMonth">End Month</label>
+      <select
+        id="endMonth"
+        name="endMonth"
+        class="acct-view-exp__select"
+        [ngModel]="endMonth()"
+        (ngModelChange)="endMonth.set($event); onPeriodFilterChange()"
+      >
+        @for (opt of months(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="acct-view-exp__filter acct-view-exp__filter--action">
+      <button type="button" class="acct-view-exp__btn acct-view-exp__btn--primary" (click)="refreshRecent()">
+        Recent Expenses
+      </button>
+    </div>
+  </form>
+
+  @if (flashSuccess()) {
+    <div class="acct-view-exp__alert acct-view-exp__alert--success" role="status">
+      {{ flashSuccess() }}
+    </div>
+  }
+  @if (flashWarn()) {
+    <div class="acct-view-exp__alert acct-view-exp__alert--warn" role="status">{{ flashWarn() }}</div>
+  }
+  @if (error()) {
+    <div class="acct-view-exp__alert acct-view-exp__alert--error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="acct-view-exp__panel" id="pageContent">
+    @if (loading() || reportLoading()) {
+      <div class="acct-view-exp__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+      </div>
+    } @else if (mode() === 'period') {
+      @if (periodItems().length === 0) {
+        <p class="acct-view-exp__lead">Sorry! No expenditure within the selected range.</p>
+      } @else {
+        <p class="acct-view-exp__lead">
+          Expenditure within the selected period is:
+          <span class="acct-view-exp__danger">{{ formatCost(periodTotal()) }}</span>
+        </p>
+
+        @for (monthGroup of periodGroups(); track monthGroup.year + '-' + monthGroup.month) {
+          <div class="acct-view-exp__period-block">
+            <h3 class="acct-view-exp__period-month">
+              <span class="acct-view-exp__danger"
+                >{{ monthGroup.monthLabel }}, {{ monthGroup.year }}</span
+              >, overall total expenses =
+              <span class="acct-view-exp__danger">{{ formatCost(monthGroup.total) }}</span>
+            </h3>
+
+            @for (week of monthGroup.weeks; track week.weekKey) {
+              <div class="acct-view-exp__period-week">
+                <p class="acct-view-exp__period-week-title">
+                  <span class="acct-view-exp__danger">{{ week.weekLabel }}</span>, overall total
+                  expenses =
+                  <span class="acct-view-exp__danger">{{ formatCost(week.total) }}</span>
+                </p>
+                <div class="acct-view-exp__table-wrap">
+                  <table class="acct-view-exp__table acct-view-exp__table--nested">
+                    <thead>
+                      <tr>
+                        <th>S/N</th>
+                        <th>Date</th>
+                        <th>Expenses Category Name</th>
+                        <th>Description</th>
+                        <th>Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of week.items; track item.id; let i = $index) {
+                        <tr>
+                          <td>{{ i + 1 }}</td>
+                          <td>{{ formatDayMonth(item.capturedDate) }}</td>
+                          <td>{{ item.categoryName }}</td>
+                          <td>{{ item.details }}</td>
+                          <td>{{ formatCost(item.cost) }}</td>
+                        </tr>
+                      }
+                      <tr class="acct-view-exp__footer-row">
+                        <td colspan="4" class="acct-view-exp__total-label">Total Cost:</td>
+                        <td>
+                          <span class="acct-view-exp__danger">{{ formatCost(week.total) }}</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    } @else if (items().length === 0) {
+      <p class="acct-view-exp__lead acct-view-exp__lead--muted">
+        The recent expenses item(s) has been confirmed.
+      </p>
+    } @else {
+      <h1 class="acct-view-exp__heading">List of Current Week Expenses</h1>
+      <div class="acct-view-exp__table-wrap">
+        <table class="acct-view-exp__table">
+          <thead>
+            <tr>
+              <th>S/N</th>
+              <th>Selected Date</th>
+              <th>Actual Date</th>
+              <th>Category Name</th>
+              <th>Details</th>
+              <th>Cost</th>
+              <th class="acct-view-exp__actions-head">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.id; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ formatLongDate(item.capturedDate) }}</td>
+                <td>{{ formatLongDate(item.createdDate) }}</td>
+                <td>{{ item.categoryName }}</td>
+                <td>{{ item.details }}</td>
+                <td>{{ formatCost(item.cost) }}</td>
+                <td class="acct-view-exp__actions-cell">
+                  <div class="acct-view-exp__actions">
+                    <button
+                      type="button"
+                      class="acct-view-exp__btn acct-view-exp__btn--edit"
+                      (click)="openEdit(item)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="acct-view-exp__btn acct-view-exp__btn--delete"
+                      (click)="deleteItem(item)"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (showConfirm() && currentWeekId()) {
+        <div class="acct-view-exp__confirm">
+          <button
+            type="button"
+            class="acct-view-exp__btn acct-view-exp__btn--info"
+            (click)="confirmExpenses()"
+          >
+            Confirm Expenses
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  @if (showEditModal()) {
+    <div class="acct-view-exp__overlay" role="dialog" aria-modal="true" (click)="closeEditModal()">
+      <div class="acct-view-exp__modal" (click)="$event.stopPropagation()">
+        <div class="acct-view-exp__modal-head">
+          <h2 class="acct-view-exp__modal-title">Edit Expense Item</h2>
+        </div>
+
+        <div class="acct-view-exp__edit-form">
+          <div class="acct-view-exp__edit-group">
+            <label class="acct-view-exp__edit-label" for="CapturedDate">Item' Date</label>
+            <div class="acct-view-exp__date-wrap">
+              <input
+                id="CapturedDate"
+                type="text"
+                class="acct-view-exp__input acct-view-exp__date-input"
+                placeholder="dd/mm/yyyy"
+                autocomplete="off"
+                readonly
+                [matDatepicker]="editDatePicker"
+                [ngModel]="editCapturedDate()"
+                (ngModelChange)="editCapturedDate.set($event)"
+                (click)="editDatePicker.open()"
+              />
+              <mat-datepicker-toggle
+                class="acct-view-exp__date-toggle"
+                [for]="editDatePicker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker
+                #editDatePicker
+                panelClass="acct-rec-inc-datepicker"
+                [touchUi]="true"
+              ></mat-datepicker>
+            </div>
+          </div>
+
+          <div class="acct-view-exp__edit-group">
+            <label class="acct-view-exp__edit-label" for="ItemCategoryId">Expenses Category</label>
+            <select
+              id="ItemCategoryId"
+              class="acct-view-exp__input"
+              [ngModel]="editCategoryId()"
+              (ngModelChange)="editCategoryId.set($event)"
+            >
+              @for (cat of editCategories(); track cat.value) {
+                <option [value]="cat.value">{{ cat.text }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="acct-view-exp__edit-group">
+            <label class="acct-view-exp__edit-label" for="Details">Details</label>
+            <textarea
+              id="Details"
+              rows="4"
+              maxlength="150"
+              class="acct-view-exp__input acct-view-exp__textarea"
+              [ngModel]="editDetails()"
+              (ngModelChange)="editDetails.set($event)"
+            ></textarea>
+          </div>
+
+          <div class="acct-view-exp__edit-group">
+            <label class="acct-view-exp__edit-label" for="Cost">Cost</label>
+            <input
+              id="Cost"
+              type="text"
+              inputmode="decimal"
+              class="acct-view-exp__input"
+              [ngModel]="editCostDisplay()"
+              (ngModelChange)="onEditCostInput($event)"
+            />
+          </div>
+
+          <div class="acct-view-exp__edit-actions">
+            <button
+              type="button"
+              class="acct-view-exp__btn acct-view-exp__btn--edit"
+              [disabled]="saving()"
+              (click)="saveEditedItem()"
+            >
+              Save Changes
+            </button>
+            <button
+              type="button"
+              class="acct-view-exp__btn acct-view-exp__btn--delete"
+              (click)="closeEditModal()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</section>

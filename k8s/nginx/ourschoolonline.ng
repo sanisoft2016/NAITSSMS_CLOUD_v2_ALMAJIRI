@@ -1,0 +1,138 @@
+# HTTP: always send both hostnames to HTTPS apex (not $host — that would keep www)
+server {
+    listen 80;
+    server_name ourschoolonline.ng www.ourschoolonline.ng;
+    return 301 https://ourschoolonline.ng$request_uri;
+}
+
+# HTTPS www → HTTPS apex (fixes CORS / login without API rebuild)
+server {
+    listen 443 ssl http2;
+    server_name www.ourschoolonline.ng;
+
+    ssl_certificate /etc/letsencrypt/live/ourschoolonline.ng/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ourschoolonline.ng/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    return 301 https://ourschoolonline.ng$request_uri;
+}
+
+# Canonical site
+server {
+    listen 443 ssl http2;
+    server_name ourschoolonline.ng;
+
+    ssl_certificate /etc/letsencrypt/live/ourschoolonline.ng/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ourschoolonline.ng/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    root /var/www/ourschoolonline;
+    index index.html;
+
+    location /api/ {
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        add_header Pragma "no-cache" always;
+        expires -1;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /home/ {
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        add_header Pragma "no-cache" always;
+        expires -1;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ^~ /Signatures/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /Passport/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /profile-avatars/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /school-logos/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /Content/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~ /uploads/ {
+        add_header Cache-Control "public, max-age=60, must-revalidate" always;
+        expires 60s;
+        proxy_intercept_errors off;
+
+        proxy_pass http://127.0.0.1:30092;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~* ^/(?:media|assets|i18n|fonts|images)/.*\.(?:js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|ico|webp)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable" always;
+        try_files $uri =404;
+    }
+    location ~* ^/(?:main|chunk|styles|polyfills|runtime)-[A-Za-z0-9]+\.(?:js|css)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable" always;
+        try_files $uri =404;
+    }
+    location = /favicon.ico {
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800" always;
+        try_files $uri =404;
+    }
+
+    location / {
+        add_header Cache-Control "no-store, no-cache, must-revalidate" always;
+        add_header Pragma "no-cache" always;
+        expires -1;
+
+        try_files $uri $uri/ /index.html;
+    }
+}

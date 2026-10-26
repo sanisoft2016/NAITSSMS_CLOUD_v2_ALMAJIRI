@@ -1,0 +1,245 @@
+<div class="cx">
+  <header class="cx-header">
+    <div>
+      <p class="cx-header__eyebrow">Programme performance tracking</p>
+      <h1>Learning outcomes</h1>
+      <p class="cx-header__sub">
+        Continuous assessment and examination scores entered by facilitators at every programme centre.
+      </p>
+    </div>
+    @if (data(); as d) {
+      <div class="cx-header__actions">
+        <label class="term-select">
+          <span>Term</span>
+          <select [ngModel]="selectedKey" (ngModelChange)="onTermChange($event)" aria-label="Select term">
+            @for (option of d.availableTerms; track termKey(option)) {
+              <option [value]="termKey(option)">
+                {{ option.label }}{{ option.complete ? '' : ' (in progress)' }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+    }
+  </header>
+
+  @if (isLoading() && !data()) {
+    <div class="cx-loading">
+      <mat-spinner diameter="36"></mat-spinner>
+      <span>Aggregating scores across centres...</span>
+    </div>
+  } @else if (failed()) {
+    <div class="cx-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() || 'Learning outcomes could not be loaded.' }}</span>
+    </div>
+  } @else if (data(); as d) {
+    @if (d.term && !d.term.complete) {
+      <div class="notice">
+        <mat-icon>info</mat-icon>
+        <span>
+          {{ d.term.label }} is still open: only the continuous assessments recorded so far are included, so
+          scores are out of the CA marks entered, not out of 100. Choose a completed term for end-of-term results.
+        </span>
+      </div>
+    }
+
+    <section class="cx-kpis">
+      <article class="kpi">
+        <span class="kpi__label">Average score</span>
+        <strong class="kpi__value" [class]="scoreTone(d.averageScore)">{{ d.averageScore }}</strong>
+        <span class="kpi__foot">
+          @if (averageDelta() !== null) {
+            <span class="delta" [class.delta--up]="averageDelta()! >= 0" [class.delta--down]="averageDelta()! < 0">
+              {{ averageDelta()! >= 0 ? '▲' : '▼' }} {{ averageDelta()! >= 0 ? '+' : '' }}{{ averageDelta() }}
+            </span>
+            on {{ d.previousTerm?.label }}
+          } @else {
+            Out of 100
+          }
+        </span>
+      </article>
+      <article class="kpi">
+        <span class="kpi__label">Results passed</span>
+        <strong class="kpi__value" [class]="rateTone(d.passRate)">{{ d.passRate }}%</strong>
+        <span class="kpi__foot">
+          @if (passDelta() !== null) {
+            <span class="delta" [class.delta--up]="passDelta()! >= 0" [class.delta--down]="passDelta()! < 0">
+              {{ passDelta()! >= 0 ? '▲' : '▼' }} {{ passDelta()! >= 0 ? '+' : '' }}{{ passDelta() }} pts
+            </span>
+          }
+          Pass mark {{ d.passMark }}
+        </span>
+      </article>
+      <article class="kpi">
+        <span class="kpi__label">Learners assessed</span>
+        <strong class="kpi__value">{{ d.learnersAssessed | number }}</strong>
+        <span class="kpi__foot">{{ d.centresReporting }} centres · {{ d.scoresRecorded | number }} subject results</span>
+      </article>
+      <article class="kpi kpi--alert">
+        <span class="kpi__label">Need remedial support</span>
+        <strong class="kpi__value">{{ d.learnersNeedingSupport | number }}</strong>
+        <span class="kpi__foot">Learners averaging below the pass mark</span>
+      </article>
+    </section>
+
+    <section class="cx-grid-2">
+      <article class="panel">
+        <header class="panel__head">
+          <div>
+            <h3>Grade distribution</h3>
+            <p>Every subject result in the term, on the report-card scale.</p>
+          </div>
+        </header>
+        <div class="bars">
+          @for (g of d.grades; track g.grade) {
+            <div class="bar-row">
+              <span class="bar-row__label"><strong>{{ g.grade }}</strong> · {{ g.range }}</span>
+              <span class="bar-row__track">
+                <span
+                  class="bar-row__fill"
+                  [class.bar-row__fill--good]="g.grade === 'A' || g.grade === 'B'"
+                  [class.bar-row__fill--warn]="g.grade === 'C' || g.grade === 'D' || g.grade === 'E'"
+                  [class.bar-row__fill--bad]="g.grade === 'F'"
+                  [style.width.%]="(g.count / maxGradeCount()) * 100"
+                ></span>
+              </span>
+              <span class="bar-row__value">{{ gradeShare(g.count) }}%</span>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="panel">
+        <header class="panel__head">
+          <div>
+            <h3>Girls, boys and levels</h3>
+            <p>Average score and share of results passed.</p>
+          </div>
+        </header>
+        <table class="cx-table">
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th class="num">Learners</th>
+              <th class="num">Average</th>
+              <th class="num">Passed</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of d.genders; track row.key) {
+              <tr>
+                <td><strong>{{ row.name }}</strong></td>
+                <td class="num">{{ row.learners | number }}</td>
+                <td class="num" [class]="scoreTone(row.averageScore)">{{ row.averageScore }}</td>
+                <td class="num">{{ row.passRate }}%</td>
+              </tr>
+            }
+            @for (row of d.levels; track row.key) {
+              <tr>
+                <td>{{ row.name }}</td>
+                <td class="num">{{ row.learners | number }}</td>
+                <td class="num" [class]="scoreTone(row.averageScore)">{{ row.averageScore }}</td>
+                <td class="num">{{ row.passRate }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </article>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h3>Subjects</h3>
+          <p>Highest average first. The gap between Qur'anic subjects and English/Numeracy is where support is needed.</p>
+        </div>
+      </header>
+      <div class="bars">
+        @for (s of d.subjects; track s.key) {
+          <div class="bar-row bar-row--wide">
+            <span class="bar-row__label" [title]="s.name">{{ s.name }}</span>
+            <span class="bar-row__track">
+              <span class="bar-row__fill" [class]="barTone(s.averageScore, 60, 45)" [style.width.%]="s.averageScore"></span>
+            </span>
+            <span class="bar-row__value">{{ s.averageScore }}</span>
+            <span class="bar-row__extra">{{ s.passRate }}% passed</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h3>Centres</h3>
+          <p>Highest average first. Select a centre to open its record.</p>
+        </div>
+      </header>
+      <div class="table-scroll">
+        <table class="cx-table">
+          <thead>
+            <tr>
+              <th class="num">#</th>
+              <th>Centre</th>
+              <th class="num">Learners</th>
+              <th class="num">Average</th>
+              <th class="num">Passed</th>
+              <th>Strongest subject</th>
+              <th>Weakest subject</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of d.centres; track row.key; let i = $index) {
+              <tr class="clickable" (click)="openCentre(row.key)">
+                <td class="num">{{ i + 1 }}</td>
+                <td>
+                  <strong>{{ row.name }}</strong>
+                  <span class="muted">{{ row.detail }}</span>
+                </td>
+                <td class="num">{{ row.learners }}</td>
+                <td class="num" [class]="scoreTone(row.averageScore)">{{ row.averageScore }}</td>
+                <td class="num">{{ row.passRate }}%</td>
+                <td>{{ row.strongestSubject }}</td>
+                <td>{{ row.weakestSubject }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel__head">
+        <div>
+          <h3>States</h3>
+          <p>Highest average first.</p>
+        </div>
+      </header>
+      <div class="table-scroll">
+        <table class="cx-table">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>Zone</th>
+              <th class="num">Learners</th>
+              <th class="num">Average</th>
+              <th class="num">Passed</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of d.states; track row.key) {
+              <tr>
+                <td><strong>{{ row.name }}</strong></td>
+                <td>{{ row.detail }}</td>
+                <td class="num">{{ row.learners }}</td>
+                <td class="num" [class]="scoreTone(row.averageScore)">{{ row.averageScore }}</td>
+                <td class="num">{{ row.passRate }}%</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</div>

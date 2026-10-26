@@ -1,0 +1,211 @@
+app-sidemenu {
+  display: block;
+
+  /* Fill the mat-sidenav width instead of hardcoding pixels */
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  overflow-x: hidden;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Ensure our nav uses the full available width */
+.legacy-sidenav {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+
+  /* revert vertical spacing between items */
+  gap: 17px;
+
+  width: 100%;
+  height: 100%;
+
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.legacy-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+
+  position: relative; /* fixes .active::before positioning */
+  gap: 5px;           /* gap between icon and label */
+}
+
+.legacy-item:hover,
+.legacy-item:focus-visible {
+  background-color: #fff;
+  color: #028b00;
+}
+
+/* ensure children inherit the hover text color */
+.legacy-item:hover .legacy-text,
+.legacy-item:focus-visible .legacy-text,
+.legacy-item:hover .legacy-icon,
+.legacy-item:focus-visible .legacy-icon,
+.legacy-item:hover .legacy-icon--fa,
+.legacy-item:focus-visible .legacy-icon--fa {
+  color: #fff;
+}
+
+.legacy-icon {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  font-size: 22px;
+  opacity: 0.9;
+
+  margin-right: 0; /* use gap instead */
+}
+
+.legacy-icon--fa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  color: inherit;
+  font-style: normal;
+  font-weight: normal;
+}
+
+.legacy-item .legacy-icon--fa::before {
+  color: inherit;
+}
+
+.legacy-text {
+  flex: 1 1 auto;
+  min-width: 0;
+
+  /* allow long labels without “cutting” horizontally */
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;  /* show up to 2 lines */
+
+  /* increase label size */
+  font-size: 15.5px;
+  line-height: 16px;
+}
+
+/* REMOVE or override this (it was overwriting your hover background) */
+.legacy-item:hover {
+  background: #028b00;
+}
+
+.legacy-item.active {
+  background: rgba(25, 118, 210, 0.12);
+}
+
+.legacy-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px;
+  background: #1976d2;
+}
+
+.accounting-option-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0 0.65rem 0.35rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.accounting-subordinate-link {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+}
+
+.accounting-subordinate-link:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.accounting-option-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: inherit;
+  opacity: 0.85;
+}
+
+.accounting-option-select {
+  width: 100%;
+  max-width: 100%;
+  height: 34px;
+  padding: 4px 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Expandable accounting sidenav: full labels, no right-edge clipping. */
+app-sidemenu.accounting-sidemenu-host {
+  overflow-x: visible;
+  min-width: 100%;
+  max-width: none;
+
+  .legacy-sidenav {
+    overflow-x: visible;
+  }
+
+  .legacy-item {
+    max-width: none;
+  }
+
+  .legacy-text {
+    flex: 1 0 auto;
+    min-width: max-content;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    display: inline-block;
+    -webkit-box-orient: unset;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+  }
+}
+
+/* Force drawer to honor expanded --sidenav-width (beats Material defaults). */
+.matero-container-wrap:has(.accounting-sidemenu-host) {
+  .matero-sidenav {
+    width: var(--sidenav-width) !important;
+    min-width: var(--sidenav-width) !important;
+    max-width: none !important;
+    --mat-sidenav-container-width: var(--sidenav-width);
+    overflow-x: hidden;
+  }
+
+  .matero-sidebar-header mat-toolbar {
+    width: var(--sidenav-width) !important;
+  }
+
+  .matero-sidebar-main {
+    overflow-x: hidden;
+  }
+}
+

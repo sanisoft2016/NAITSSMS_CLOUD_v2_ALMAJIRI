@@ -1,0 +1,502 @@
+/* Monthly payroll — legacy MonthlyPaymentIndex / PaymentSlip, polished shell. */
+:host {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.acct-pay {
+  --pay-ink: #2a3f54;
+  --pay-muted: #73879c;
+  --pay-line: #d9dee4;
+  --pay-accent: #1a6aa8;
+  --pay-card: #ffffff;
+  --pay-shadow: 0 10px 28px rgb(42 63 84 / 8%);
+  --pay-highlight: #ffe566;
+
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 1.25rem 0 2.5rem;
+  color: var(--pay-ink);
+}
+
+.acct-pay__header {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.acct-pay__heading {
+  margin: 0 0 0.45rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.acct-pay__lead {
+  margin: 0;
+  color: var(--pay-muted);
+  font-size: 1.05rem;
+}
+
+.acct-pay__alert {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.acct-pay__alert--success {
+  color: #3c763d;
+  background: #dff0d8;
+  border: 1px solid #d6e9c6;
+}
+
+.acct-pay__alert--error {
+  color: #922820;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+}
+
+.acct-pay__card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.25rem 1.5rem;
+  background: var(--pay-card);
+  border: 1px solid var(--pay-line);
+  border-radius: 12px;
+  box-shadow: var(--pay-shadow);
+}
+
+.acct-pay__form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1rem;
+}
+
+.acct-pay__label {
+  margin: 0;
+  font-weight: 600;
+  min-width: 12rem;
+}
+
+.acct-pay__date-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 14rem;
+}
+
+.acct-pay__input,
+.acct-pay__select,
+.acct-pay__cell-input {
+  box-sizing: border-box;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid #c5ced8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--pay-ink);
+  background: #fff;
+}
+
+.acct-pay__date-input {
+  width: 11rem;
+}
+
+.acct-pay__input:focus,
+.acct-pay__select:focus,
+.acct-pay__cell-input:focus {
+  outline: none;
+  border-color: var(--pay-accent);
+  box-shadow: 0 0 0 3px rgb(26 106 168 / 15%);
+}
+
+.acct-pay__loading {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.acct-pay__btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.acct-pay__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.acct-pay__btn--xs {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+.acct-pay__btn--primary {
+  color: #fff;
+  background: #337ab7;
+  border-color: #2e6da4;
+}
+
+.acct-pay__btn--primary:hover:not(:disabled) {
+  background: #286090;
+}
+
+.acct-pay__btn--warn {
+  color: #fff;
+  background: #f0ad4e;
+  border-color: #eea236;
+}
+
+.acct-pay__btn--warn:hover:not(:disabled) {
+  background: #ec971f;
+}
+
+.acct-pay__btn--danger {
+  color: #fff;
+  background: #d9534f;
+  border-color: #d43f3a;
+}
+
+.acct-pay__btn--danger:hover:not(:disabled) {
+  background: #c9302c;
+}
+
+.acct-pay__btn--right {
+  margin-left: auto;
+}
+
+.acct-pay__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  overflow: auto;
+  background: rgb(24 36 51 / 48%);
+  backdrop-filter: blur(2px);
+  left: var(--sidenav-width, 0);
+}
+
+.acct-pay__overlay--nested {
+  z-index: 1300;
+  background: rgb(24 36 51 / 55%);
+}
+
+.acct-pay__modal {
+  width: min(1240px, 98%);
+  margin: 1.5rem auto 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgb(24 36 51 / 28%);
+  overflow: hidden;
+}
+
+.acct-pay__modal--wide {
+  padding: 0 0 1rem;
+}
+
+.acct-pay__modal--print {
+  padding: 1rem 1.25rem 1.5rem;
+}
+
+.acct-pay__modal--small {
+  width: min(560px, 96%);
+  padding: 1.25rem 1.4rem 1.4rem;
+}
+
+.acct-pay__modal-head {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.35rem 0.55rem 0;
+  background: #f7f9fc;
+  border-bottom: 1px solid var(--pay-line);
+}
+
+.acct-pay__modal-close {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--pay-muted);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem 0.45rem;
+}
+
+.acct-pay__empty {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.acct-pay__empty-text {
+  margin: 0 0 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #a94442;
+}
+
+.acct-pay__banner {
+  margin: 1rem 1.25rem;
+  text-align: center;
+}
+
+.acct-pay__banner-text {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: var(--pay-highlight);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.acct-pay__table-wrap {
+  margin: 0 1rem 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--pay-line);
+  border-radius: 10px;
+}
+
+.acct-pay__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.acct-pay__table th,
+.acct-pay__table td {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--pay-line);
+  vertical-align: middle;
+}
+
+.acct-pay__table thead th {
+  background: #eef3f8;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.acct-pay__table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+.acct-pay__cell-input {
+  width: 5.5em;
+  padding: 0.3rem 0.4rem;
+}
+
+.acct-pay__select {
+  min-width: 9.5rem;
+  padding: 0.3rem 0.4rem;
+}
+
+.acct-pay__total-row td {
+  background: #fffbe6;
+}
+
+.acct-pay__total-label {
+  text-align: right;
+  font-weight: 900;
+  font-size: 1.35rem;
+  background: var(--pay-highlight) !important;
+}
+
+.acct-pay__total-value {
+  font-weight: 900;
+  font-size: 1.35rem;
+  background: var(--pay-highlight) !important;
+}
+
+.acct-pay__summary {
+  border: 1px solid var(--pay-line);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.35rem 0;
+  background: #fafbfc;
+}
+
+.acct-pay__summary-line {
+  margin: 0.35rem 0 0.85rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.acct-pay__em {
+  color: #c9302c;
+  font-weight: 700;
+}
+
+.acct-pay__types {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.85rem;
+}
+
+.acct-pay__types td {
+  border: 1px solid var(--pay-line);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+}
+
+.acct-pay__types-label {
+  width: 30%;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 700;
+  background: #f4f7fb;
+}
+
+.acct-pay__footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.acct-pay__confirmed {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  background: var(--pay-highlight);
+  font-weight: 700;
+}
+
+.acct-pay__print-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.acct-pay-print__page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Even spacing; ~3× prior on-screen gap (was ~3em combined) */
+  gap: 9em;
+  margin-bottom: 2.5rem;
+}
+
+.acct-pay-print__card {
+  border: 1px solid #333;
+  padding: 1em;
+  margin: 0;
+}
+
+.acct-pay-print__grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.acct-pay-print__col {
+  width: 50%;
+  vertical-align: top;
+  padding: 0.15rem 0.75rem;
+}
+
+.acct-pay-print__col--left {
+  border-right: 1px solid #333;
+}
+
+.acct-pay-print__inner {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.acct-pay-print__inner th {
+  text-align: left;
+  padding: 0.25rem 0.45rem;
+  width: 8rem;
+  font-weight: 700;
+}
+
+.acct-pay-print__inner td {
+  padding: 0.25rem 0.45rem;
+}
+
+.acct-pay-print .gross {
+  color: #c00;
+}
+
+.acct-pay-print .net {
+  color: #06c;
+}
+
+.acct-pay__modal-lead {
+  margin: 0 0 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.acct-pay__modal-lead--right {
+  text-align: right;
+}
+
+.acct-pay__edit-group {
+  display: grid;
+  grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr);
+  gap: 0.55rem 1rem;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+.acct-pay__edit-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-align: right;
+}
+
+.acct-pay__edit-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--pay-line);
+}
+
+@media (max-width: 720px) {
+  .acct-pay__form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acct-pay__date-wrap {
+    width: 100%;
+  }
+
+  .acct-pay__date-input {
+    flex: 1;
+    width: auto;
+  }
+
+  .acct-pay__edit-group {
+    grid-template-columns: 1fr;
+  }
+
+  .acct-pay__edit-label {
+    text-align: left;
+  }
+
+  .acct-pay__footer-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acct-pay__btn--right {
+    margin-left: 0;
+  }
+}
